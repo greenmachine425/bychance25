@@ -2,6 +2,7 @@
  * Bychance - Image Generation Service
  * 
  * Supports:
+ * - Built-in Window Server & Security Engine integration (rate limiting, Safe-Mode guardrail, magic-byte verification)
  * - Model-aware prompt conditioning (FLUX.1 Anime, Illustrious XL, Animagine XL, Pony V6 XL, FLUX.1 Dev, FLUX 3D, SDXL Turbo)
  * - Pollinations.ai FLUX & Turbo models (Free, zero-key, high-res)
  * - Automatic host failover (image.pollinations.ai & gen.pollinations.ai)
@@ -13,6 +14,7 @@
  */
 
 import { PerchanceEngine } from './perchanceEngine.js';
+import { EmbeddedServer } from './embeddedServer.js';
 
 export const ImageGenerator = {
   // Configurable settings
@@ -61,12 +63,14 @@ export const ImageGenerator = {
           this.saveSettings(this.settings);
         }
       }
-      const savedSecrets = sessionStorage.getItem('bychance_secrets');
-      if (savedSecrets) {
-        const parsedSecrets = JSON.parse(savedSecrets);
-        this.settings.pollinationsKey = parsedSecrets.pollinationsKey || this.settings.pollinationsKey || '';
-        this.settings.hfToken = parsedSecrets.hfToken || this.settings.hfToken || '';
-        this.settings.customApiKey = parsedSecrets.customApiKey || this.settings.customApiKey || '';
+      if (!EmbeddedServer.securityPolicy.memoryOnlySecrets) {
+        const savedSecrets = sessionStorage.getItem('bychance_secrets');
+        if (savedSecrets) {
+          const parsedSecrets = JSON.parse(savedSecrets);
+          this.settings.pollinationsKey = parsedSecrets.pollinationsKey || this.settings.pollinationsKey || '';
+          this.settings.hfToken = parsedSecrets.hfToken || this.settings.hfToken || '';
+          this.settings.customApiKey = parsedSecrets.customApiKey || this.settings.customApiKey || '';
+        }
       }
     } catch (e) {
       console.warn('Could not load settings from storage');
@@ -74,7 +78,7 @@ export const ImageGenerator = {
   },
 
   /**
-   * Save non-sensitive settings to localStorage and API credentials to sessionStorage
+   * Save non-sensitive settings to localStorage and API credentials to sessionStorage (unless RAM-only mode is active)
    */
   saveSettings(newSettings) {
     this.settings = { ...this.settings, ...newSettings };
@@ -87,12 +91,16 @@ export const ImageGenerator = {
       };
       localStorage.setItem('bychance_settings', JSON.stringify(publicSettings));
 
-      const secretSettings = {
-        pollinationsKey: this.settings.pollinationsKey || '',
-        hfToken: this.settings.hfToken || '',
-        customApiKey: this.settings.customApiKey || ''
-      };
-      sessionStorage.setItem('bychance_secrets', JSON.stringify(secretSettings));
+      if (EmbeddedServer.securityPolicy.memoryOnlySecrets) {
+        sessionStorage.removeItem('bychance_secrets');
+      } else {
+        const secretSettings = {
+          pollinationsKey: this.settings.pollinationsKey || '',
+          hfToken: this.settings.hfToken || '',
+          customApiKey: this.settings.customApiKey || ''
+        };
+        sessionStorage.setItem('bychance_secrets', JSON.stringify(secretSettings));
+      }
     } catch (e) {
       console.warn('Could not save settings');
     }
@@ -149,7 +157,6 @@ export const ImageGenerator = {
 
     if (enableBoosters && profile) {
       if (profile.qualityPrefix) {
-        // Only prepend prefix tokens that are not already in the prompt
         const missingPrefix = profile.qualityPrefix
           .split(',')
           .map(s => s.trim())
@@ -186,7 +193,7 @@ export const ImageGenerator = {
   },
 
   /**
-   * Generate a single image with automatic retries and failover
+   * Generate a single image with automatic retries, failover, and security verification
    */
   async generateSingle({
     prompt,
@@ -201,6 +208,9 @@ export const ImageGenerator = {
   }) {
     const startTime = performance.now();
 
+    // Enforce Safe-Mode Prompt Guardrail on raw input first
+    EmbeddedServer.enforcePromptSafety(prompt, negativePrompt);
+
     // Determine dimensions
     const ratioConfig = this.aspectRatios[aspectRatio] || this.aspectRatios['2:3'];
     const width = ratioConfig.width;
@@ -211,14 +221,18 @@ export const ImageGenerator = {
 
     // Resolve prompt & model-aware style modifiers
     const prepared = this.preparePrompt(prompt, style, enableBoosters, effectiveModelKey);
-    const finalPrompt = prepared.fullPrompt;
 
     // Combine user negative prompt with model + style negative prompt
-    const combinedNegative = this._dedupeTokens(
+    const rawCombinedNegative = this._dedupeTokens(
       [negativePrompt, prepared.styleNegative]
         .filter(s => s && s.trim().length > 0)
         .join(', ')
     );
+
+    // Re-verify resolved prompt & negative through Safe-Mode Guardrail
+    const safetyChecked = EmbeddedServer.enforcePromptSafety(prepared.fullPrompt, rawCombinedNegative);
+    const finalPrompt = safetyChecked.prompt;
+    const combinedNegative = safetyChecked.negativePrompt;
 
     // Determine seed (random if not specified)
     const effectiveSeed = (seed !== null && seed !== undefined && seed !== '')
@@ -229,6 +243,9 @@ export const ImageGenerator = {
 
     let imageUrl = '';
     let imageBlob = null;
+
+    EmbeddedServer.requestCount++;
+    EmbeddedServer._log('GENERATE', `Rendering [${profile ? profile.shortName : effectiveModelKey}] ${width}x${height} (Seed: ${effectiveSeed})`);
 
     if (this.settings.provider === 'pollinations') {
       imageUrl = await this._generatePollinationsWithFailover(
@@ -264,15 +281,20 @@ export const ImageGenerator = {
       imageBlob = result.blob;
     }
 
-    // Attempt to convert to Blob for local IndexedDB caching if possible
+    // Attempt to convert to validated binary Blob for local IndexedDB caching
     if (!imageBlob && imageUrl) {
       try {
-        const fetchRes = await fetch(imageUrl, { mode: 'cors' });
+        const fetchRes = await fetch(imageUrl, {
+          mode: 'cors',
+          referrerPolicy: 'no-referrer',
+          credentials: 'omit'
+        });
         if (fetchRes.ok) {
-          imageBlob = await fetchRes.blob();
+          const rawBlob = await fetchRes.blob();
+          imageBlob = await EmbeddedServer.validateImageBlob(rawBlob);
         }
       } catch (err) {
-        // Direct browser <img> rendering will still work even if CORS restricts Blob reading
+        // Direct browser <img> rendering will still work if CORS restricts Blob reading
       }
     }
 
@@ -320,7 +342,7 @@ export const ImageGenerator = {
   },
 
   /**
-   * Generate a batch of images (1, 2, or 4)
+   * Generate a batch of images (1, 2, or 4) with rate-limit verification
    */
   async generateBatch({
     prompt,
@@ -335,6 +357,10 @@ export const ImageGenerator = {
     onProgress = null
   }) {
     const count = Math.min(Math.max(parseInt(batchCount, 10) || 1, 1), 4);
+
+    // Check built-in window server rate limiter before firing batch
+    EmbeddedServer.checkRateLimit(count);
+
     const promises = [];
 
     for (let i = 0; i < count; i++) {
@@ -363,11 +389,12 @@ export const ImageGenerator = {
   },
 
   /**
-   * Helper to load an image via Image object with custom timeout
+   * Helper to load an image via Image object with custom timeout and no-referrer protection
    */
   _preloadImage(url, timeoutMs = 35000) {
     return new Promise((resolve, reject) => {
       const img = new Image();
+      img.referrerPolicy = 'no-referrer';
       let timer = setTimeout(() => {
         img.src = '';
         reject(new Error(`Timed out after ${Math.round(timeoutMs / 1000)}s`));
@@ -427,18 +454,17 @@ export const ImageGenerator = {
    * Build clean Pollinations.ai URL
    */
   _buildPollinationsUrl(prompt, width, height, seed, model, negativePrompt, useGenHost = false) {
-    // Clean prompt of special characters that interfere with path routing
     const cleanPrompt = prompt.replace(/[/\\#?&]/g, ' ').replace(/\s+/g, ' ').trim();
     const encodedPrompt = encodeURIComponent(cleanPrompt);
     
-    // Model mapping: Pollinations supports 'flux' and 'turbo'
     const validModel = (model === 'turbo') ? 'turbo' : 'flux';
 
     const baseUrl = useGenHost
       ? `https://gen.pollinations.ai/image/${encodedPrompt}`
       : `https://image.pollinations.ai/prompt/${encodedPrompt}`;
 
-    let url = `${baseUrl}?width=${width}&height=${height}&seed=${seed}&model=${validModel}&nologo=true&enhance=false`;
+    const safeParam = EmbeddedServer.securityPolicy.safeModeGuardrail ? '&safe=true' : '';
+    let url = `${baseUrl}?width=${width}&height=${height}&seed=${seed}&model=${validModel}&nologo=true&enhance=false${safeParam}`;
 
     if (this.settings.pollinationsKey) {
       url += `&key=${encodeURIComponent(this.settings.pollinationsKey)}`;
@@ -455,7 +481,7 @@ export const ImageGenerator = {
   },
 
   /**
-   * Hugging Face Inference API generator
+   * Hugging Face Inference API generator with binary magic-byte validation
    */
   async _generateHuggingFace(prompt, negativePrompt, width, height, seed, guidanceScale = 6.5, profile = null) {
     if (!this.settings.hfToken) {
@@ -471,6 +497,8 @@ export const ImageGenerator = {
 
     const response = await fetch(endpoint, {
       method: 'POST',
+      referrerPolicy: 'no-referrer',
+      credentials: 'omit',
       headers: {
         'Authorization': `Bearer ${this.settings.hfToken}`,
         'Content-Type': 'application/json'
@@ -491,35 +519,27 @@ export const ImageGenerator = {
       throw new Error(`Hugging Face API Error (${response.status})`);
     }
 
-    const blob = await response.blob();
+    const rawBlob = await response.blob();
+    const blob = await EmbeddedServer.validateImageBlob(rawBlob);
     const url = URL.createObjectURL(blob);
     return { url, blob };
   },
 
   /**
-   * Custom Endpoint (WebUI / A1111 / OpenAI compatible)
+   * Custom Endpoint (WebUI / A1111 / OpenAI compatible) with endpoint & magic-byte security checks
    */
   async _generateCustom(prompt, negativePrompt, width, height, seed, guidanceScale = 6.5) {
     if (!this.settings.customEndpoint) {
       throw new Error('Custom Endpoint URL is required. Please configure it in Settings.');
     }
 
-    let parsedEndpoint;
-    try {
-      parsedEndpoint = new URL(this.settings.customEndpoint);
-    } catch {
-      throw new Error('Invalid Custom Endpoint URL.');
-    }
-    if (parsedEndpoint.protocol !== 'http:' && parsedEndpoint.protocol !== 'https:') {
-      throw new Error('Custom Endpoint URL must use http:// or https://');
-    }
+    const parsedEndpoint = EmbeddedServer.validateEndpointUrl(this.settings.customEndpoint);
 
     const headers = { 'Content-Type': 'application/json' };
     if (this.settings.customApiKey) {
       headers['Authorization'] = `Bearer ${this.settings.customApiKey}`;
     }
 
-    // Default to A1111 sdapi/v1/txt2img payload format or OpenAI format
     const isTxt2Img = parsedEndpoint.pathname.includes('txt2img');
     const body = isTxt2Img ? {
       prompt: prompt,
@@ -538,6 +558,8 @@ export const ImageGenerator = {
 
     const response = await fetch(parsedEndpoint.toString(), {
       method: 'POST',
+      referrerPolicy: 'no-referrer',
+      credentials: 'omit',
       headers,
       body: JSON.stringify(body)
     });
@@ -555,7 +577,7 @@ export const ImageGenerator = {
       b64 = json.data[0].b64_json;
     } else if (json.data && json.data[0] && json.data[0].url) {
       const returnedUrl = String(json.data[0].url);
-      if (!/^https?:\/\//i.test(returnedUrl) && !/^data:image\//i.test(returnedUrl)) {
+      if (!/^https?:\/\//i.test(returnedUrl) && !/^data:image\/(png|jpeg|webp);base64,/i.test(returnedUrl)) {
         throw new Error('Untrusted image URL scheme from custom endpoint');
       }
       return { url: this._redactUrlSecrets(returnedUrl), blob: null };
@@ -563,13 +585,7 @@ export const ImageGenerator = {
       throw new Error('Unrecognized response format from custom endpoint');
     }
 
-    const byteCharacters = atob(b64);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: 'image/png' });
+    const blob = EmbeddedServer.base64ToValidatedBlob(b64);
     const url = URL.createObjectURL(blob);
 
     return { url, blob };

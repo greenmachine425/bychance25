@@ -39,6 +39,15 @@ A clean, modern web application that functions like **Perchance**, powered by mo
   - Render **1, 2, or 4 images** concurrently with live skeleton progress cards.
   - Aspect ratios: **1:1** (1024×1024), **2:3** (680×1024), **3:4** (768×1024), **9:16** (576×1024), **16:9** (1024×576).
 
+- **🛡️ Built-In Window Server & 7-Layer User Security Center**:
+  - **100% In-Window Embedded Server (`EmbeddedServer`)**: Intercepts and serves `/api/status`, `/api/gallery`, `/api/save-image`, and `/api/security-audit` directly inside the browser application window (`index.html` / `standalone.html`), requiring zero external server processes while supporting hybrid sync if `server.py` is running.
+  - **In-Window Content Security Policy (CSP) & `no-referrer`**: Enforced directly via `<meta>` headers inside the window and HTTP headers so prompts and URLs never leak via Referer headers.
+  - **Binary Magic-Byte Image Verification**: Validates `PNG`, `JPEG`, and `WebP` file signatures on all generated/imported images and rejects `SVG`/`HTML` payloads to eliminate stored XSS vectors.
+  - **Ephemeral Credential Isolation & RAM-Only Mode**: API keys never touch `localStorage`, IndexedDB, or JSON backups; users can enable **Strict RAM-Only Mode** or trigger a one-click **Emergency Credential Wipe**.
+  - **Remote Plaintext HTTP Blocker**: Prevents custom endpoints from sending prompts or API keys over unencrypted non-localhost `http://` connections.
+  - **Safe-Mode Content & Prompt Guardrail**: Blocks explicit/unsafe prompt tokens and enforces safe negative prompt conditioning.
+  - **In-Window Rate Limiter**: Protects users from accidental infinite loops or quota exhaustion.
+
 - **🔍 Fullscreen Lightbox & Local Persistence**:
   - Interactive pan & zoom, metadata inspector, PNG download, prompt/seed copy, settings reuse, IndexedDB persistence, and JSON backup export.
 

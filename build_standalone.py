@@ -33,6 +33,9 @@ def build():
     with open(PUBLIC_DIR / "js" / "storage.js", "r", encoding="utf-8") as f:
         storage_code = f.read()
 
+    with open(PUBLIC_DIR / "js" / "embeddedServer.js", "r", encoding="utf-8") as f:
+        embedded_server_code = f.read()
+
     with open(PUBLIC_DIR / "js" / "viewer.js", "r", encoding="utf-8") as f:
         viewer_code = f.read()
 
@@ -54,6 +57,8 @@ def build():
         clean_module(perchance_code),
         "// === MODULE: Storage ===",
         clean_module(storage_code),
+        "// === MODULE: EmbeddedServer ===",
+        clean_module(embedded_server_code),
         "// === MODULE: Viewer ===",
         clean_module(viewer_code),
         "// === MODULE: ImageGenerator ===",
@@ -69,11 +74,15 @@ def build():
     with open(target_path, "w", encoding="utf-8") as f:
         f.write(html)
 
+    target_root_index = BASE_DIR / "index.html"
+    with open(target_root_index, "w", encoding="utf-8") as f:
+        f.write(html)
+
     target_public = PUBLIC_DIR / "standalone.html"
     with open(target_public, "w", encoding="utf-8") as f:
         f.write(html)
 
-    print(f"Successfully generated {target_path} ({len(html)} bytes)")
+    print(f"Successfully generated {target_path} and {target_root_index} ({len(html)} bytes)")
 
 if __name__ == "__main__":
     build()

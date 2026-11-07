@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https: http://127.0.0.1:* http://localhost:*; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self';" />
   <title>Bychance — Anime AI Image Generator</title>
   <meta name="description" content="Clean, powerful anime AI image generation platform inspired by Perchance. Free, unlimited, featuring FLUX, Illustrious XL, Animagine XL, Pony V6 & Dynamic Syntax." />
   
@@ -54,6 +56,13 @@
     </div>
 
     <div class="flex items-center gap-2">
+      <!-- Built-In Window Server & Security Console Button -->
+      <button id="btn-open-server-security" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 transition-all" title="Built-In Window Server &amp; User Security Console">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>🛡️</span>
+        <span id="header-server-badge" class="hidden lg:inline">Window Server • Protected</span>
+      </button>
+
       <!-- Model & Prompting Guide Modal Button -->
       <button id="btn-open-guide" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 transition-all" title="Model Profiles, Trigger Identifiers & Prompt Engineering Guide">
         <span>📘</span>
@@ -634,6 +643,117 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Built-In Window Server & Security Console Modal -->
+  <div id="server-security-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[88vh]">
+      <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">🛡️</span>
+          <div>
+            <h3 class="font-bold text-base text-white">Built-In Window Server &amp; User Security Center</h3>
+            <p class="text-xs text-zinc-400">Self-contained in-window API engine, 7-point security audit, and privacy guardrails</p>
+          </div>
+        </div>
+        <button data-close-modal="server-security-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-5 text-xs">
+        <!-- Server Runtime Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800">
+            <span class="text-[10px] uppercase tracking-wider text-zinc-400 block">Server Engine Mode</span>
+            <span id="srv-mode-label" class="font-bold text-emerald-400 text-xs mt-1 block">Built-In Window Server</span>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800">
+            <span class="text-[10px] uppercase tracking-wider text-zinc-400 block">Security Posture</span>
+            <span id="srv-security-score" class="font-bold text-emerald-300 text-xs mt-1 block">100% Verified (7/7)</span>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800">
+            <span class="text-[10px] uppercase tracking-wider text-zinc-400 block">Requests / Blocked</span>
+            <span id="srv-requests-count" class="font-mono font-bold text-zinc-200 text-xs mt-1 block">0 handled • 0 blocked</span>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800">
+            <span class="text-[10px] uppercase tracking-wider text-zinc-400 block">In-Window Storage</span>
+            <span id="srv-storage-count" class="font-mono font-bold text-indigo-300 text-xs mt-1 block">IndexedDB Active</span>
+          </div>
+        </div>
+
+        <!-- User Security & Privacy Guardrail Controls -->
+        <div class="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-zinc-800/80">
+            <div>
+              <h4 class="font-bold text-sm text-white">Active User Protection &amp; Privacy Guardrails</h4>
+              <p class="text-[11px] text-zinc-400">Configure how the built-in window server protects your prompts, API keys, and browser</p>
+            </div>
+            <button id="btn-test-window-api" type="button" class="px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 font-semibold text-xs whitespace-nowrap transition-all">
+              ⚡ Ping Built-In /api/status
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+            <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 cursor-pointer hover:border-zinc-700">
+              <input type="checkbox" id="sec-safe-mode" checked class="mt-0.5 rounded bg-zinc-900 border-zinc-700 text-emerald-500 focus:ring-emerald-500" />
+              <div>
+                <span class="font-semibold text-zinc-200 block">Safe-Mode Prompt &amp; Content Guardrail</span>
+                <span class="text-[11px] text-zinc-400">Blocks explicit/NSFW tokens and enforces safe anime rating conditioning.</span>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 cursor-pointer hover:border-zinc-700">
+              <input type="checkbox" id="sec-memory-only" class="mt-0.5 rounded bg-zinc-900 border-zinc-700 text-emerald-500 focus:ring-emerald-500" />
+              <div>
+                <span class="font-semibold text-zinc-200 block">Strict RAM-Only API Keys</span>
+                <span class="text-[11px] text-zinc-400">Keeps API keys exclusively in volatile JS memory (never writes to sessionStorage).</span>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 cursor-pointer hover:border-zinc-700">
+              <input type="checkbox" id="sec-block-http" checked class="mt-0.5 rounded bg-zinc-900 border-zinc-700 text-emerald-500 focus:ring-emerald-500" />
+              <div>
+                <span class="font-semibold text-zinc-200 block">Block Unencrypted Remote HTTP</span>
+                <span class="text-[11px] text-zinc-400">Prevents custom endpoints from transmitting prompts or keys over plaintext internet HTTP.</span>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 cursor-pointer hover:border-zinc-700">
+              <input type="checkbox" id="sec-strict-mime" checked class="mt-0.5 rounded bg-zinc-900 border-zinc-700 text-emerald-500 focus:ring-emerald-500" />
+              <div>
+                <span class="font-semibold text-zinc-200 block">Binary Magic-Byte Verification</span>
+                <span class="text-[11px] text-zinc-400">Verifies PNG/JPEG/WebP file headers and blocks SVG/HTML payloads to prevent XSS.</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-zinc-800/80">
+            <span class="text-[11px] text-zinc-400">Need to immediately clear all active credentials on a shared device?</span>
+            <button id="btn-purge-secrets" type="button" class="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-semibold text-xs transition-all">
+              🧹 Emergency Wipe: Purge API Keys &amp; Session Secrets
+            </button>
+          </div>
+        </div>
+
+        <!-- 7-Point Live Security Audit Checklist -->
+        <div class="space-y-2">
+          <h4 class="font-bold text-xs uppercase tracking-wider text-zinc-400">7-Point Live Window Security Audit</h4>
+          <div id="srv-audit-list" class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+            <!-- Dynamically populated audit items -->
+          </div>
+        </div>
+
+        <!-- Built-In Window Server Live Activity Log -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-xs uppercase tracking-wider text-zinc-400">In-Window Server Request &amp; Security Log (Secrets Redacted)</h4>
+            <span class="text-[10px] font-mono text-emerald-400">/api/status • /api/gallery • /api/save-image</span>
+          </div>
+          <div id="srv-log-output" class="p-3 rounded-2xl bg-zinc-950 border border-zinc-800 font-mono text-[11px] text-zinc-300 max-h-40 overflow-y-auto space-y-1">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

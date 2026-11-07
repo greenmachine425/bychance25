@@ -44,12 +44,15 @@ export const Storage = {
   },
 
   /**
-   * Sanitize image URL to strip any query secrets and reject dangerous schemes
+   * Sanitize image URL to strip any query secrets and reject dangerous schemes (including SVG data URLs)
    */
   _sanitizeUrl(rawUrl) {
     if (!rawUrl || typeof rawUrl !== 'string') return '';
     const trimmed = rawUrl.trim();
-    if (!/^(https?:\/\/|blob:|data:image\/|\/gallery\/)/i.test(trimmed)) {
+    if (/^data:image\/svg/i.test(trimmed)) {
+      return '';
+    }
+    if (!/^(https?:\/\/|blob:|data:image\/(png|jpeg|jpg|webp);base64,|\/gallery\/)/i.test(trimmed)) {
       return '';
     }
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {

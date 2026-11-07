@@ -3,6 +3,7 @@
  */
 
 import { PerchanceEngine } from './perchanceEngine.js';
+import { EmbeddedServer } from './embeddedServer.js';
 import { ImageGenerator } from './imageGenerator.js';
 import { Storage } from './storage.js';
 import { Viewer } from './viewer.js';
@@ -36,9 +37,10 @@ class App {
   }
 
   async init() {
-    console.log('Initializing Bychance application...');
-    ImageGenerator.init();
+    console.log('Initializing Bychance application & Built-In Window Server...');
     await Storage.init();
+    await EmbeddedServer.init();
+    ImageGenerator.init();
 
     Viewer.init((savedItem) => this.applySavedSettings(savedItem));
 
@@ -46,6 +48,7 @@ class App {
     this.renderTemplateLibrary();
     this.renderTagBuilder();
     this.renderModelGuideModal();
+    await this.renderServerSecurityModal();
     this.bindEvents();
     this.updateSyntaxPreview();
     this.updatePromptCoach();
@@ -57,6 +60,14 @@ class App {
     // Listen for image deletion events from Viewer
     window.addEventListener('bychance:image-deleted', () => {
       this.loadGallery();
+    });
+
+    // Listen for built-in window server log events
+    window.addEventListener('bychance:server-log', () => {
+      const srvModal = document.getElementById('server-security-modal');
+      if (srvModal && !srvModal.classList.contains('hidden')) {
+        this.renderServerSecurityModal();
+      }
     });
 
     console.log('Bychance initialized successfully.');
@@ -323,6 +334,59 @@ class App {
         if (modal) modal.classList.add('hidden');
       });
     });
+
+    // Built-In Window Server & Security Console Modal toggle
+    const btnOpenSrvSec = document.getElementById('btn-open-server-security');
+    const srvSecModal = document.getElementById('server-security-modal');
+    if (btnOpenSrvSec && srvSecModal) {
+      btnOpenSrvSec.addEventListener('click', async () => {
+        await this.renderServerSecurityModal();
+        srvSecModal.classList.remove('hidden');
+      });
+    }
+
+    // Security policy checkboxes inside the Built-In Server & Security Console
+    const bindSecurityCheckbox = (id, policyKey, label) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.checked = Boolean(EmbeddedServer.securityPolicy[policyKey]);
+        el.addEventListener('change', async () => {
+          EmbeddedServer.saveSecurityPolicy({ [policyKey]: el.checked });
+          await this.renderServerSecurityModal();
+          this.showToast(`${label}: ${el.checked ? 'Enabled 🛡️' : 'Disabled'}`);
+        });
+      }
+    };
+    bindSecurityCheckbox('sec-safe-mode', 'safeModeGuardrail', 'Safe-Mode Guardrail');
+    bindSecurityCheckbox('sec-memory-only', 'memoryOnlySecrets', 'Strict RAM-Only Keys');
+    bindSecurityCheckbox('sec-block-http', 'blockRemoteHttp', 'Remote HTTP Blocker');
+    bindSecurityCheckbox('sec-strict-mime', 'strictMimeValidation', 'Magic-Byte Verification');
+
+    // Test Built-In /api/status Endpoint button
+    const btnTestApi = document.getElementById('btn-test-window-api');
+    if (btnTestApi) {
+      btnTestApi.addEventListener('click', async () => {
+        try {
+          const res = await fetch('/api/status');
+          const data = await res.json();
+          await this.renderServerSecurityModal();
+          this.showToast(`In-Window /api/status OK • Mode: ${data.modeLabel} (${data.uptimeSeconds}s uptime)`);
+        } catch (err) {
+          this.showToast('In-Window API check error');
+        }
+      });
+    }
+
+    // Emergency Credential Purge button
+    const btnPurgeSecrets = document.getElementById('btn-purge-secrets');
+    if (btnPurgeSecrets) {
+      btnPurgeSecrets.addEventListener('click', async () => {
+        EmbeddedServer.purgeCredentialsAndSession(ImageGenerator);
+        this.populateSettingsForm();
+        await this.renderServerSecurityModal();
+        this.showToast('Wiped all API keys from memory & session! 🧹');
+      });
+    }
 
     // Model & Prompt Guide Modal toggle
     const btnOpenGuide = document.getElementById('btn-open-guide');
@@ -726,7 +790,7 @@ class App {
       card.innerHTML = `
         <div>
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xl">${tpl.icon}</span>
+            <span class="text-xl">${this.escapeHtml(tpl.icon)}</span>
             <div class="flex items-center gap-1.5">
               <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/20">${this.escapeHtml(recModel)}</span>
               <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400">${this.escapeHtml(tpl.category)}</span>
@@ -990,6 +1054,72 @@ class App {
         }
       });
     });
+  }
+
+  /**
+   * Render Built-In Window Server & Security Console Modal
+   */
+  async renderServerSecurityModal() {
+    const status = await EmbeddedServer.getStatus();
+    const audit = EmbeddedServer.runSecurityAudit();
+
+    const headerBadge = document.getElementById('header-server-badge');
+    if (headerBadge) {
+      headerBadge.textContent = status.mode === 'hybrid'
+        ? `Hybrid Server • ${audit.score}% Safe`
+        : `Window Server • ${audit.score}% Safe`;
+    }
+
+    const modeEl = document.getElementById('srv-mode-label');
+    if (modeEl) modeEl.textContent = status.modeLabel;
+
+    const scoreEl = document.getElementById('srv-security-score');
+    if (scoreEl) scoreEl.textContent = `${audit.score}% Verified (${audit.passedCount}/${audit.totalChecks} Checks)`;
+
+    const reqEl = document.getElementById('srv-requests-count');
+    if (reqEl) reqEl.textContent = `${status.requestsHandled} handled • ${status.threatsBlocked} blocked`;
+
+    const storeEl = document.getElementById('srv-storage-count');
+    if (storeEl) storeEl.textContent = `${status.galleryItemsStored} items in IndexedDB`;
+
+    // Sync checkbox states
+    const syncCheck = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.checked = Boolean(val);
+    };
+    syncCheck('sec-safe-mode', status.securityPolicy.safeModeGuardrail);
+    syncCheck('sec-memory-only', status.securityPolicy.memoryOnlySecrets);
+    syncCheck('sec-block-http', status.securityPolicy.blockRemoteHttp);
+    syncCheck('sec-strict-mime', status.securityPolicy.strictMimeValidation);
+
+    const auditList = document.getElementById('srv-audit-list');
+    if (auditList) {
+      auditList.innerHTML = audit.checks.map(c => `
+        <div class="p-3 rounded-xl border ${c.passed ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-amber-950/25 border-amber-500/30'} flex items-start gap-2.5">
+          <span class="text-sm mt-0.5">${c.passed ? '✅' : '⚠️'}</span>
+          <div>
+            <div class="font-semibold text-xs ${c.passed ? 'text-emerald-300' : 'text-amber-300'}">${this.escapeHtml(c.title)}</div>
+            <p class="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">${this.escapeHtml(c.detail)}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    const logOutput = document.getElementById('srv-log-output');
+    if (logOutput) {
+      if (EmbeddedServer.logs.length === 0) {
+        logOutput.innerHTML = `<div class="text-zinc-500">No requests logged yet.</div>`;
+      } else {
+        logOutput.innerHTML = EmbeddedServer.logs.map(entry => {
+          const badgeClass = entry.level === 'SECURITY'
+            ? 'text-amber-400'
+            : entry.level === 'API'
+              ? 'text-emerald-400'
+              : 'text-indigo-400';
+          return `<div><span class="text-zinc-500">[${this.escapeHtml(entry.time)}]</span> <span class="font-bold ${badgeClass}">${this.escapeHtml(entry.level)}</span> ${this.escapeHtml(entry.message)}</div>`;
+        }).join('');
+      }
+    }
   }
 
   /**
