@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bychance — Anime AI Image Generator</title>
+  <meta name="description" content="Clean, powerful anime AI image generation platform inspired by Perchance. Free, unlimited, featuring FLUX and Anime models with template randomizer syntax." />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fdf2f8',
+              100: '#fce7f3',
+              500: '#ec4899',
+              600: '#db2777',
+              700: '#be185d'
+            },
+            anime: {
+              indigo: '#6366f1',
+              violet: '#8b5cf6',
+              cyan: '#06b6d4',
+              pink: '#f43f5e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-[#0b0b0f] text-zinc-100 min-h-screen flex flex-col selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Top Navigation Header -->
+  <header class="glass-header sticky top-0 z-40 px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-zinc-800/80">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+        <span class="text-lg">✨</span>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-zinc-200 to-indigo-300 bg-clip-text text-transparent">Bychance</h1>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Anime Studio</span>
+        </div>
+        <p class="text-[11px] text-zinc-400 hidden sm:block">Perchance-inspired AI Anime Generator with FLUX & Dynamic Syntax</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <!-- Templates Modal Button -->
+      <button id="btn-open-templates" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 flex items-center gap-1.5 transition-all">
+        <span>📜</span>
+        <span class="hidden md:inline">Templates</span>
+      </button>
+
+      <!-- Tag Builder Modal Button -->
+      <button id="btn-open-tags" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 flex items-center gap-1.5 transition-all">
+        <span>🏷️</span>
+        <span class="hidden md:inline">Tag Builder</span>
+      </button>
+
+      <!-- Export History Button -->
+      <button id="btn-export-history" class="p-2 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition-all" title="Export History as JSON">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+      </button>
+
+      <!-- Settings Button -->
+      <button id="btn-open-settings" class="p-2 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition-all" title="Settings & Providers">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+
+    <!-- Top Generation Section: Inputs & Controls -->
+    <section class="glass-panel rounded-3xl p-5 sm:p-7 border border-zinc-800/80 shadow-2xl relative overflow-hidden">
+      <!-- Glow background accent -->
+      <div class="absolute -top-32 -left-32 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-32 -right-32 w-80 h-80 bg-pink-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Prompt Input Block -->
+      <div class="space-y-3 relative z-10">
+        <div class="flex items-center justify-between">
+          <label for="prompt-input" class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+            <span>Anime Prompt</span>
+            <span class="text-[10px] lowercase text-zinc-500 font-normal">(supports Perchance <code class="text-indigo-400">{opt1|opt2}</code> syntax)</span>
+          </label>
+
+          <div class="flex items-center gap-2">
+            <!-- Random Prompt Button -->
+            <button id="btn-random-prompt" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/60 flex items-center gap-1.5 transition-all shadow-sm" title="Roll a random anime prompt from dictionary">
+              <span>🎲</span>
+              <span>Random Prompt</span>
+            </button>
+
+            <!-- Random Template Button -->
+            <button id="btn-random-template" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 transition-all" title="Generate Perchance template with options">
+              <span>✨</span>
+              <span>Syntax Roll</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="relative">
+          <textarea
+            id="prompt-input"
+            rows="3"
+            placeholder="e.g. 1girl, {silver|sakura pink} hair, {cyberpunk jacket|school uniform}, {Tokyo night|ancient shrine}, anime key visual, masterpiece"
+            class="w-full rounded-2xl bg-zinc-950/70 border border-zinc-800 p-4 text-sm sm:text-base text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-sans leading-relaxed resize-y"
+          >1girl, {sakura pink|silver white} hair with twin tails, glowing sapphire eyes, {school sailor uniform|cyberpunk techwear}, drifting cherry blossom petals, Japanese shrine courtyard, cinematic lighting, masterpiece anime artstyle</textarea>
+        </div>
+
+        <!-- Perchance Syntax Live Evaluation Preview -->
+        <div id="syntax-preview-container" class="hidden flex items-center gap-2 p-2.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 text-xs text-indigo-300">
+          <span class="text-sm">🎲</span>
+          <span class="font-medium text-zinc-400 whitespace-nowrap">Evaluated preview:</span>
+          <span id="syntax-preview-text" class="text-zinc-200 truncate italic"></span>
+        </div>
+
+        <!-- Style Presets Carousel -->
+        <div>
+          <label class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block mb-2">Art Styles & Aesthetic Presets</label>
+          <div id="style-presets-container" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            <!-- Dynamically populated style buttons -->
+          </div>
+        </div>
+
+        <!-- Controls Row: Aspect Ratio, Batch, Model, Seed, Guidance -->
+        <div class="pt-3 border-t border-zinc-800/80 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-center">
+          
+          <!-- Aspect Ratio (4 cols) -->
+          <div class="lg:col-span-4 space-y-1.5">
+            <label class="text-[11px] font-medium text-zinc-400 flex items-center justify-between">
+              <span>Aspect Ratio</span>
+            </label>
+            <div class="flex items-center gap-1.5 overflow-x-auto">
+              <button data-ratio="1:1" class="aspect-ratio-btn px-2.5 py-1.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:border-zinc-700 flex items-center gap-1" title="Square (1:1 - 1024x1024)">
+                <span class="ratio-icon ratio-1-1"></span>
+                <span>1:1</span>
+              </button>
+              <button data-ratio="2:3" class="aspect-ratio-btn active px-2.5 py-1.5 rounded-lg text-xs font-medium border border-indigo-500 bg-indigo-500/20 text-indigo-300 flex items-center gap-1" title="Portrait (2:3 - 680x1024)">
+                <span class="ratio-icon ratio-2-3"></span>
+                <span>2:3</span>
+              </button>
+              <button data-ratio="3:4" class="aspect-ratio-btn px-2.5 py-1.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:border-zinc-700 flex items-center gap-1" title="Portrait (3:4 - 768x1024)">
+                <span class="ratio-icon ratio-3-4"></span>
+                <span>3:4</span>
+              </button>
+              <button data-ratio="9:16" class="aspect-ratio-btn px-2.5 py-1.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:border-zinc-700 flex items-center gap-1" title="Phone Wallpaper (9:16 - 576x1024)">
+                <span class="ratio-icon ratio-9-16"></span>
+                <span>9:16</span>
+              </button>
+              <button data-ratio="16:9" class="aspect-ratio-btn px-2.5 py-1.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:border-zinc-700 flex items-center gap-1" title="Widescreen (16:9 - 1024x576)">
+                <span class="ratio-icon ratio-16-9"></span>
+                <span>16:9</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Model Switcher (3 cols) -->
+          <div class="lg:col-span-3 space-y-1.5">
+            <label for="model-select" class="text-[11px] font-medium text-zinc-400 block">AI Model Engine</label>
+            <select id="model-select" class="w-full rounded-xl bg-zinc-950/70 border border-zinc-800 px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500">
+              <option value="flux" selected>FLUX.1 (High Aesthetic Anime)</option>
+              <option value="turbo">SDXL Turbo (Ultra Fast ~2s)</option>
+            </select>
+          </div>
+
+          <!-- Batch Size (2 cols) -->
+          <div class="lg:col-span-2 space-y-1.5">
+            <label class="text-[11px] font-medium text-zinc-400 block">Batch Count</label>
+            <div class="flex items-center gap-1 bg-zinc-950/80 p-1 rounded-xl border border-zinc-800">
+              <button data-count="1" class="batch-count-btn active flex-1 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition-all">1</button>
+              <button data-count="2" class="batch-count-btn flex-1 py-1 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition-all">2</button>
+              <button data-count="4" class="batch-count-btn flex-1 py-1 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition-all">4</button>
+            </div>
+          </div>
+
+          <!-- Seed Control (3 cols) -->
+          <div class="lg:col-span-3 space-y-1.5">
+            <label for="seed-input" class="text-[11px] font-medium text-zinc-400 block">Seed (Consistency)</label>
+            <div class="flex items-center gap-1">
+              <input
+                id="seed-input"
+                type="number"
+                placeholder="Random seed"
+                class="w-full rounded-xl bg-zinc-950/70 border border-zinc-800 px-2.5 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-indigo-500"
+              />
+              <!-- Seed Randomize Button -->
+              <button id="btn-random-seed" class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800" title="Randomize seed">
+                🎲
+              </button>
+              <!-- Seed Lock Button -->
+              <button id="btn-lock-seed" class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800" title="Lock seed">
+                <svg class="w-4 h-4 text-zinc-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Collapsible Negative Prompt & Quality Booster Options -->
+        <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-4">
+            <button id="toggle-negative-btn" type="button" class="text-zinc-400 hover:text-zinc-200 font-medium">
+              Show Negative Prompt ▼
+            </button>
+
+            <!-- Quality Booster Checkbox -->
+            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white select-none">
+              <input type="checkbox" id="quality-booster-toggle" checked class="rounded bg-zinc-900 border-zinc-700 text-indigo-600 focus:ring-indigo-500" />
+              <span>Anime Quality Booster</span>
+            </label>
+          </div>
+
+          <!-- Guidance Scale Slider -->
+          <div class="flex items-center gap-3">
+            <span class="text-zinc-400">Guidance Scale:</span>
+            <input type="range" id="guidance-slider" min="3" max="15" step="0.5" value="7.5" class="w-24 sm:w-32" />
+            <span id="guidance-val" class="font-mono text-zinc-300 w-8">7.5</span>
+          </div>
+        </div>
+
+        <div id="negative-prompt-container" class="hidden pt-2">
+          <label for="negative-input" class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block mb-1">Negative Prompt (Things to exclude)</label>
+          <input
+            id="negative-input"
+            type="text"
+            placeholder="e.g. low quality, blurry, deformed hands, extra fingers, bad anatomy, text, watermark"
+            class="w-full rounded-xl bg-zinc-950/70 border border-zinc-800 px-3.5 py-2 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+
+        <!-- Primary Action Button -->
+        <div class="pt-4">
+          <button
+            id="btn-generate"
+            type="button"
+            class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 text-white font-bold text-base sm:text-lg shadow-xl shadow-indigo-600/25 hover:shadow-indigo-600/40 transform active:scale-[0.99] transition-all flex items-center justify-center gap-2 glow-purple"
+          >
+            <span>Generate Anime</span>
+            <span class="text-xs opacity-80 font-normal ml-1 hidden sm:inline">(Ctrl+↵)</span>
+          </button>
+        </div>
+
+        <!-- Animated Progress bar -->
+        <div id="generation-progress-bar" class="hidden w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+          <div class="bg-gradient-to-r from-indigo-500 via-pink-500 to-cyan-400 h-full w-full animate-pulse"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Real-time Live Preview Stage -->
+    <section id="live-stage" class="space-y-4">
+      <div id="live-preview-grid">
+        <!-- Live generation cards appear here -->
+      </div>
+    </section>
+
+    <!-- Gallery / Generations History Section -->
+    <section class="space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-zinc-800">
+        <div class="flex items-center gap-3">
+          <h2 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            <span>Artwork Gallery</span>
+            <span id="gallery-count" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400">0 items</span>
+          </h2>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <!-- Search box -->
+          <div class="relative">
+            <input
+              id="gallery-search"
+              type="text"
+              placeholder="Search prompt, seed..."
+              class="rounded-xl bg-zinc-900 border border-zinc-800 pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 w-36 sm:w-48"
+            />
+            <span class="absolute left-2.5 top-2 text-zinc-500 text-xs">🔍</span>
+          </div>
+
+          <!-- All / Favorites Filter Pills -->
+          <div class="flex items-center bg-zinc-900 p-1 rounded-xl border border-zinc-800 text-xs font-medium">
+            <button id="filter-all-btn" class="px-2.5 py-1 rounded-lg bg-zinc-800 text-white transition-all">All</button>
+            <button id="filter-fav-btn" class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition-all">⭐ Favorites</button>
+          </div>
+
+          <!-- Clear History Button -->
+          <button id="btn-clear-history" class="p-2 rounded-xl text-zinc-400 hover:text-rose-400 hover:bg-zinc-900 transition-all" title="Clear all generated images">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Gallery Grid -->
+      <div id="gallery-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4">
+        <!-- Rendered images will populate here -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-zinc-800/60 py-6 px-4 text-center text-xs text-zinc-500">
+    <p>Bychance — Free Anime Image Generator inspired by Perchance.</p>
+    <p class="mt-1 text-[11px] text-zinc-600">Built with FLUX.1 & Perchance Template Syntactic Expansion.</p>
+  </footer>
+
+  <!-- Lightbox Fullscreen Modal -->
+  <div id="lightbox-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-2 sm:p-6">
+    <div class="relative w-full max-w-6xl h-full max-h-[92vh] glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col md:flex-row">
+      
+      <!-- Close button -->
+      <button id="lightbox-close-btn" class="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-black/60 hover:bg-black text-white backdrop-blur transition-all" title="Close (Esc)">
+        ✕
+      </button>
+
+      <!-- Prev / Next Navigation Arrows -->
+      <button id="lightbox-prev-btn" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/60 hover:bg-black text-white backdrop-blur transition-all disabled:opacity-30 disabled:pointer-events-none" title="Previous Image">
+        ‹
+      </button>
+      <button id="lightbox-next-btn" class="absolute right-4 md:right-[380px] top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/60 hover:bg-black text-white backdrop-blur transition-all disabled:opacity-30 disabled:pointer-events-none" title="Next Image">
+        ›
+      </button>
+
+      <!-- Left / Center: Interactive Image Display Stage -->
+      <div id="lightbox-image-wrapper" class="flex-1 relative bg-black/80 flex items-center justify-center overflow-hidden select-none cursor-grab">
+        <img id="lightbox-image" src="" alt="" class="max-h-full max-w-full object-contain transition-transform duration-100 ease-out" />
+
+        <!-- Zoom Controls Overlay -->
+        <div class="absolute bottom-4 left-4 z-20 flex items-center gap-1 bg-black/70 backdrop-blur px-2.5 py-1.5 rounded-xl border border-zinc-800 text-xs text-zinc-300">
+          <button id="lightbox-zoom-out" class="p-1 hover:text-white" title="Zoom Out (-)">−</button>
+          <span id="lightbox-zoom-level" class="font-mono px-1">100%</span>
+          <button id="lightbox-zoom-in" class="p-1 hover:text-white" title="Zoom In (+)">+</button>
+          <button id="lightbox-zoom-reset" class="ml-1 text-[10px] text-zinc-400 hover:text-white" title="Reset Zoom (0)">Reset</button>
+        </div>
+      </div>
+
+      <!-- Right: Detailed Metadata & Action Sidebar -->
+      <div class="w-full md:w-96 bg-zinc-950/95 border-t md:border-t-0 md:border-l border-zinc-800 p-6 flex flex-col justify-between overflow-y-auto">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-400">Artwork Details</span>
+            <button id="lightbox-fav-btn" class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 transition-all">
+              ⭐ Favorite
+            </button>
+          </div>
+
+          <!-- Prompt Card -->
+          <div class="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2">
+            <div class="flex items-center justify-between text-xs text-zinc-400">
+              <span class="font-medium">Prompt</span>
+              <button id="lightbox-copy-prompt-btn" class="text-indigo-400 hover:text-indigo-300 text-[11px] font-semibold">Copy</button>
+            </div>
+            <p id="lightbox-prompt" class="text-xs text-zinc-200 font-sans leading-relaxed"></p>
+          </div>
+
+          <!-- Evaluated Prompt (if Perchance syntax used) -->
+          <div id="lightbox-evaluated-container" class="hidden p-3 rounded-2xl bg-indigo-950/20 border border-indigo-500/20 space-y-1">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-indigo-300">Perchance Syntax Evaluated</span>
+            <p id="lightbox-evaluated-prompt" class="text-xs text-indigo-200 italic font-sans leading-relaxed"></p>
+          </div>
+
+          <!-- Technical Specs Grid -->
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="text-[10px] text-zinc-500 block">Model</span>
+              <span id="lightbox-model" class="font-medium text-zinc-300 truncate block"></span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="text-[10px] text-zinc-500 block">Style</span>
+              <span id="lightbox-style" class="font-medium text-zinc-300 truncate block"></span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="text-[10px] text-zinc-500 block">Dimensions</span>
+              <span id="lightbox-dimensions" class="font-medium text-zinc-300 truncate block"></span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] text-zinc-500">Seed</span>
+                <button id="lightbox-copy-seed-btn" class="text-[10px] text-indigo-400">Copy</button>
+              </div>
+              <span id="lightbox-seed" class="font-mono font-medium text-zinc-300 truncate block"></span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="text-[10px] text-zinc-500 block">Render Time</span>
+              <span id="lightbox-duration" class="font-medium text-zinc-300 truncate block"></span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="text-[10px] text-zinc-500 block">Created</span>
+              <span id="lightbox-date" class="font-medium text-zinc-300 truncate block"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-2 pt-4 border-t border-zinc-800">
+          <button id="lightbox-download-btn" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-all flex items-center justify-center gap-2">
+            <span>💾 Download Full Resolution (PNG)</span>
+          </button>
+          
+          <button id="lightbox-apply-settings-btn" class="w-full py-2.5 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 font-semibold text-xs transition-all flex items-center justify-center gap-2">
+            <span>🔄 Reuse Prompt & Settings</span>
+          </button>
+
+          <button id="lightbox-delete-btn" class="w-full py-2 px-4 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-950/20 text-xs transition-all">
+            Delete Image
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Template Library Modal -->
+  <div id="templates-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-3xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">📜</span>
+          <div>
+            <h3 class="font-bold text-base text-white">Perchance Template Library</h3>
+            <p class="text-xs text-zinc-400">Pre-built generator formulas with rich anime combinatorial lists</p>
+          </div>
+        </div>
+        <button data-close-modal="templates-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+      </div>
+
+      <div id="templates-list" class="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Rendered template cards -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Tag Builder Modal -->
+  <div id="tags-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-3xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">🏷️</span>
+          <div>
+            <h3 class="font-bold text-base text-white">Interactive Tag Builder</h3>
+            <p class="text-xs text-zinc-400">Click any tag pill to append it to your active anime prompt</p>
+          </div>
+        </div>
+        <button data-close-modal="tags-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+      </div>
+
+      <div id="tags-container" class="p-5 overflow-y-auto">
+        <!-- Rendered tag categories -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col">
+      <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">⚙️</span>
+          <div>
+            <h3 class="font-bold text-base text-white">Generation Settings & Providers</h3>
+            <p class="text-xs text-zinc-400">Configure AI providers and API keys</p>
+          </div>
+        </div>
+        <button data-close-modal="settings-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+      </div>
+
+      <form id="settings-form" class="p-5 space-y-4 text-xs">
+        <div>
+          <label for="settings-provider" class="block font-medium text-zinc-300 mb-1">Inference Provider</label>
+          <select id="settings-provider" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2.5 text-zinc-200">
+            <option value="pollinations">Pollinations.ai (Free, High-Res FLUX & Anime, No Key)</option>
+            <option value="huggingface">Hugging Face Inference API</option>
+            <option value="custom">Custom WebUI / OpenAI Compatible Endpoint</option>
+          </select>
+        </div>
+
+        <div id="settings-pollinations-section" class="pt-2 border-t border-zinc-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <p class="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Pollinations API Key</p>
+            <a href="https://enter.pollinations.ai" target="_blank" rel="noopener noreferrer" class="text-[11px] text-indigo-400 hover:underline">Get Free Key ↗</a>
+          </div>
+          <div>
+            <label for="settings-pollinations-key" class="block font-medium text-zinc-400 mb-1">API Key (Optional / if required by your network)</label>
+            <input id="settings-pollinations-key" type="password" autocomplete="off" placeholder="pk_... (from enter.pollinations.ai)" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2 text-zinc-200 font-mono" />
+          </div>
+        </div>
+
+        <div id="settings-hf-section" class="pt-2 border-t border-zinc-800 space-y-3">
+          <p class="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Hugging Face Options (Optional)</p>
+          <div>
+            <label for="settings-hf-token" class="block font-medium text-zinc-400 mb-1">HF User Access Token</label>
+            <input id="settings-hf-token" type="password" autocomplete="off" placeholder="hf_..." class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2 text-zinc-200" />
+          </div>
+          <div>
+            <label for="settings-hf-model" class="block font-medium text-zinc-400 mb-1">HF Model Repo</label>
+            <input id="settings-hf-model" type="text" placeholder="cagliostrolab/animagine-xl-3.1" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2 text-zinc-200" />
+          </div>
+        </div>
+
+        <div id="settings-custom-section" class="pt-2 border-t border-zinc-800 space-y-3">
+          <p class="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Custom WebUI / Server Options (Optional)</p>
+          <div>
+            <label for="settings-custom-endpoint" class="block font-medium text-zinc-400 mb-1">Endpoint URL</label>
+            <input id="settings-custom-endpoint" type="text" placeholder="http://127.0.0.1:7860/sdapi/v1/txt2img" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2 text-zinc-200" />
+          </div>
+          <div>
+            <label for="settings-custom-api-key" class="block font-medium text-zinc-400 mb-1">API Key (if required)</label>
+            <input id="settings-custom-api-key" type="password" autocomplete="off" placeholder="sk-..." class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2 text-zinc-200" />
+          </div>
+        </div>
+
+        <div class="pt-3">
+          <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-all">
+            Save Settings
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Pill -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl bg-zinc-900/95 border border-zinc-700/80 text-white text-xs font-medium shadow-2xl backdrop-blur transition-opacity duration-300 opacity-0 pointer-events-none">
+  </div>
+
+  <!-- Bootstrap App Script -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

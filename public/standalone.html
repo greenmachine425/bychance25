@@ -1,0 +1,3102 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bychance — Anime AI Image Generator</title>
+  <meta name="description" content="Clean, powerful anime AI image generation platform inspired by Perchance. Free, unlimited, featuring FLUX and Anime models with template randomizer syntax." />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fdf2f8',
+              100: '#fce7f3',
+              500: '#ec4899',
+              600: '#db2777',
+              700: '#be185d'
+            },
+            anime: {
+              indigo: '#6366f1',
+              violet: '#8b5cf6',
+              cyan: '#06b6d4',
+              pink: '#f43f5e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Stylesheet -->
+  <style>
+/* Bychance - Custom Styles & Design System */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg-primary: #09090b;
+  --bg-secondary: #121217;
+  --bg-card: #181820;
+  --accent-pink: #ec4899;
+  --accent-violet: #8b5cf6;
+  --accent-cyan: #06b6d4;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(139, 92, 246, 0.5);
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-primary);
+  color: #f4f4f5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Glassmorphism effects */
+.glass-panel {
+  background: rgba(24, 24, 32, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-header {
+  background: rgba(9, 9, 11, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* Subtle glowing accents */
+.glow-purple {
+  box-shadow: 0 0 25px -5px rgba(139, 92, 246, 0.3);
+}
+
+.glow-pink {
+  box-shadow: 0 0 25px -5px rgba(236, 72, 153, 0.3);
+}
+
+/* Pulse animation for generating states */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(236, 72, 153, 0.4);
+  }
+}
+
+.anim-pulse-glow {
+  animation: pulseGlow 3s infinite ease-in-out;
+}
+
+/* Range input styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #27272a;
+  border-radius: 9999px;
+  height: 6px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #818cf8;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(129, 140, 248, 0.8);
+  transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Custom aspect ratio badges */
+.ratio-icon {
+  display: inline-block;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+}
+
+.ratio-1-1 { width: 14px; height: 14px; }
+.ratio-2-3 { width: 11px; height: 16px; }
+.ratio-3-4 { width: 12px; height: 16px; }
+.ratio-9-16 { width: 9px; height: 16px; }
+.ratio-3-2 { width: 16px; height: 11px; }
+.ratio-16-9 { width: 16px; height: 9px; }
+
+/* Modal fade animations */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+/* Card hover glow */
+.art-card {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+
+.art-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(99, 102, 241, 0.15);
+}
+
+</style>
+</head>
+<body class="bg-[#0b0b0f] text-zinc-100 min-h-screen flex flex-col selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Top Navigation Header -->
+  <header class="glass-header sticky top-0 z-40 px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-zinc-800/80">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+        <span class="text-lg">✨</span>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-zinc-200 to-indigo-300 bg-clip-text text-transparent">Bychance</h1>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Anime Studio</span>
+        </div>
+        <p class="text-[11px] text-zinc-400 hidden sm:block">Perchance-inspired AI Anime Generator with FLUX & Dynamic Syntax</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <!-- Templates Modal Button -->
+      <button id="btn-open-templates" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 flex items-center gap-1.5 transition-all">
+        <span>📜</span>
+        <span class="hidden md:inline">Templates</span>
+      </button>
+
+      <!-- Tag Builder Modal Button -->
+      <button id="btn-open-tags" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 flex items-center gap-1.5 transition-all">
+        <span>🏷️</span>
+        <span class="hidden md:inline">Tag Builder</span>
+      </button>
+
+      <!-- Export History Button -->
+      <button id="btn-export-history" class="p-2 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition-all" title="Export History as JSON">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+      </button>
+
+      <!-- Settings Button -->
+      <button id="btn-open-settings" class="p-2 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition-all" title="Settings & Providers">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+
+    <!-- Top Generation Section: Inputs & Controls -->
+    <section class="glass-panel rounded-3xl p-5 sm:p-7 border border-zinc-800/80 shadow-2xl relative overflow-hidden">
+      <!-- Glow background accent -->
+      <div class="absolute -top-32 -left-32 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-32 -right-32 w-80 h-80 bg-pink-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Prompt Input Block -->
+      <div class="space-y-3 relative z-10">
+        <div class="flex items-center justify-between">
+          <label for="prompt-input" class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+            <span>Anime Prompt</span>
+            <span class="text-[10px] lowercase text-zinc-500 font-normal">(supports Perchance <code class="text-indigo-400">{opt1|opt2}</code> syntax)</span>
+          </label>
+
+          <div class="flex items-center gap-2">
+            <!-- Random Prompt Button -->
+            <button id="btn-random-prompt" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/60 flex items-center gap-1.5 transition-all shadow-sm" title="Roll a random anime prompt from dictionary">
+              <span>🎲</span>
+              <span>Random Prompt</span>
+            </button>
+
+            <!-- Random Template Button -->
+            <button id="btn-random-template" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 transition-all" title="Generate Perchance template with options">
+              <span>✨</span>
+              <span>Syntax Roll</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="relative">
+          <textarea
+            id="prompt-input"
+            rows="3"
+            placeholder="e.g. 1girl, {silver|sakura pink} hair, {cyberpunk jacket|school uniform}, {Tokyo night|ancient shrine}, anime key visual, masterpiece"
+            class="w-full rounded-2xl bg-zinc-950/70 border border-zinc-800 p-4 text-sm sm:text-base text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-sans leading-relaxed resize-y"
+          >1girl, {sakura pink|silver white} hair with twin tails, glowing sapphire eyes, {school sailor uniform|cyberpunk techwear}, drifting cherry blossom petals, Japanese shrine courtyard, cinematic lighting, masterpiece anime artstyle</textarea>
+        </div>
+
+        <!-- Perchance Syntax Live Evaluation Preview -->
+        <div id="syntax-preview-container" class="hidden flex items-center gap-2 p-2.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 text-xs text-indigo-300">
+          <span class="text-sm">🎲</span>
+          <span class="font-medium text-zinc-400 whitespace-nowrap">Evaluated preview:</span>
+          <span id="syntax-preview-text" class="text-zinc-200 truncate italic"></span>
+        </div>
+
+        <!-- Style Presets Carousel -->
+        <div>
+          <label class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block mb-2">Art Styles & Aesthetic Presets</label>
+          <div id="style-presets-container" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            <!-- Dynamically populated style buttons -->
+          </div>
+        </div>
+
+        <!-- Controls Row: Aspect Ratio, Batch, Model, Seed, Guidance -->
+        <div class="pt-3 border-t border-zinc-800/80 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-center">
+          
+          <!-- Aspect Ratio (4 cols) -->
+          <div class="lg:col-span-4 space-y-1.5">
+            <label class="text-[11px] font-medium text-zinc-400 flex items-center justify-between">
+              <span>Aspect Ratio</span>
+            </label>
+            <div class="flex items-center gap-1.5 overflow-x-auto">
+              <button data-ratio="1:1" class="aspect-ratio-btn px-2.5 py-1.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:border-zinc-700 flex items-center gap-1" title="Square (1:1 - 1024x1024)">
+                <span class="ratio-icon ratio-1-1"></span>
+                <span>1:1</span>
+              </button>
+              <button data-ratio="2:3" class="aspect-ratio-btn active px-2.5 py-1.5 rounded-lg text-xs font-medium border border-indigo-500 bg-indigo-500/20 text-indigo-300 flex items-center gap-1" title="Portrait (2:3 - 680x1024)">
+                <span class="ratio-icon ratio-2-3"></span>
+                <span>2:3</span>
+              </button>
+              <button data-ratio="3:4" class="aspect-ratio-btn px-2.5 py-1.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:border-zinc-700 flex items-center gap-1" title="Portrait (3:4 - 768x1024)">
+                <span class="ratio-icon ratio-3-4"></span>
+                <span>3:4</span>
+              </button>
+              <button data-ratio="9:16" class="aspect-ratio-btn px-2.5 py-1.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:border-zinc-700 flex items-center gap-1" title="Phone Wallpaper (9:16 - 576x1024)">
+                <span class="ratio-icon ratio-9-16"></span>
+                <span>9:16</span>
+              </button>
+              <button data-ratio="16:9" class="aspect-ratio-btn px-2.5 py-1.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:border-zinc-700 flex items-center gap-1" title="Widescreen (16:9 - 1024x576)">
+                <span class="ratio-icon ratio-16-9"></span>
+                <span>16:9</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Model Switcher (3 cols) -->
+          <div class="lg:col-span-3 space-y-1.5">
+            <label for="model-select" class="text-[11px] font-medium text-zinc-400 block">AI Model Engine</label>
+            <select id="model-select" class="w-full rounded-xl bg-zinc-950/70 border border-zinc-800 px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500">
+              <option value="flux" selected>FLUX.1 (High Aesthetic Anime)</option>
+              <option value="turbo">SDXL Turbo (Ultra Fast ~2s)</option>
+            </select>
+          </div>
+
+          <!-- Batch Size (2 cols) -->
+          <div class="lg:col-span-2 space-y-1.5">
+            <label class="text-[11px] font-medium text-zinc-400 block">Batch Count</label>
+            <div class="flex items-center gap-1 bg-zinc-950/80 p-1 rounded-xl border border-zinc-800">
+              <button data-count="1" class="batch-count-btn active flex-1 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition-all">1</button>
+              <button data-count="2" class="batch-count-btn flex-1 py-1 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition-all">2</button>
+              <button data-count="4" class="batch-count-btn flex-1 py-1 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition-all">4</button>
+            </div>
+          </div>
+
+          <!-- Seed Control (3 cols) -->
+          <div class="lg:col-span-3 space-y-1.5">
+            <label for="seed-input" class="text-[11px] font-medium text-zinc-400 block">Seed (Consistency)</label>
+            <div class="flex items-center gap-1">
+              <input
+                id="seed-input"
+                type="number"
+                placeholder="Random seed"
+                class="w-full rounded-xl bg-zinc-950/70 border border-zinc-800 px-2.5 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-indigo-500"
+              />
+              <!-- Seed Randomize Button -->
+              <button id="btn-random-seed" class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800" title="Randomize seed">
+                🎲
+              </button>
+              <!-- Seed Lock Button -->
+              <button id="btn-lock-seed" class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800" title="Lock seed">
+                <svg class="w-4 h-4 text-zinc-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Collapsible Negative Prompt & Quality Booster Options -->
+        <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-4">
+            <button id="toggle-negative-btn" type="button" class="text-zinc-400 hover:text-zinc-200 font-medium">
+              Show Negative Prompt ▼
+            </button>
+
+            <!-- Quality Booster Checkbox -->
+            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white select-none">
+              <input type="checkbox" id="quality-booster-toggle" checked class="rounded bg-zinc-900 border-zinc-700 text-indigo-600 focus:ring-indigo-500" />
+              <span>Anime Quality Booster</span>
+            </label>
+          </div>
+
+          <!-- Guidance Scale Slider -->
+          <div class="flex items-center gap-3">
+            <span class="text-zinc-400">Guidance Scale:</span>
+            <input type="range" id="guidance-slider" min="3" max="15" step="0.5" value="7.5" class="w-24 sm:w-32" />
+            <span id="guidance-val" class="font-mono text-zinc-300 w-8">7.5</span>
+          </div>
+        </div>
+
+        <div id="negative-prompt-container" class="hidden pt-2">
+          <label for="negative-input" class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block mb-1">Negative Prompt (Things to exclude)</label>
+          <input
+            id="negative-input"
+            type="text"
+            placeholder="e.g. low quality, blurry, deformed hands, extra fingers, bad anatomy, text, watermark"
+            class="w-full rounded-xl bg-zinc-950/70 border border-zinc-800 px-3.5 py-2 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+
+        <!-- Primary Action Button -->
+        <div class="pt-4">
+          <button
+            id="btn-generate"
+            type="button"
+            class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 text-white font-bold text-base sm:text-lg shadow-xl shadow-indigo-600/25 hover:shadow-indigo-600/40 transform active:scale-[0.99] transition-all flex items-center justify-center gap-2 glow-purple"
+          >
+            <span>Generate Anime</span>
+            <span class="text-xs opacity-80 font-normal ml-1 hidden sm:inline">(Ctrl+↵)</span>
+          </button>
+        </div>
+
+        <!-- Animated Progress bar -->
+        <div id="generation-progress-bar" class="hidden w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+          <div class="bg-gradient-to-r from-indigo-500 via-pink-500 to-cyan-400 h-full w-full animate-pulse"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Real-time Live Preview Stage -->
+    <section id="live-stage" class="space-y-4">
+      <div id="live-preview-grid">
+        <!-- Live generation cards appear here -->
+      </div>
+    </section>
+
+    <!-- Gallery / Generations History Section -->
+    <section class="space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-zinc-800">
+        <div class="flex items-center gap-3">
+          <h2 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            <span>Artwork Gallery</span>
+            <span id="gallery-count" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400">0 items</span>
+          </h2>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <!-- Search box -->
+          <div class="relative">
+            <input
+              id="gallery-search"
+              type="text"
+              placeholder="Search prompt, seed..."
+              class="rounded-xl bg-zinc-900 border border-zinc-800 pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 w-36 sm:w-48"
+            />
+            <span class="absolute left-2.5 top-2 text-zinc-500 text-xs">🔍</span>
+          </div>
+
+          <!-- All / Favorites Filter Pills -->
+          <div class="flex items-center bg-zinc-900 p-1 rounded-xl border border-zinc-800 text-xs font-medium">
+            <button id="filter-all-btn" class="px-2.5 py-1 rounded-lg bg-zinc-800 text-white transition-all">All</button>
+            <button id="filter-fav-btn" class="px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white transition-all">⭐ Favorites</button>
+          </div>
+
+          <!-- Clear History Button -->
+          <button id="btn-clear-history" class="p-2 rounded-xl text-zinc-400 hover:text-rose-400 hover:bg-zinc-900 transition-all" title="Clear all generated images">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Gallery Grid -->
+      <div id="gallery-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4">
+        <!-- Rendered images will populate here -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-zinc-800/60 py-6 px-4 text-center text-xs text-zinc-500">
+    <p>Bychance — Free Anime Image Generator inspired by Perchance.</p>
+    <p class="mt-1 text-[11px] text-zinc-600">Built with FLUX.1 & Perchance Template Syntactic Expansion.</p>
+  </footer>
+
+  <!-- Lightbox Fullscreen Modal -->
+  <div id="lightbox-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-2 sm:p-6">
+    <div class="relative w-full max-w-6xl h-full max-h-[92vh] glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col md:flex-row">
+      
+      <!-- Close button -->
+      <button id="lightbox-close-btn" class="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-black/60 hover:bg-black text-white backdrop-blur transition-all" title="Close (Esc)">
+        ✕
+      </button>
+
+      <!-- Prev / Next Navigation Arrows -->
+      <button id="lightbox-prev-btn" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/60 hover:bg-black text-white backdrop-blur transition-all disabled:opacity-30 disabled:pointer-events-none" title="Previous Image">
+        ‹
+      </button>
+      <button id="lightbox-next-btn" class="absolute right-4 md:right-[380px] top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/60 hover:bg-black text-white backdrop-blur transition-all disabled:opacity-30 disabled:pointer-events-none" title="Next Image">
+        ›
+      </button>
+
+      <!-- Left / Center: Interactive Image Display Stage -->
+      <div id="lightbox-image-wrapper" class="flex-1 relative bg-black/80 flex items-center justify-center overflow-hidden select-none cursor-grab">
+        <img id="lightbox-image" src="" alt="" class="max-h-full max-w-full object-contain transition-transform duration-100 ease-out" />
+
+        <!-- Zoom Controls Overlay -->
+        <div class="absolute bottom-4 left-4 z-20 flex items-center gap-1 bg-black/70 backdrop-blur px-2.5 py-1.5 rounded-xl border border-zinc-800 text-xs text-zinc-300">
+          <button id="lightbox-zoom-out" class="p-1 hover:text-white" title="Zoom Out (-)">−</button>
+          <span id="lightbox-zoom-level" class="font-mono px-1">100%</span>
+          <button id="lightbox-zoom-in" class="p-1 hover:text-white" title="Zoom In (+)">+</button>
+          <button id="lightbox-zoom-reset" class="ml-1 text-[10px] text-zinc-400 hover:text-white" title="Reset Zoom (0)">Reset</button>
+        </div>
+      </div>
+
+      <!-- Right: Detailed Metadata & Action Sidebar -->
+      <div class="w-full md:w-96 bg-zinc-950/95 border-t md:border-t-0 md:border-l border-zinc-800 p-6 flex flex-col justify-between overflow-y-auto">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-400">Artwork Details</span>
+            <button id="lightbox-fav-btn" class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 transition-all">
+              ⭐ Favorite
+            </button>
+          </div>
+
+          <!-- Prompt Card -->
+          <div class="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2">
+            <div class="flex items-center justify-between text-xs text-zinc-400">
+              <span class="font-medium">Prompt</span>
+              <button id="lightbox-copy-prompt-btn" class="text-indigo-400 hover:text-indigo-300 text-[11px] font-semibold">Copy</button>
+            </div>
+            <p id="lightbox-prompt" class="text-xs text-zinc-200 font-sans leading-relaxed"></p>
+          </div>
+
+          <!-- Evaluated Prompt (if Perchance syntax used) -->
+          <div id="lightbox-evaluated-container" class="hidden p-3 rounded-2xl bg-indigo-950/20 border border-indigo-500/20 space-y-1">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-indigo-300">Perchance Syntax Evaluated</span>
+            <p id="lightbox-evaluated-prompt" class="text-xs text-indigo-200 italic font-sans leading-relaxed"></p>
+          </div>
+
+          <!-- Technical Specs Grid -->
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="text-[10px] text-zinc-500 block">Model</span>
+              <span id="lightbox-model" class="font-medium text-zinc-300 truncate block"></span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="text-[10px] text-zinc-500 block">Style</span>
+              <span id="lightbox-style" class="font-medium text-zinc-300 truncate block"></span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="text-[10px] text-zinc-500 block">Dimensions</span>
+              <span id="lightbox-dimensions" class="font-medium text-zinc-300 truncate block"></span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] text-zinc-500">Seed</span>
+                <button id="lightbox-copy-seed-btn" class="text-[10px] text-indigo-400">Copy</button>
+              </div>
+              <span id="lightbox-seed" class="font-mono font-medium text-zinc-300 truncate block"></span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="text-[10px] text-zinc-500 block">Render Time</span>
+              <span id="lightbox-duration" class="font-medium text-zinc-300 truncate block"></span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+              <span class="text-[10px] text-zinc-500 block">Created</span>
+              <span id="lightbox-date" class="font-medium text-zinc-300 truncate block"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-2 pt-4 border-t border-zinc-800">
+          <button id="lightbox-download-btn" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-all flex items-center justify-center gap-2">
+            <span>💾 Download Full Resolution (PNG)</span>
+          </button>
+          
+          <button id="lightbox-apply-settings-btn" class="w-full py-2.5 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 font-semibold text-xs transition-all flex items-center justify-center gap-2">
+            <span>🔄 Reuse Prompt & Settings</span>
+          </button>
+
+          <button id="lightbox-delete-btn" class="w-full py-2 px-4 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-950/20 text-xs transition-all">
+            Delete Image
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Template Library Modal -->
+  <div id="templates-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-3xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">📜</span>
+          <div>
+            <h3 class="font-bold text-base text-white">Perchance Template Library</h3>
+            <p class="text-xs text-zinc-400">Pre-built generator formulas with rich anime combinatorial lists</p>
+          </div>
+        </div>
+        <button data-close-modal="templates-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+      </div>
+
+      <div id="templates-list" class="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Rendered template cards -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Tag Builder Modal -->
+  <div id="tags-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-3xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">🏷️</span>
+          <div>
+            <h3 class="font-bold text-base text-white">Interactive Tag Builder</h3>
+            <p class="text-xs text-zinc-400">Click any tag pill to append it to your active anime prompt</p>
+          </div>
+        </div>
+        <button data-close-modal="tags-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+      </div>
+
+      <div id="tags-container" class="p-5 overflow-y-auto">
+        <!-- Rendered tag categories -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col">
+      <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">⚙️</span>
+          <div>
+            <h3 class="font-bold text-base text-white">Generation Settings & Providers</h3>
+            <p class="text-xs text-zinc-400">Configure AI providers and API keys</p>
+          </div>
+        </div>
+        <button data-close-modal="settings-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+      </div>
+
+      <form id="settings-form" class="p-5 space-y-4 text-xs">
+        <div>
+          <label for="settings-provider" class="block font-medium text-zinc-300 mb-1">Inference Provider</label>
+          <select id="settings-provider" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2.5 text-zinc-200">
+            <option value="pollinations">Pollinations.ai (Free, High-Res FLUX & Anime, No Key)</option>
+            <option value="huggingface">Hugging Face Inference API</option>
+            <option value="custom">Custom WebUI / OpenAI Compatible Endpoint</option>
+          </select>
+        </div>
+
+        <div id="settings-pollinations-section" class="pt-2 border-t border-zinc-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <p class="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Pollinations API Key</p>
+            <a href="https://enter.pollinations.ai" target="_blank" rel="noopener noreferrer" class="text-[11px] text-indigo-400 hover:underline">Get Free Key ↗</a>
+          </div>
+          <div>
+            <label for="settings-pollinations-key" class="block font-medium text-zinc-400 mb-1">API Key (Optional / if required by your network)</label>
+            <input id="settings-pollinations-key" type="password" autocomplete="off" placeholder="pk_... (from enter.pollinations.ai)" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2 text-zinc-200 font-mono" />
+          </div>
+        </div>
+
+        <div id="settings-hf-section" class="pt-2 border-t border-zinc-800 space-y-3">
+          <p class="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Hugging Face Options (Optional)</p>
+          <div>
+            <label for="settings-hf-token" class="block font-medium text-zinc-400 mb-1">HF User Access Token</label>
+            <input id="settings-hf-token" type="password" autocomplete="off" placeholder="hf_..." class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2 text-zinc-200" />
+          </div>
+          <div>
+            <label for="settings-hf-model" class="block font-medium text-zinc-400 mb-1">HF Model Repo</label>
+            <input id="settings-hf-model" type="text" placeholder="cagliostrolab/animagine-xl-3.1" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2 text-zinc-200" />
+          </div>
+        </div>
+
+        <div id="settings-custom-section" class="pt-2 border-t border-zinc-800 space-y-3">
+          <p class="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Custom WebUI / Server Options (Optional)</p>
+          <div>
+            <label for="settings-custom-endpoint" class="block font-medium text-zinc-400 mb-1">Endpoint URL</label>
+            <input id="settings-custom-endpoint" type="text" placeholder="http://127.0.0.1:7860/sdapi/v1/txt2img" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2 text-zinc-200" />
+          </div>
+          <div>
+            <label for="settings-custom-api-key" class="block font-medium text-zinc-400 mb-1">API Key (if required)</label>
+            <input id="settings-custom-api-key" type="password" autocomplete="off" placeholder="sk-..." class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2 text-zinc-200" />
+          </div>
+        </div>
+
+        <div class="pt-3">
+          <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-all">
+            Save Settings
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Pill -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl bg-zinc-900/95 border border-zinc-700/80 text-white text-xs font-medium shadow-2xl backdrop-blur transition-opacity duration-300 opacity-0 pointer-events-none">
+  </div>
+
+  <!-- Bootstrap App Script -->
+  <script>
+(function() {
+// === MODULE: PerchanceEngine ===
+
+/**
+ * Bychance - Perchance-style Template Syntax & Anime Generator Engine
+ * 
+ * Implements:
+ * 1. Perchance syntax parsing ({a|b|c}, weighted choices, nested sets)
+ * 2. Comprehensive anime generation dictionary & prompt randomizer
+ * 3. Pre-made generator templates (Ghibli, Shinkai, 90s Cel, Cyberpunk, etc.)
+ * 4. Tag builder catalog for interactive prompt construction
+ */
+
+const PerchanceEngine = {
+  /**
+   * Parse and evaluate Perchance syntax in a text string.
+   * Supports:
+   * - Basic sets: {apple|banana|cherry}
+   * - Nested sets: {cute {cat|fox} girl|badass {samurai|ninja}}
+   * - Weighted chances: {50% high chance|25% medium|25% rare}
+   */
+  evaluate(template) {
+    if (!template || typeof template !== 'string') return '';
+
+    let text = template;
+    const maxIterations = 20;
+    let iteration = 0;
+
+    // Iteratively resolve innermost { ... } blocks
+    while (iteration < maxIterations) {
+      const match = text.match(/\{([^{}]+)\}/);
+      if (!match) break;
+
+      const fullMatch = match[0];
+      const innerContent = match[1];
+      const selectedOption = this._chooseFromSet(innerContent);
+
+      text = text.replace(fullMatch, () => selectedOption);
+      iteration++;
+    }
+
+    return text.trim();
+  },
+
+  /**
+   * Helper to pick one option from a pipe-delimited string
+   * Handles weighted options like '50% a|50% b' or plain 'a|b|c'
+   */
+  _chooseFromSet(innerContent) {
+    const rawOptions = innerContent.split('|').map(s => s.trim()).filter(s => s.length > 0);
+    if (rawOptions.length === 0) return '';
+
+    // Check for percentage weights (e.g., "60% option A")
+    let hasWeights = false;
+    const weightedOptions = [];
+    let totalWeight = 0;
+
+    for (const opt of rawOptions) {
+      const weightMatch = opt.match(/^(\d+(?:\.\d+)?)\s*%\s*(.*)$/);
+      if (weightMatch) {
+        hasWeights = true;
+        const weight = parseFloat(weightMatch[1]);
+        const val = weightMatch[2].trim();
+        weightedOptions.push({ value: val, weight });
+        totalWeight += weight;
+      } else {
+        weightedOptions.push({ value: opt, weight: 1 });
+        totalWeight += 1;
+      }
+    }
+
+    if (hasWeights && totalWeight > 0) {
+      let rand = Math.random() * totalWeight;
+      for (const item of weightedOptions) {
+        if (rand < item.weight) {
+          return item.value;
+        }
+        rand -= item.weight;
+      }
+      return weightedOptions[weightedOptions.length - 1].value;
+    }
+
+    // Default uniform random choice
+    const idx = Math.floor(Math.random() * rawOptions.length);
+    return rawOptions[idx];
+  },
+
+  /**
+   * Comprehensive anime dictionary for prompt construction & randomization
+   */
+  dictionary: {
+    subjects: [
+      "1girl, beautiful anime heroine",
+      "1girl, cyberpunk blade runner",
+      "1girl, magical girl in ornate dress",
+      "1girl, shrine maiden (miko)",
+      "1girl, kuudere elf sorceress",
+      "1girl, tsundere academy student",
+      "1girl, mecha pilot in plugsuit",
+      "1girl, gothic lolita princess",
+      "1girl, wandering ronin swordsman",
+      "1girl, cyberpunk hacker with tech visor",
+      "1girl, celestial dragon princess",
+      "1girl, cozy slice-of-life barista",
+      "1girl, ethereal fairy with translucent wings",
+      "1boy, charismatic shonen protagonist",
+      "1boy, stoic dark fantasy swordsman",
+      "1boy, futuristic cyber vigilante",
+      "1boy, mysterious academy prodigy",
+      "1girl and 1boy, romantic anime couple under umbrella",
+      "chibi anime mascot with adorable companion"
+    ],
+
+    hairColors: [
+      "silver white", "sakura pastel pink", "midnight raven black", "golden blonde",
+      "glowing cyan", "crimson red", "twilight violet", "emerald green",
+      "two-tone pastel lavender and mint", "fiery gradient orange"
+    ],
+
+    hairStyles: [
+      "twin tails with fluttering ribbons", "flowing long hair with intricate braid",
+      "messy short bob with side fringe", "hime cut with blunt bangs",
+      "high ponytail tied with silk cord", "loose wavy hair drifting in wind",
+      "elaborate braided bun with floral hairpins", "spiky dynamic anime hair"
+    ],
+
+    eyeStyles: [
+      "gem-like crimson eyes", "deep ocean sapphire blue eyes", "glowing electric violet eyes",
+      "heterochromia (one gold eye, one turquoise eye)", "star-shaped pupils with cosmic sparkle",
+      "warm honey amber eyes", "emerald green eyes with soft specular highlights"
+    ],
+
+    expressions: [
+      "gentle serene smile", "smug playful smirk", "intense focused combat gaze",
+      "tsundere pout with faint blush", "mysterious melancholic gaze",
+      "confident radiant grin", "winking playfully at the viewer",
+      "calm stoic expression"
+    ],
+
+    attire: [
+      "futuristic glowing techwear jacket and pleated skirt",
+      "elaborate ceremonial white and crimson miko kimono",
+      "ornate gothic lolita dress with black lace and velvet ribbons",
+      "sleek sci-fi pilot plugsuit with glowing circuitry",
+      "traditional Japanese school sailor uniform with red neckerchief",
+      "ornate golden-trimmed fantasy armor with flowing royal cape",
+      "oversized streetwear hoodie with headphone around neck",
+      "enchanted sorceress robe adorned with star constellations",
+      "flowing summer sundress with straw hat",
+      "cyberpunk combat gear with tactical harness and holographic badges"
+    ],
+
+    accessories: [
+      "fluffy kemonomimi cat ears and tail",
+      "glowing celestial halo floating above head",
+      "futuristic holographic visor over one eye",
+      "ancient katana with glowing runes along the edge",
+      "ornate magical crystal staff radiating starlight",
+      "translucent cherry blossom hairpin",
+      "vintage round glasses catching lens glare",
+      "silver cross earrings and choker",
+      "delicate butterfly hairpin fluttering"
+    ],
+
+    scenery: [
+      "ancient Japanese shrine courtyard with drifting sakura cherry blossoms",
+      "rain-slicked Neo-Tokyo cyberpunk alley illuminated by vibrant neon signs",
+      "breathtaking floating sky island with ancient overgrown ruins and waterfalls",
+      "dreamy sunset train platform overlooking a sparkling coastal sea",
+      "enchanted bioluminescent fantasy forest with floating ethereal spirits",
+      "rooftop garden at twilight overlooking an endless metropolis of light",
+      "cozy sunlit greenhouse cafe filled with blooming plants and vintage books",
+      "grand celestial observatory with massive crystal telescope under starry Milky Way",
+      "snowy mountain shrine gate under a brilliant aurora borealis",
+      "traditional Japanese tatami room with open shoji doors facing autumn maple garden"
+    ],
+
+    lighting: [
+      "cinematic golden hour rim lighting, soft warm sunlight",
+      "vibrant neon backlight with cyan and magenta bloom",
+      "ethereal volumetric god rays filtering through clouds",
+      "magical starlight and gentle glowing particle bokeh",
+      "dramatic dynamic chiaroscuro lighting with sharp highlights",
+      "soft diffused anime studio lighting, clean specular highlights",
+      "romantic sunset twilight with gradient pastel hues",
+      "mystical glowing blue bioluminescent ambience"
+    ],
+
+    cameraAndComposition: [
+      "portrait close-up, expressive eyes in sharp focus",
+      "medium shot, dynamic pose with flowing fabrics",
+      "wide cinematic angle, breathtaking environmental composition",
+      "dramatic low angle hero shot, expansive sky backdrop",
+      "intimate over-the-shoulder perspective with depth of field",
+      "side profile with hair fluttering across the wind"
+    ],
+
+    qualityBoosters: [
+      "masterpiece", "best quality", "ultra-detailed anime artstyle",
+      "sharp focus", "intricate lineart", "vibrant color palette",
+      "studio anime key visual", "clean illustration"
+    ]
+  },
+
+  /**
+   * Pre-configured style definitions that map to specific prompt modifiers,
+   * negative prompts, and aesthetic tunings.
+   */
+  stylePresets: {
+    "flux-anime": {
+      name: "Modern Digital Anime",
+      description: "Crisp lines, vibrant colors, 4K key visual aesthetic",
+      promptSuffix: ", modern anime key visual, clean crisp lineart, vibrant rich colors, polished digital illustration, high production value, trending on pixiv",
+      negativePrompt: "low quality, worst quality, blurry, deformed, bad anatomy, extra limbs, watermark, text, signature, rough sketch",
+      recommendedModel: "flux"
+    },
+    "retro-90s": {
+      name: "90s Retro Cel Anime",
+      description: "Classic hand-painted animation cels, vintage grain & warm hues",
+      promptSuffix: ", 1990s anime aesthetic, classic hand-painted animation cel style, retro anime color palette, film grain, soft cel shading, nostalgia, vintage anime screencap, studio art from 1995",
+      negativePrompt: "3D render, digital CGI, modern oversaturated digital art, plastic texture, low quality, blurry",
+      recommendedModel: "flux"
+    },
+    "studio-ghibli": {
+      name: "Studio Ghibli Watercolor",
+      description: "Whimsical, lush pastoral backgrounds, hand-drawn painterly feel",
+      promptSuffix: ", Hayao Miyazaki Studio Ghibli style, lush painterly background, whimsical gouache and watercolor textures, warm emotional lighting, hand-drawn traditional animation masterpiece",
+      negativePrompt: "dark, gritty, photo, 3D, CGI, plastic, harsh neon, deformed, low quality",
+      recommendedModel: "flux"
+    },
+    "makoto-shinkai": {
+      name: "Makoto Shinkai (Your Name / Weathering)",
+      description: "Radiant skies, dramatic clouds, hyper-detailed twilight lighting",
+      promptSuffix: ", Makoto Shinkai visual style, CoMix Wave Films aesthetic, dramatic volumetric cumulus clouds, radiant twilight sky, hyper-detailed sparkling environmental reflections, emotional cinematic atmosphere",
+      negativePrompt: "flat colors, low detail, washed out, dull lighting, low quality, bad anatomy",
+      recommendedModel: "flux"
+    },
+    "cyberpunk-trigger": {
+      name: "Cyberpunk / Studio Trigger",
+      description: "High saturation, angular action lines, neon futuristic pop",
+      promptSuffix: ", Studio Trigger dynamic anime style, Cyberpunk Edgerunners aesthetic, bold sharp angular linework, explosive neon saturation, dynamic action framing, electric energy",
+      negativePrompt: "dull, muted, pastel, washed out, realism, blurry, low resolution",
+      recommendedModel: "flux"
+    },
+    "kyoto-animation": {
+      name: "Kyoto Animation (KyoAni)",
+      description: "Luminous glassy eyes, delicate soft bloom, slice-of-life warmth",
+      promptSuffix: ", Kyoto Animation style, delicate expressive character design, luminous glassy eye reflections, soft bloom lighting, warm heartfelt atmosphere, intricate hair movement",
+      negativePrompt: "rough, messy, harsh, grotesque, bad anatomy, deformed face, low quality",
+      recommendedModel: "flux"
+    },
+    "ufotable-action": {
+      name: "Ufotable Action (Demon Slayer)",
+      description: "High contrast darks, dynamic particle VFX, dramatic impact lighting",
+      promptSuffix: ", Ufotable anime style, high contrast dramatic lighting, brilliant elemental particle effects, glowing kinetic energy aura, cinematic anime battle scene, intense atmosphere",
+      negativePrompt: "flat, low contrast, washed out, static, boring, deformed, low quality",
+      recommendedModel: "flux"
+    },
+    "manga-ink": {
+      name: "Manga Monochrome Ink",
+      description: "Crisp black and white ink, screentone shading, manga panel",
+      promptSuffix: ", Japanese manga illustration, high contrast black and white ink drawing, meticulous screentones, cross-hatching, dramatic manga lineart, clean monochrome panel",
+      negativePrompt: "color, full color, watercolor, blurry, messy, low quality, photorealistic",
+      recommendedModel: "flux"
+    },
+    "chibi-sticker": {
+      name: "Chibi & Kawaii Sticker",
+      description: "Adorable oversized head, cute proportions, pastel sticker art",
+      promptSuffix: ", cute chibi anime character, kawaii proportions, large expressive sparkling eyes, sticker design with clean white outline, bright pastel colors, adorable playful charm",
+      negativePrompt: "realistic proportions, scary, grim, dark, low quality, bad anatomy, deformed",
+      recommendedModel: "flux"
+    },
+    "dark-fantasy": {
+      name: "Dark Fantasy Anime",
+      description: "Moody gothic ambiance, glowing ethereal runes, ornate dark armor",
+      promptSuffix: ", dark fantasy anime aesthetic, gothic atmosphere, intricate ornate dark armor, glowing ethereal magic runes, misty cinematic lighting, moody epic composition",
+      negativePrompt: "cheerful, pastel, comedic, low quality, deformed, blurry",
+      recommendedModel: "flux"
+    }
+  },
+
+  /**
+   * Pre-built Perchance Template Library
+   * Allows users to load, inspect, and randomize classic Perchance-style templates
+   */
+  templates: [
+    {
+      id: "magical-girl",
+      title: "Magical Girl Awakening",
+      category: "Fantasy",
+      icon: "✨",
+      template: "1girl, magical girl in {ornate white and pink lace dress|flowing celestial starry gown|fluttering ribbons and frills}, {sakura pink|golden blonde|silver} hair styled into {flowing twin tails|elaborate braided curls|long floating waves}, {radiant ruby|sparkling sapphire|golden amber} eyes, wielding a {glowing crystal star wand|radiant magical scepter}, surrounded by {floating magical glyphs and starlight|fluttering glowing cherry blossoms|swirling cosmic sparkles}, {ancient shrine courtyard at dusk|floating cloud palace|mystical crystal sanctuary}, cinematic lighting, masterpiece"
+    },
+    {
+      id: "cyberpunk-ronin",
+      title: "Cyberpunk Street Ronin",
+      category: "Sci-Fi",
+      icon: "⚡",
+      template: "1girl, badass cyberpunk ronin, {raven black|neon cyan|crimson} hair with {an asymmetrical undercut|messy bob with cyber wires|high combat ponytail}, {glowing cybernetic optics|electric blue eyes}, wearing {oversized techwear trenchcoat with glowing holographic collar|sleek carbon fiber armor and pleated skirt}, holding a {futuristic thermal katana glowing neon red|dual high-frequency plasma blades}, in a {rain-drenched Shinjuku neon back-alley with puddle reflections|skyline rooftop overlooking holographic billboards}, steam rising, volumetric fog, rim lighting, 4K anime key visual"
+    },
+    {
+      id: "ghibli-countryside",
+      title: "Ghibli Countryside Afternoon",
+      category: "Slice of Life",
+      icon: "🍃",
+      template: "1girl in {loose floral sundress and straw hat|cozy vintage apron over white blouse}, {chestnut brown|soft black} hair with {breezy bangs|cute braided pigtails}, looking with {wonder|warm peaceful smile} toward the horizon, sitting in {a lush green meadow overlooking rural Japanese train tracks|a rustic hillside cottage garden blooming with sunflowers}, {giant fluffy cumulus clouds in brilliant azure sky|soft golden late-afternoon sunlight}, Studio Ghibli painterly watercolor artstyle, nostalgic peaceful mood"
+    },
+    {
+      id: "shinkai-twilight",
+      title: "Makoto Shinkai Twilight Rooftop",
+      category: "Cinematic",
+      icon: "🌆",
+      template: "{1girl|1girl and 1boy standing close}, {wind-blown hair|fluttering school uniform}, gazing up at {a brilliant split comet streaking through twilight sky|spectacular purple and gold sunset clouds reflecting in rooftop rainwater}, Tokyo skyline silhouette in distance, Makoto Shinkai CoMix Wave visual style, hyper-detailed cloud physics, emotional cinematic atmosphere, dazzling light lens flare"
+    },
+    {
+      id: "shonen-awakening",
+      title: "Shonen Battle Awakening",
+      category: "Action",
+      icon: "🔥",
+      template: "{1boy|1girl}, anime warrior in combat stance, {spiky crimson hair|electric blue hair} standing on end, {fierce determined eyes glowing with elemental power}, {shredded battle armor with glowing energy crests|dark combat gi}, enveloped in {surging azure lightning aura|swirling dragon flames and embers}, cracked battlefield ground, high dynamic range, dynamic perspective, Ufotable anime action sequence, intense particle effects"
+    },
+    {
+      id: "gothic-moonlight",
+      title: "Gothic Lolita Moonlight",
+      category: "Gothic",
+      icon: "🌙",
+      template: "1girl, gothic lolita noble, {porcelain pale skin}, {silver white|obsidian black} hair in {luxurious twin drill curls|cascading waves with black lace headpiece}, {crimson vampire eyes|heterochromia gold and red}, wearing {extravagant Victorian mourning dress with velvet ribbons and corsetry}, holding {a vintage antique parasol|a single blooming dark rose}, inside {a gothic cathedral courtyard under a blood red full moon|an overgrown graveyard with stone gargoyles}, eerie mist, ethereal moonlight, dark romantic anime aesthetic"
+    },
+    {
+      id: "mecha-cockpit",
+      title: "Mecha Pilot Sync Rate 100%",
+      category: "Mecha",
+      icon: "🤖",
+      template: "1girl, elite mecha pilot, {short sporty purple hair|sleek blonde bob}, wearing {skintight neural plugsuit with glowing interface nodes}, seated inside {the holographic panoramic cockpit of a giant combat mecha}, {neon tactical HUD displays reflecting in eyes|heads-up radar holographic graphs floating in air}, deep space battlefield visible outside viewport, high tension, neon accents, Gainax / Trigger mecha anime aesthetic"
+    },
+    {
+      id: "cozy-cafe",
+      title: "Cozy Rainy Day Cafe",
+      category: "Slice of Life",
+      icon: "☕",
+      template: "1girl, cute cafe barista, {warm honey brown hair in loose messy bun|soft dark bob}, {sweet gentle smile}, wearing {knitted oversized turtleneck sweater and brown apron}, holding {a ceramic mug of steaming latte with foam art}, sitting by {a rain-streaked cafe window overlooking a peaceful European cobblestone street}, indoor warm lighting, fairy lights bokeh, cozy melancholic atmosphere, Kyoto Animation slice of life artstyle"
+    }
+  ],
+
+  /**
+   * Generates a completely randomized, high quality anime prompt
+   * using the internal dictionary and Perchance combinatorial logic.
+   */
+  generateRandomPrompt() {
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+    const subject = pick(this.dictionary.subjects);
+    const hairColor = pick(this.dictionary.hairColors);
+    const hairStyle = pick(this.dictionary.hairStyles);
+    const eyeStyle = pick(this.dictionary.eyeStyles);
+    const expression = pick(this.dictionary.expressions);
+    const attire = pick(this.dictionary.attire);
+    const accessory = Math.random() > 0.3 ? `, ${pick(this.dictionary.accessories)}` : "";
+    const scenery = pick(this.dictionary.scenery);
+    const lighting = pick(this.dictionary.lighting);
+    const camera = pick(this.dictionary.cameraAndComposition);
+
+    return `${subject}, ${hairColor} ${hairStyle}, ${eyeStyle}, ${expression}, wearing ${attire}${accessory}, ${scenery}, ${lighting}, ${camera}`;
+  },
+
+  /**
+   * Generates a Perchance-syntax template with inline curly braces
+   * that the user can explore or edit.
+   */
+  generateRandomTemplate() {
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    const pickTwo = arr => {
+      const a = pick(arr);
+      let b = pick(arr);
+      while (b === a) b = pick(arr);
+      return `{${a}|${b}}`;
+    };
+
+    const hairSet = pickTwo(this.dictionary.hairColors);
+    const hairStyleSet = pickTwo(this.dictionary.hairStyles);
+    const eyeSet = pickTwo(this.dictionary.eyeStyles);
+    const expressionSet = pickTwo(this.dictionary.expressions);
+    const attireSet = pickTwo(this.dictionary.attire);
+    const scenerySet = pickTwo(this.dictionary.scenery);
+    const lightingSet = pickTwo(this.dictionary.lighting);
+
+    return `1girl, ${hairSet} ${hairStyleSet}, ${eyeSet}, ${expressionSet}, wearing ${attireSet}, ${scenerySet}, ${lightingSet}, masterpiece anime visual`;
+  },
+
+  /**
+   * Interactive Tag Library for the Tag Builder
+   */
+  getTagCategories() {
+    return [
+      {
+        name: "Character",
+        tags: [
+          "1girl", "1boy", "magical girl", "cyberpunk samurai", "shrine maiden",
+          "elf sorceress", "academy student", "mecha pilot", "gothic lolita",
+          "chibi mascot", "kemonomimi catgirl", "kitsune fox girl", "demon princess",
+          "angelic knight", "barista", "steampunk engineer"
+        ]
+      },
+      {
+        name: "Hair & Face",
+        tags: [
+          "silver hair", "sakura pink hair", "raven black hair", "blonde hair",
+          "cyan hair", "twin tails", "flowing long hair", "hime cut", "short bob",
+          "ponytail", "blue eyes", "crimson red eyes", "golden amber eyes",
+          "heterochromia", "star pupils", "gentle smile", "smug smirk",
+          "tsundere pout", "blushing", "winking", "stoic expression"
+        ]
+      },
+      {
+        name: "Outfit",
+        tags: [
+          "school sailor uniform", "miko kimono", "gothic lolita dress",
+          "cyberpunk techwear", "pilot plugsuit", "fantasy battle armor",
+          "oversized hoodie", "sorceress robe", "summer sundress",
+          "steampunk coat", "maid outfit", "kimono with obi"
+        ]
+      },
+      {
+        name: "Scenery & Setting",
+        tags: [
+          "cherry blossom shrine", "Neo-Tokyo cyberpunk alley", "floating sky island",
+          "sunset train platform", "enchanted forest", "rooftop garden at dusk",
+          "rainy city street", "celestial observatory", "snowy mountain torii",
+          "tatami tea room", "ancient overgrown ruins", "cozy bookshop cafe"
+        ]
+      },
+      {
+        name: "Lighting & Effects",
+        tags: [
+          "cinematic rim lighting", "golden hour sunset", "vibrant neon glow",
+          "volumetric god rays", "ethereal starlight bokeh", "glowing magic runes",
+          "drifting cherry blossom petals", "rain reflections", "floating embers",
+          "aurora borealis", "sparkling lens flare", "soft studio lighting"
+        ]
+      },
+      {
+        name: "Composition",
+        tags: [
+          "portrait close-up", "medium shot", "wide cinematic shot",
+          "dynamic battle pose", "dramatic low angle", "looking at viewer",
+          "profile view", "wind blown hair", "depth of field"
+        ]
+      }
+    ];
+  }
+};
+
+
+// === MODULE: Storage ===
+
+/**
+ * Bychance - Storage Service (IndexedDB + LocalStorage)
+ * 
+ * Preserves generated images, prompts, seeds, metadata, and user favorites locally.
+ */
+
+const DB_NAME = 'bychance_db';
+const DB_VERSION = 1;
+const STORE_NAME = 'generations';
+
+const Storage = {
+  db: null,
+
+  async init() {
+    return new Promise((resolve) => {
+      if (!window.indexedDB) {
+        console.warn('IndexedDB not available, using localStorage fallback');
+        resolve(false);
+        return;
+      }
+
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+          store.createIndex('timestamp', 'timestamp', { unique: false });
+          store.createIndex('isFavorite', 'isFavorite', { unique: false });
+          store.createIndex('model', 'model', { unique: false });
+        }
+      };
+
+      request.onsuccess = (event) => {
+        this.db = event.target.result;
+        resolve(true);
+      };
+
+      request.onerror = (event) => {
+        console.error('IndexedDB open error:', event.target.error);
+        resolve(false);
+      };
+    });
+  },
+
+  /**
+   * Sanitize image URL to strip any query secrets and reject dangerous schemes
+   */
+  _sanitizeUrl(rawUrl) {
+    if (!rawUrl || typeof rawUrl !== 'string') return '';
+    const trimmed = rawUrl.trim();
+    if (!/^(https?:\/\/|blob:|data:image\/|\/gallery\/)/i.test(trimmed)) {
+      return '';
+    }
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      try {
+        const parsed = new URL(trimmed);
+        ['key', 'api_key', 'apikey', 'token', 'access_token'].forEach(p => parsed.searchParams.delete(p));
+        return parsed.toString();
+      } catch {
+        return '';
+      }
+    }
+    return trimmed;
+  },
+
+  /**
+   * Save a newly generated image record
+   */
+  async saveImage(item) {
+    const record = {
+      id: item.id || 'img_' + Date.now(),
+      prompt: item.prompt || '',
+      evaluatedPrompt: item.evaluatedPrompt || item.prompt || '',
+      fullPrompt: item.fullPrompt || item.prompt || '',
+      negativePrompt: item.negativePrompt || '',
+      style: item.style || '',
+      model: item.model || 'flux-anime',
+      aspectRatio: item.aspectRatio || '2:3',
+      width: item.width || 832,
+      height: item.height || 1216,
+      seed: item.seed,
+      guidanceScale: item.guidanceScale || 7.5,
+      durationMs: item.durationMs || 0,
+      timestamp: item.timestamp || Date.now(),
+      isFavorite: false,
+      url: this._sanitizeUrl(item.url || ''),
+      blob: item.blob || null
+    };
+
+    if (this.db) {
+      return new Promise((resolve, reject) => {
+        const tx = this.db.transaction([STORE_NAME], 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.put(record);
+
+        req.onsuccess = () => resolve(record);
+        req.onerror = (e) => reject(e.target.error);
+      });
+    } else {
+      // LocalStorage fallback (metadata only)
+      try {
+        const items = this._getLocalStorageList();
+        const stripped = { ...record, blob: null };
+        items.unshift(stripped);
+        if (items.length > 50) items.pop();
+        localStorage.setItem('bychance_history', JSON.stringify(items));
+        return record;
+      } catch (err) {
+        console.error('LocalStorage save error', err);
+        return record;
+      }
+    }
+  },
+
+  /**
+   * Retrieve all saved images, sorted newest first
+   */
+  async getAllImages(onlyFavorites = false, searchQuery = '') {
+    if (this.db) {
+      return new Promise((resolve, reject) => {
+        const tx = this.db.transaction([STORE_NAME], 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.getAll();
+
+        req.onsuccess = () => {
+          let results = req.result || [];
+          results.sort((a, b) => b.timestamp - a.timestamp);
+
+          if (onlyFavorites) {
+            results = results.filter(i => i.isFavorite);
+          }
+
+          if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            results = results.filter(i => 
+              (i.prompt && i.prompt.toLowerCase().includes(q)) ||
+              (i.model && i.model.toLowerCase().includes(q)) ||
+              (i.style && i.style.toLowerCase().includes(q)) ||
+              (String(i.seed).includes(q))
+            );
+          }
+
+          // Ensure object URLs are active for records with blobs
+          results.forEach(item => {
+            if (item.blob && (!item.url || item.url.startsWith('blob:'))) {
+              item.url = URL.createObjectURL(item.blob);
+            }
+          });
+
+          resolve(results);
+        };
+
+        req.onerror = (e) => reject(e.target.error);
+      });
+    } else {
+      let items = this._getLocalStorageList();
+      if (onlyFavorites) items = items.filter(i => i.isFavorite);
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        items = items.filter(i => (i.prompt && i.prompt.toLowerCase().includes(q)));
+      }
+      return items;
+    }
+  },
+
+  /**
+   * Toggle favorite status
+   */
+  async toggleFavorite(id) {
+    if (this.db) {
+      return new Promise((resolve, reject) => {
+        const tx = this.db.transaction([STORE_NAME], 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const getReq = store.get(id);
+
+        getReq.onsuccess = () => {
+          const item = getReq.result;
+          if (!item) {
+            resolve(false);
+            return;
+          }
+          item.isFavorite = !item.isFavorite;
+          const putReq = store.put(item);
+          putReq.onsuccess = () => resolve(item.isFavorite);
+          putReq.onerror = (e) => reject(e.target.error);
+        };
+        getReq.onerror = (e) => reject(e.target.error);
+      });
+    } else {
+      const items = this._getLocalStorageList();
+      const item = items.find(i => i.id === id);
+      if (item) {
+        item.isFavorite = !item.isFavorite;
+        localStorage.setItem('bychance_history', JSON.stringify(items));
+        return item.isFavorite;
+      }
+      return false;
+    }
+  },
+
+  /**
+   * Delete an image by ID
+   */
+  async deleteImage(id) {
+    if (this.db) {
+      return new Promise((resolve, reject) => {
+        const tx = this.db.transaction([STORE_NAME], 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.delete(id);
+        req.onsuccess = () => resolve(true);
+        req.onerror = (e) => reject(e.target.error);
+      });
+    } else {
+      let items = this._getLocalStorageList();
+      items = items.filter(i => i.id !== id);
+      localStorage.setItem('bychance_history', JSON.stringify(items));
+      return true;
+    }
+  },
+
+  /**
+   * Clear all history
+   */
+  async clearAll() {
+    if (this.db) {
+      return new Promise((resolve, reject) => {
+        const tx = this.db.transaction([STORE_NAME], 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.clear();
+        req.onsuccess = () => resolve(true);
+        req.onerror = (e) => reject(e.target.error);
+      });
+    } else {
+      localStorage.removeItem('bychance_history');
+      return true;
+    }
+  },
+
+  /**
+   * Export all generations metadata as JSON
+   */
+  async exportBackup() {
+    const list = await this.getAllImages();
+    // Exclude heavy blobs and redact any sensitive query params from JSON const cleanList = list.map(item => {
+      const copy = { ...item };
+      delete copy.blob;
+      copy.url = this._sanitizeUrl(copy.url || '');
+      return copy;
+    });
+
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(cleanList, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute('href', dataStr);
+    dlAnchor.setAttribute('download', `bychance_backup_${new Date().toISOString().slice(0, 10)}.json`);
+    dlAnchor.click();
+  },
+
+  _getLocalStorageList() {
+    try {
+      const raw = localStorage.getItem('bychance_history');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+};
+
+
+// === MODULE: Viewer ===
+
+/**
+ * Bychance - Image Viewer & Lightbox Module
+ * 
+ * Provides:
+ * - Interactive lightbox with zoom, pan, and keyboard navigation
+ * - Full generation metadata inspector
+ * - Quick actions: Download, Copy Prompt, Reuse Settings, Variations, Favorite, Delete
+ */
+
+
+const Viewer = {
+  activeItem: null,
+  galleryItems: [],
+  currentIndex: -1,
+  zoomLevel: 1,
+  panX: 0,
+  panY: 0,
+  isDragging: false,
+  dragStartX: 0,
+  dragStartY: 0,
+  onApplySettingsCallback: null,
+
+  init(onApplySettings) {
+    this.onApplySettingsCallback = onApplySettings;
+    this._bindEvents();
+  },
+
+  /**
+   * Open the viewer with a specific item and current gallery list for navigation
+   */
+  open(item, fullList = []) {
+    this.activeItem = item;
+    this.galleryItems = fullList;
+    this.currentIndex = fullList.findIndex(i => i.id === item.id);
+    this.zoomLevel = 1;
+    this.panX = 0;
+    this.panY = 0;
+
+    const modal = document.getElementById('lightbox-modal');
+    if (!modal) return;
+
+    this.render();
+    modal.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+  },
+
+  /**
+   * Close the viewer
+   */
+  close() {
+    const modal = document.getElementById('lightbox-modal');
+    if (modal) modal.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+    this.activeItem = null;
+  },
+
+  /**
+   * Update modal contents with activeItem data
+   */
+  render() {
+    const item = this.activeItem;
+    if (!item) return;
+
+    const imgEl = document.getElementById('lightbox-image');
+    if (imgEl) {
+      imgEl.src = Storage._sanitizeUrl(item.url);
+      imgEl.alt = item.prompt || 'Generated anime illustration';
+      this._updateImageTransform();
+    }
+
+    // Populate metadata
+    this._setText('lightbox-prompt', item.prompt);
+    
+    // Perchance evaluated prompt section (only if different from template)
+    const evaluatedContainer = document.getElementById('lightbox-evaluated-container');
+    if (evaluatedContainer) {
+      if (item.evaluatedPrompt && item.evaluatedPrompt !== item.prompt) {
+        evaluatedContainer.classList.remove('hidden');
+        this._setText('lightbox-evaluated-prompt', item.evaluatedPrompt);
+      } else {
+        evaluatedContainer.classList.add('hidden');
+      }
+    }
+
+    this._setText('lightbox-negative', item.negativePrompt || 'None');
+    this._setText('lightbox-model', item.model || 'FLUX Anime');
+    this._setText('lightbox-style', item.style ? (item.style.replace('-', ' ').toUpperCase()) : 'Default');
+    this._setText('lightbox-dimensions', `${item.width} × ${item.height} (${item.aspectRatio || '2:3'})`);
+    this._setText('lightbox-seed', String(item.seed));
+    this._setText('lightbox-duration', item.durationMs ? `${(item.durationMs / 1000).toFixed(1)}s` : 'Instant');
+    this._setText('lightbox-date', new Date(item.timestamp).toLocaleString());
+
+    // Favorite button state
+    const favBtn = document.getElementById('lightbox-fav-btn');
+    if (favBtn) {
+      favBtn.innerHTML = item.isFavorite 
+        ? `<svg class="w-5 h-5 text-amber-400 fill-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Favorited`
+        : `<svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke-width="2"/></svg> Favorite`;
+    }
+
+    // Prev / Next button states
+    const prevBtn = document.getElementById('lightbox-prev-btn');
+    const nextBtn = document.getElementById('lightbox-next-btn');
+    if (prevBtn) prevBtn.disabled = this.currentIndex <= 0;
+    if (nextBtn) nextBtn.disabled = this.currentIndex < 0 || this.currentIndex >= this.galleryItems.length - 1;
+  },
+
+  /**
+   * Navigate to next image
+   */
+  next() {
+    if (this.currentIndex < this.galleryItems.length - 1) {
+      this.currentIndex++;
+      this.activeItem = this.galleryItems[this.currentIndex];
+      this.zoomLevel = 1;
+      this.panX = 0;
+      this.panY = 0;
+      this.render();
+    }
+  },
+
+  /**
+   * Navigate to previous image
+   */
+  prev() {
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+      this.activeItem = this.galleryItems[this.currentIndex];
+      this.zoomLevel = 1;
+      this.panX = 0;
+      this.panY = 0;
+      this.render();
+    }
+  },
+
+  /**
+   * Zoom controls
+   */
+  zoomIn() {
+    this.zoomLevel = Math.min(this.zoomLevel + 0.25, 3.5);
+    this._updateImageTransform();
+  },
+
+  zoomOut() {
+    this.zoomLevel = Math.max(this.zoomLevel - 0.25, 0.5);
+    if (this.zoomLevel === 1) {
+      this.panX = 0;
+      this.panY = 0;
+    }
+    this._updateImageTransform();
+  },
+
+  resetZoom() {
+    this.zoomLevel = 1;
+    this.panX = 0;
+    this.panY = 0;
+    this._updateImageTransform();
+  },
+
+  _updateImageTransform() {
+    const imgEl = document.getElementById('lightbox-image');
+    if (imgEl) {
+      imgEl.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.zoomLevel})`;
+    }
+    const zoomText = document.getElementById('lightbox-zoom-level');
+    if (zoomText) {
+      zoomText.textContent = `${Math.round(this.zoomLevel * 100)}%`;
+    }
+  },
+
+  /**
+   * Download the active image file
+   */
+  async download() {
+    if (!this.activeItem) return;
+    const item = this.activeItem;
+    const slug = (item.prompt || 'anime')
+      .slice(0, 25)
+      .replace(/[^a-zA-Z0-9]/g, '_')
+      .toLowerCase();
+    const filename = `bychance_${slug}_${item.seed}.png`;
+
+    try {
+      if (item.blob) {
+        const url = URL.createObjectURL(item.blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } else {
+        const res = await fetch(item.url);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+      this.showToast('Image downloaded!');
+    } catch (e) {
+      console.warn('Direct blob download failed, falling back to anchor', e);
+      const safeUrl = Storage._sanitizeUrl(item.url);
+      if (safeUrl) {
+        const a = document.createElement('a');
+        a.href = safeUrl;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.download = filename;
+        a.click();
+      }
+    }
+  },
+
+  /**
+   * Copy prompt or seed to clipboard
+   */
+  async copyText(text, label = 'Prompt') {
+    try {
+      await navigator.clipboard.writeText(text);
+      this.showToast(`${label} copied to clipboard!`);
+    } catch {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      this.showToast(`${label} copied!`);
+    }
+  },
+
+  /**
+   * Apply settings from the active item into generation inputs
+   */
+  applySettings() {
+    if (!this.activeItem || !this.onApplySettingsCallback) return;
+    this.onApplySettingsCallback(this.activeItem);
+    this.close();
+    this.showToast('Applied prompt and settings!');
+  },
+
+  /**
+   * Toggle favorite
+   */
+  async toggleFavorite() {
+    if (!this.activeItem) return;
+    const isFav = await Storage.toggleFavorite(this.activeItem.id);
+    this.activeItem.isFavorite = isFav;
+    this.render();
+    this.showToast(isFav ? 'Added to favorites ⭐' : 'Removed from favorites');
+  },
+
+  /**
+   * Delete image
+   */
+  async deleteItem() {
+    if (!this.activeItem) return;
+    if (!confirm('Are you sure you want to delete this image?')) return;
+    await Storage.deleteImage(this.activeItem.id);
+    this.showToast('Image deleted');
+    this.close();
+    // Dispatch event so gallery refreshes
+    window.dispatchEvent(new CustomEvent('bychance:image-deleted', { detail: { id: this.activeItem.id } }));
+  },
+
+  showToast(message) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.remove('opacity-0', 'pointer-events-none');
+    toast.classList.add('opacity-100');
+    setTimeout(() => {
+      toast.classList.remove('opacity-100');
+      toast.classList.add('opacity-0', 'pointer-events-none');
+    }, 2400);
+  },
+
+  _setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  },
+
+  _bindEvents() {
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('lightbox-modal');
+      if (!modal || modal.classList.contains('hidden')) return;
+
+      if (e.key === 'Escape') this.close();
+      if (e.key === 'ArrowRight') this.next();
+      if (e.key === 'ArrowLeft') this.prev();
+      if (e.key === '+' || e.key === '=') this.zoomIn();
+      if (e.key === '-') this.zoomOut();
+      if (e.key === '0') this.resetZoom();
+    });
+
+    // Panning image with mouse
+    const imgWrapper = document.getElementById('lightbox-image-wrapper');
+    if (imgWrapper) {
+      imgWrapper.addEventListener('mousedown', (e) => {
+        if (this.zoomLevel <= 1) return;
+        this.isDragging = true;
+        this.dragStartX = e.clientX - this.panX;
+        this.dragStartY = e.clientY - this.panY;
+        imgWrapper.style.cursor = 'grabbing';
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!this.isDragging) return;
+        this.panX = e.clientX - this.dragStartX;
+        this.panY = e.clientY - this.dragStartY;
+        this._updateImageTransform();
+      });
+
+      window.addEventListener('mouseup', () => {
+        this.isDragging = false;
+        if (imgWrapper) imgWrapper.style.cursor = this.zoomLevel > 1 ? 'grab' : 'default';
+      });
+
+      // Mouse wheel zoom
+      imgWrapper.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        if (e.deltaY < 0) this.zoomIn();
+        else this.zoomOut();
+      }, { passive: false });
+    }
+  }
+};
+
+
+// === MODULE: ImageGenerator ===
+
+/**
+ * Bychance - Image Generation Service
+ * 
+ * Supports:
+ * - Pollinations.ai FLUX & Turbo models (Free, zero-key, high-res)
+ * - Automatic host failover (image.pollinations.ai & gen.pollinations.ai)
+ * - Hugging Face Inference API
+ * - Custom WebUI / OpenAI-compatible image endpoints
+ * - Optimized aspect ratio dimension mapping (max-edge 1024 to prevent GPU timeouts)
+ * - Quality boosting & negative prompt enrichment
+ * - Batch generation (1, 2, 4 images)
+ */
+
+
+const ImageGenerator = {
+  // Configurable settings
+  settings: {
+    provider: 'pollinations', // 'pollinations' | 'huggingface' | 'custom'
+    defaultModel: 'flux',
+    pollinationsKey: '',
+    hfToken: '',
+    hfModel: 'cagliostrolab/animagine-xl-3.1',
+    customEndpoint: '',
+    customApiKey: ''
+  },
+
+  // Dimension presets optimized for free GPU inference (<= 1024 to prevent OOM)
+  aspectRatios: {
+    '1:1': { label: 'Square (1:1)', width: 1024, height: 1024, cssRatio: '1 / 1' },
+    '2:3': { label: 'Portrait (2:3)', width: 680, height: 1024, cssRatio: '2 / 3' },
+    '3:4': { label: 'Portrait (3:4)', width: 768, height: 1024, cssRatio: '3 / 4' },
+    '9:16': { label: 'Story/Phone (9:16)', width: 576, height: 1024, cssRatio: '9 / 16' },
+    '3:2': { label: 'Landscape (3:2)', width: 1024, height: 680, cssRatio: '3 / 2' },
+    '4:3': { label: 'Landscape (4:3)', width: 1024, height: 768, cssRatio: '4 / 3' },
+    '16:9': { label: 'Cinematic (16:9)', width: 1024, height: 576, cssRatio: '16 / 9' }
+  },
+
+  /**
+   * Initialize settings from localStorage (non-sensitive) and sessionStorage (API keys)
+   */
+  init() {
+    try {
+      const saved = localStorage.getItem('bychance_settings');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Migrate any legacy keys out of persistent localStorage into sessionStorage
+        const hadLegacyKeys = Boolean(parsed.pollinationsKey || parsed.hfToken || parsed.customApiKey);
+        this.settings = {
+          ...this.settings,
+          provider: parsed.provider || this.settings.provider,
+          defaultModel: parsed.defaultModel || this.settings.defaultModel,
+          hfModel: parsed.hfModel || this.settings.hfModel,
+          customEndpoint: parsed.customEndpoint || this.settings.customEndpoint
+        };
+        if (hadLegacyKeys) {
+          this.settings.pollinationsKey = parsed.pollinationsKey || '';
+          this.settings.hfToken = parsed.hfToken || '';
+          this.settings.customApiKey = parsed.customApiKey || '';
+          this.saveSettings(this.settings);
+        }
+      }
+      const savedSecrets = sessionStorage.getItem('bychance_secrets');
+      if (savedSecrets) {
+        const parsedSecrets = JSON.parse(savedSecrets);
+        this.settings.pollinationsKey = parsedSecrets.pollinationsKey || this.settings.pollinationsKey || '';
+        this.settings.hfToken = parsedSecrets.hfToken || this.settings.hfToken || '';
+        this.settings.customApiKey = parsedSecrets.customApiKey || this.settings.customApiKey || '';
+      }
+    } catch (e) {
+      console.warn('Could not load settings from storage');
+    }
+  },
+
+  /**
+   * Save non-sensitive settings to localStorage and API credentials to sessionStorage
+   */
+  saveSettings(newSettings) {
+    this.settings = { ...this.settings, ...newSettings };
+    try {
+      const publicSettings = {
+        provider: this.settings.provider,
+        defaultModel: this.settings.defaultModel,
+        hfModel: this.settings.hfModel,
+        customEndpoint: this.settings.customEndpoint
+      };
+      localStorage.setItem('bychance_settings', JSON.stringify(publicSettings));
+
+      const secretSettings = {
+        pollinationsKey: this.settings.pollinationsKey || '',
+        hfToken: this.settings.hfToken || '',
+        customApiKey: this.settings.customApiKey || ''
+      };
+      sessionStorage.setItem('bychance_secrets', JSON.stringify(secretSettings));
+    } catch (e) {
+      console.warn('Could not save settings');
+    }
+  },
+
+  /**
+   * Prepare the final prompt by:
+   * 1. Resolving Perchance template syntax {a|b|c}
+   * 2. Appending style preset tokens if selected
+   * 3. Appending master anime quality boosters if enabled
+   */
+  preparePrompt(rawPrompt, styleKey = '', enableBoosters = true) {
+    // 1. Resolve Perchance curly brackets
+    let evaluated = PerchanceEngine.evaluate(rawPrompt);
+
+    // 2. Apply style preset
+    let styleSuffix = '';
+    let styleNegative = '';
+    let styleModel = null;
+
+    if (styleKey && PerchanceEngine.stylePresets[styleKey]) {
+      const preset = PerchanceEngine.stylePresets[styleKey];
+      styleSuffix = preset.promptSuffix;
+      styleNegative = preset.negativePrompt;
+      styleModel = preset.recommendedModel || 'flux';
+    }
+
+    // 3. Apply Quality Booster if enabled
+    let boosterTokens = '';
+    if (enableBoosters) {
+      boosterTokens = ', masterpiece, best quality, ultra-detailed anime artstyle, vibrant colors, sharp focus';
+    }
+
+    const fullPrompt = `${evaluated}${styleSuffix}${boosterTokens}`.trim();
+
+    return {
+      evaluatedPrompt: evaluated,
+      fullPrompt: fullPrompt,
+      styleNegative: styleNegative,
+      recommendedModel: styleModel
+    };
+  },
+
+  /**
+   * Generate a single image with automatic retries and failover
+   */
+  async generateSingle({
+    prompt,
+    negativePrompt = '',
+    style = '',
+    aspectRatio = '2:3',
+    seed = null,
+    model = 'flux',
+    guidanceScale = 7.5,
+    enableBoosters = true,
+    batchIndex = 0
+  }) {
+    const startTime = performance.now();
+
+    // Determine dimensions
+    const ratioConfig = this.aspectRatios[aspectRatio] || this.aspectRatios['2:3'];
+    const width = ratioConfig.width;
+    const height = ratioConfig.height;
+
+    // Resolve prompt & style modifiers
+    const prepared = this.preparePrompt(prompt, style, enableBoosters);
+    const finalPrompt = prepared.fullPrompt;
+
+    // Combine user negative prompt with style negative prompt
+    const combinedNegative = [negativePrompt, prepared.styleNegative]
+      .filter(s => s && s.trim().length > 0)
+      .join(', ');
+
+    // Determine seed (random if not specified)
+    const effectiveSeed = (seed !== null && seed !== undefined && seed !== '')
+      ? Number(seed) + batchIndex
+      : Math.floor(Math.random() * 2147483647);
+
+    // Pick model (user selection overrides style recommended)
+    const effectiveModel = (model && model === 'turbo') ? 'turbo' : (prepared.recommendedModel || 'flux');
+
+    let imageUrl = '';
+    let imageBlob = null;
+
+    if (this.settings.provider === 'pollinations') {
+      imageUrl = await this._generatePollinationsWithFailover(finalPrompt, width, height, effectiveSeed, effectiveModel, combinedNegative);
+    } else if (this.settings.provider === 'huggingface') {
+      const result = await this._generateHuggingFace(finalPrompt, combinedNegative, width, height, effectiveSeed);
+      imageUrl = result.url;
+      imageBlob = result.blob;
+    } else if (this.settings.provider === 'custom') {
+      const result = await this._generateCustom(finalPrompt, combinedNegative, width, height, effectiveSeed);
+      imageUrl = result.url;
+      imageBlob = result.blob;
+    }
+
+    // Attempt to convert to Blob for local IndexedDB caching if possible
+    if (!imageBlob && imageUrl) {
+      try {
+        const fetchRes = await fetch(imageUrl, { mode: 'cors' });
+        if (fetchRes.ok) {
+          imageBlob = await fetchRes.blob();
+        }
+      } catch (err) {
+        // Direct browser <img> rendering will still work even if CORS restricts Blob reading
+      }
+    }
+
+    // Never persist API key query parameters in the saved record URL
+    const sanitizedUrl = this._redactUrlSecrets(imageUrl);
+    const displayUrl = imageBlob ? URL.createObjectURL(imageBlob) : sanitizedUrl;
+
+    const duration = Math.round(performance.now() - startTime);
+
+    return {
+      id: 'img_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+      url: displayUrl,
+      blob: imageBlob,
+      prompt: prompt,
+      evaluatedPrompt: prepared.evaluatedPrompt,
+      fullPrompt: finalPrompt,
+      negativePrompt: combinedNegative,
+      style: style,
+      model: effectiveModel,
+      aspectRatio: aspectRatio,
+      width: width,
+      height: height,
+      seed: effectiveSeed,
+      guidanceScale: guidanceScale,
+      durationMs: duration,
+      timestamp: Date.now()
+    };
+  },
+
+  /**
+   * Strip sensitive query parameters (such as key, token, api_key) from a URL
+   */
+  _redactUrlSecrets(rawUrl) {
+    if (!rawUrl || typeof rawUrl !== 'string') return '';
+    try {
+      const parsed = new URL(rawUrl, window.location.origin);
+      ['key', 'api_key', 'apikey', 'token', 'access_token'].forEach(param => {
+        parsed.searchParams.delete(param);
+      });
+      return parsed.toString();
+    } catch {
+      return rawUrl.replace(/([?&])(key|api_key|apikey|token)=[^&]*/gi, '$1').replace(/[?&]$/, '');
+    }
+  },
+
+  /**
+   * Generate a batch of images (1, 2, or 4)
+   */
+  async generateBatch({
+    prompt,
+    negativePrompt = '',
+    style = '',
+    aspectRatio = '2:3',
+    seed = null,
+    model = 'flux',
+    guidanceScale = 7.5,
+    enableBoosters = true,
+    batchCount = 1,
+    onProgress = null
+  }) {
+    const count = Math.min(Math.max(parseInt(batchCount, 10) || 1, 1), 4);
+    const promises = [];
+
+    for (let i = 0; i < count; i++) {
+      const p = this.generateSingle({
+        prompt,
+        negativePrompt,
+        style,
+        aspectRatio,
+        seed,
+        model,
+        guidanceScale,
+        enableBoosters,
+        batchIndex: i
+      }).then(result => {
+        if (onProgress) onProgress({ index: i, count, result, success: true });
+        return result;
+      }).catch(error => {
+        if (onProgress) onProgress({ index: i, count, error, success: false });
+        throw error;
+      });
+
+      promises.push(p);
+    }
+
+    return Promise.allSettled(promises);
+  },
+
+  /**
+   * Helper to load an image via Image object with custom timeout
+   */
+  _preloadImage(url, timeoutMs = 35000) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      let timer = setTimeout(() => {
+        img.src = '';
+        reject(new Error(`Timed out after ${Math.round(timeoutMs / 1000)}s`));
+      }, timeoutMs);
+
+      img.onload = () => {
+        clearTimeout(timer);
+        resolve(url);
+      };
+
+      img.onerror = () => {
+        clearTimeout(timer);
+        reject(new Error('Failed to load image from provider'));
+      };
+
+      img.src = url;
+    });
+  },
+
+  /**
+   * Generates using Pollinations with automatic host failover & fallback models
+   */
+  async _generatePollinationsWithFailover(prompt, width, height, seed, model, negativePrompt) {
+    // 1. Primary Attempt: image.pollinations.ai
+    const primaryUrl = this._buildPollinationsUrl(prompt, width, height, seed, model, negativePrompt, false);
+    try {
+      await this._preloadImage(primaryUrl, 30000);
+      return primaryUrl;
+    } catch (err1) {
+      console.warn('Pollinations primary endpoint failed or timed out:', err1);
+    }
+
+    // 2. Fallback Attempt: gen.pollinations.ai
+    const fallbackUrl = this._buildPollinationsUrl(prompt, width, height, seed, model, negativePrompt, true);
+    try {
+      await this._preloadImage(fallbackUrl, 25000);
+      return fallbackUrl;
+    } catch (err2) {
+      console.warn('Pollinations secondary endpoint failed:', err2);
+    }
+
+    // 3. Fallback Model: turbo model (fastest inference, takes ~2 seconds)
+    if (model !== 'turbo') {
+      const turboUrl = this._buildPollinationsUrl(prompt, width, height, seed, 'turbo', negativePrompt, false);
+      try {
+        await this._preloadImage(turboUrl, 20000);
+        return turboUrl;
+      } catch (err3) {
+        console.warn('Pollinations turbo fallback failed:', err3);
+      }
+    }
+
+    throw new Error('Image generation provider failed or timed out. If using Pollinations, add a free key in Settings (⚙️), or configure Hugging Face / a local WebUI endpoint.');
+  },
+
+  /**
+   * Build clean Pollinations.ai URL
+   */
+  _buildPollinationsUrl(prompt, width, height, seed, model, negativePrompt, useGenHost = false) {
+    // Clean prompt of special characters that interfere with path routing
+    const cleanPrompt = prompt.replace(/[/\\#?&]/g, ' ').replace(/\s+/g, ' ').trim();
+    const encodedPrompt = encodeURIComponent(cleanPrompt);
+    
+    // Model mapping: Pollinations supports 'flux' and 'turbo'
+    const validModel = (model === 'turbo') ? 'turbo' : 'flux';
+
+    const baseUrl = useGenHost
+      ? `https://gen.pollinations.ai/image/${encodedPrompt}`
+      : `https://image.pollinations.ai/prompt/${encodedPrompt}`;
+
+    let url = `${baseUrl}?width=${width}&height=${height}&seed=${seed}&model=${validModel}&nologo=true`;
+
+    if (this.settings.pollinationsKey) {
+      url += `&key=${encodeURIComponent(this.settings.pollinationsKey)}`;
+    }
+
+    if (negativePrompt) {
+      const cleanNeg = negativePrompt.replace(/[/\\#?&]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (cleanNeg) {
+        url += `&negative_prompt=${encodeURIComponent(cleanNeg)}`;
+      }
+    }
+
+    return url;
+  },
+
+  /**
+   * Hugging Face Inference API generator
+   */
+  async _generateHuggingFace(prompt, negativePrompt, width, height, seed) {
+    if (!this.settings.hfToken) {
+      throw new Error('Hugging Face User Access Token is required. Please set it in Settings.');
+    }
+
+    const modelName = (this.settings.hfModel || 'cagliostrolab/animagine-xl-3.1').trim();
+    if (!/^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/.test(modelName)) {
+      throw new Error('Invalid Hugging Face model repository identifier.');
+    }
+    const endpoint = `https://api-inference.huggingface.co/models/${modelName}`;
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.settings.hfToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: {
+          negative_prompt: negativePrompt,
+          width: Math.min(width, 1024),
+          height: Math.min(height, 1024),
+          seed: seed
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Hugging Face API Error (${response.status})`);
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    return { url, blob };
+  },
+
+  /**
+   * Custom Endpoint (WebUI / A1111 / OpenAI compatible)
+   */
+  async _generateCustom(prompt, negativePrompt, width, height, seed) {
+    if (!this.settings.customEndpoint) {
+      throw new Error('Custom Endpoint URL is required. Please configure it in Settings.');
+    }
+
+    let parsedEndpoint;
+    try {
+      parsedEndpoint = new URL(this.settings.customEndpoint);
+    } catch {
+      throw new Error('Invalid Custom Endpoint URL.');
+    }
+    if (parsedEndpoint.protocol !== 'http:' && parsedEndpoint.protocol !== 'https:') {
+      throw new Error('Custom Endpoint URL must use http:// or https://');
+    }
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (this.settings.customApiKey) {
+      headers['Authorization'] = `Bearer ${this.settings.customApiKey}`;
+    }
+
+    // Default to A1111 sdapi/v1/txt2img payload format or OpenAI format
+    const isTxt2Img = parsedEndpoint.pathname.includes('txt2img');
+    const body = isTxt2Img ? {
+      prompt: prompt,
+      negative_prompt: negativePrompt,
+      width: width,
+      height: height,
+      seed: seed,
+      steps: 25,
+      cfg_scale: 7.0
+    } : {
+      prompt: prompt,
+      size: `${width}x${height}`,
+      n: 1,
+      response_format: 'b64_json'
+    };
+
+    const response = await fetch(parsedEndpoint.toString(), {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Custom API Error (${response.status})`);
+    }
+
+    const json = await response.json();
+    let b64 = '';
+
+    if (json.images && json.images[0]) {
+      b64 = json.images[0];
+    } else if (json.data && json.data[0] && json.data[0].b64_json) {
+      b64 = json.data[0].b64_json;
+    } else if (json.data && json.data[0] && json.data[0].url) {
+      const returnedUrl = String(json.data[0].url);
+      if (!/^https?:\/\//i.test(returnedUrl) && !/^data:image\//i.test(returnedUrl)) {
+        throw new Error('Untrusted image URL scheme from custom endpoint');
+      }
+      return { url: this._redactUrlSecrets(returnedUrl), blob: null };
+    } else {
+      throw new Error('Unrecognized response format from custom endpoint');
+    }
+
+    const byteCharacters = atob(b64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'image/png' });
+    const url = URL.createObjectURL(blob);
+
+    return { url, blob };
+  }
+};
+
+
+// === MODULE: App ===
+
+/**
+ * Bychance - Main Application Controller
+ */
+
+
+class App {
+  constructor() {
+    this.isGenerating = false;
+    this.currentSeed = null;
+    this.isSeedLocked = false;
+    this.currentBatch = [];
+    this.galleryItems = [];
+    this.currentFilter = 'all'; // 'all' | 'favorites'
+    this.searchQuery = '';
+  }
+
+  escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  async init() {
+    console.log('Initializing Bychance application...');
+    ImageGenerator.init();
+    await Storage.init();
+
+    Viewer.init((savedItem) => this.applySavedSettings(savedItem));
+
+    this.renderStylePresets();
+    this.renderTemplateLibrary();
+    this.renderTagBuilder();
+    this.bindEvents();
+    await this.loadGallery();
+
+    // Default random seed
+    this.generateNewSeed();
+
+    // Listen for image deletion events from Viewer
+    window.addEventListener('bychance:image-deleted', () => {
+      this.loadGallery();
+    });
+
+    console.log('Bychance initialized successfully.');
+  }
+
+  bindEvents() {
+    // Generate Button
+    const genBtn = document.getElementById('btn-generate');
+    if (genBtn) genBtn.addEventListener('click', () => this.handleGenerate());
+
+    // Keyboard shortcut Ctrl+Enter or Cmd+Enter
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        this.handleGenerate();
+      }
+    });
+
+    // Random Prompt Button (Dice)
+    const btnRandom = document.getElementById('btn-random-prompt');
+    if (btnRandom) {
+      btnRandom.addEventListener('click', () => {
+        const promptInput = document.getElementById('prompt-input');
+        if (promptInput) {
+          promptInput.value = PerchanceEngine.generateRandomPrompt();
+          this.updateSyntaxPreview();
+          this.showToast('Rolled a new random anime scenario! 🎲');
+        }
+      });
+    }
+
+    // Random Perchance Syntax Template
+    const btnRandomTemplate = document.getElementById('btn-random-template');
+    if (btnRandomTemplate) {
+      btnRandomTemplate.addEventListener('click', () => {
+        const promptInput = document.getElementById('prompt-input');
+        if (promptInput) {
+          promptInput.value = PerchanceEngine.generateRandomTemplate();
+          this.updateSyntaxPreview();
+          this.showToast('Created random Perchance template with {options}! ✨');
+        }
+      });
+    }
+
+    // Seed Randomize Button
+    const btnRandomSeed = document.getElementById('btn-random-seed');
+    if (btnRandomSeed) {
+      btnRandomSeed.addEventListener('click', () => {
+        this.generateNewSeed();
+      });
+    }
+
+    // Seed Lock Toggle
+    const btnLockSeed = document.getElementById('btn-lock-seed');
+    if (btnLockSeed) {
+      btnLockSeed.addEventListener('click', () => {
+        this.isSeedLocked = !this.isSeedLocked;
+        this.updateSeedLockUI();
+      });
+    }
+
+    // Seed Input manual change
+    const seedInput = document.getElementById('seed-input');
+    if (seedInput) {
+      seedInput.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        this.currentSeed = isNaN(val) ? null : val;
+      });
+    }
+
+    // Live Syntax Preview on prompt typing
+    const promptInput = document.getElementById('prompt-input');
+    if (promptInput) {
+      promptInput.addEventListener('input', () => {
+        this.updateSyntaxPreview();
+      });
+    }
+
+    // Guidance Scale Slider
+    const guidanceSlider = document.getElementById('guidance-slider');
+    const guidanceVal = document.getElementById('guidance-val');
+    if (guidanceSlider && guidanceVal) {
+      guidanceSlider.addEventListener('input', (e) => {
+        guidanceVal.textContent = parseFloat(e.target.value).toFixed(1);
+      });
+    }
+
+    // Aspect Ratio Buttons
+    const aspectBtns = document.querySelectorAll('.aspect-ratio-btn');
+    aspectBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        aspectBtns.forEach(b => b.classList.remove('active', 'border-indigo-500', 'bg-indigo-500/20', 'text-indigo-300'));
+        btn.classList.add('active', 'border-indigo-500', 'bg-indigo-500/20', 'text-indigo-300');
+      });
+    });
+
+    // Batch Count Buttons (1, 2, 4)
+    const batchBtns = document.querySelectorAll('.batch-count-btn');
+    batchBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        batchBtns.forEach(b => b.classList.remove('active', 'bg-indigo-600', 'text-white'));
+        btn.classList.add('active', 'bg-indigo-600', 'text-white');
+      });
+    });
+
+    // Toggle Negative Prompt details
+    const toggleNegativeBtn = document.getElementById('toggle-negative-btn');
+    const negativeContainer = document.getElementById('negative-prompt-container');
+    if (toggleNegativeBtn && negativeContainer) {
+      toggleNegativeBtn.addEventListener('click', () => {
+        const isHidden = negativeContainer.classList.contains('hidden');
+        if (isHidden) {
+          negativeContainer.classList.remove('hidden');
+          toggleNegativeBtn.textContent = 'Hide Negative Prompt ▲';
+        } else {
+          negativeContainer.classList.add('hidden');
+          toggleNegativeBtn.textContent = 'Show Negative Prompt ▼';
+        }
+      });
+    }
+
+    // Gallery Filters (All / Favorites)
+    const filterAllBtn = document.getElementById('filter-all-btn');
+    const filterFavBtn = document.getElementById('filter-fav-btn');
+    if (filterAllBtn && filterFavBtn) {
+      filterAllBtn.addEventListener('click', () => {
+        this.currentFilter = 'all';
+        filterAllBtn.classList.add('bg-zinc-800', 'text-white');
+        filterFavBtn.classList.remove('bg-zinc-800', 'text-white');
+        this.loadGallery();
+      });
+      filterFavBtn.addEventListener('click', () => {
+        this.currentFilter = 'favorites';
+        filterFavBtn.classList.add('bg-zinc-800', 'text-white');
+        filterAllBtn.classList.remove('bg-zinc-800', 'text-white');
+        this.loadGallery();
+      });
+    }
+
+    // Gallery Search
+    const gallerySearch = document.getElementById('gallery-search');
+    if (gallerySearch) {
+      gallerySearch.addEventListener('input', (e) => {
+        this.searchQuery = e.target.value.trim();
+        this.loadGallery();
+      });
+    }
+
+    // Clear History Button
+    const btnClearHistory = document.getElementById('btn-clear-history');
+    if (btnClearHistory) {
+      btnClearHistory.addEventListener('click', async () => {
+        if (confirm('Clear all generated image history?')) {
+          await Storage.clearAll();
+          await this.loadGallery();
+          this.showToast('Gallery cleared');
+        }
+      });
+    }
+
+    // Export Backup Button
+    const btnExport = document.getElementById('btn-export-history');
+    if (btnExport) {
+      btnExport.addEventListener('click', () => {
+        Storage.exportBackup();
+      });
+    }
+
+    // Modal Close Buttons
+    document.querySelectorAll('[data-close-modal]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const targetModalId = btn.getAttribute('data-close-modal');
+        const modal = document.getElementById(targetModalId);
+        if (modal) modal.classList.add('hidden');
+      });
+    });
+
+    // Tag Builder Modal toggle
+    const btnOpenTags = document.getElementById('btn-open-tags');
+    const tagModal = document.getElementById('tags-modal');
+    if (btnOpenTags && tagModal) {
+      btnOpenTags.addEventListener('click', () => tagModal.classList.remove('hidden'));
+    }
+
+    // Template Library Modal toggle
+    const btnOpenTemplates = document.getElementById('btn-open-templates');
+    const templatesModal = document.getElementById('templates-modal');
+    if (btnOpenTemplates && templatesModal) {
+      btnOpenTemplates.addEventListener('click', () => templatesModal.classList.remove('hidden'));
+    }
+
+    // Settings Modal toggle
+    const btnOpenSettings = document.getElementById('btn-open-settings');
+    const settingsModal = document.getElementById('settings-modal');
+    if (btnOpenSettings && settingsModal) {
+      btnOpenSettings.addEventListener('click', () => {
+        this.populateSettingsForm();
+        settingsModal.classList.remove('hidden');
+      });
+    }
+
+    // Save Settings
+    const formSettings = document.getElementById('settings-form');
+    if (formSettings) {
+      formSettings.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.saveSettingsForm();
+        settingsModal.classList.add('hidden');
+        this.showToast('Settings saved');
+      });
+    }
+
+    // Lightbox Modal action buttons
+    const lbClose = document.getElementById('lightbox-close-btn');
+    if (lbClose) lbClose.addEventListener('click', () => Viewer.close());
+
+    const lbNext = document.getElementById('lightbox-next-btn');
+    if (lbNext) lbNext.addEventListener('click', () => Viewer.next());
+
+    const lbPrev = document.getElementById('lightbox-prev-btn');
+    if (lbPrev) lbPrev.addEventListener('click', () => Viewer.prev());
+
+    const lbZoomIn = document.getElementById('lightbox-zoom-in');
+    if (lbZoomIn) lbZoomIn.addEventListener('click', () => Viewer.zoomIn());
+
+    const lbZoomOut = document.getElementById('lightbox-zoom-out');
+    if (lbZoomOut) lbZoomOut.addEventListener('click', () => Viewer.zoomOut());
+
+    const lbZoomReset = document.getElementById('lightbox-zoom-reset');
+    if (lbZoomReset) lbZoomReset.addEventListener('click', () => Viewer.resetZoom());
+
+    const lbDownload = document.getElementById('lightbox-download-btn');
+    if (lbDownload) lbDownload.addEventListener('click', () => Viewer.download());
+
+    const lbCopyPrompt = document.getElementById('lightbox-copy-prompt-btn');
+    if (lbCopyPrompt) lbCopyPrompt.addEventListener('click', () => {
+      if (Viewer.activeItem) Viewer.copyText(Viewer.activeItem.prompt, 'Prompt');
+    });
+
+    const lbCopySeed = document.getElementById('lightbox-copy-seed-btn');
+    if (lbCopySeed) lbCopySeed.addEventListener('click', () => {
+      if (Viewer.activeItem) Viewer.copyText(String(Viewer.activeItem.seed), 'Seed');
+    });
+
+    const lbApplySettings = document.getElementById('lightbox-apply-settings-btn');
+    if (lbApplySettings) lbApplySettings.addEventListener('click', () => Viewer.applySettings());
+
+    const lbFav = document.getElementById('lightbox-fav-btn');
+    if (lbFav) lbFav.addEventListener('click', async () => {
+      await Viewer.toggleFavorite();
+      this.loadGallery();
+    });
+
+    const lbDelete = document.getElementById('lightbox-delete-btn');
+    if (lbDelete) lbDelete.addEventListener('click', () => Viewer.deleteItem());
+  }
+
+  /**
+   * Update Perchance Syntax Preview pill under prompt box
+   */
+  updateSyntaxPreview() {
+    const promptInput = document.getElementById('prompt-input');
+    const previewContainer = document.getElementById('syntax-preview-container');
+    const previewText = document.getElementById('syntax-preview-text');
+    if (!promptInput || !previewContainer || !previewText) return;
+
+    const val = promptInput.value;
+    if (val.includes('{') && val.includes('}')) {
+      const resolved = PerchanceEngine.evaluate(val);
+      previewText.textContent = resolved;
+      previewContainer.classList.remove('hidden');
+    } else {
+      previewContainer.classList.add('hidden');
+    }
+  }
+
+  /**
+   * Generate new random seed
+   */
+  generateNewSeed() {
+    this.currentSeed = Math.floor(Math.random() * 2147483647);
+    const seedInput = document.getElementById('seed-input');
+    if (seedInput) seedInput.value = this.currentSeed;
+  }
+
+  updateSeedLockUI() {
+    const btnLock = document.getElementById('btn-lock-seed');
+    if (!btnLock) return;
+    if (this.isSeedLocked) {
+      btnLock.innerHTML = `<svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`;
+      btnLock.title = 'Seed is locked (consistent character/composition)';
+      this.showToast('Seed locked 🔒');
+    } else {
+      btnLock.innerHTML = `<svg class="w-4 h-4 text-zinc-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>`;
+      btnLock.title = 'Seed is unlocked (will randomize each generation)';
+      this.showToast('Seed unlocked 🔓');
+    }
+  }
+
+  /**
+   * Render Style Presets Pills
+   */
+  renderStylePresets() {
+    const container = document.getElementById('style-presets-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    // "None / Default" preset
+    const defaultBtn = document.createElement('button');
+    defaultBtn.className = 'style-preset-btn active px-3 py-1.5 rounded-lg text-xs font-medium border border-indigo-500 bg-indigo-500/20 text-indigo-300 transition-all flex items-center gap-1.5 whitespace-nowrap';
+    defaultBtn.setAttribute('data-style', '');
+    defaultBtn.innerHTML = `<span>✨</span><span>Default</span>`;
+    container.appendChild(defaultBtn);
+
+    Object.entries(PerchanceEngine.stylePresets).forEach(([key, preset]) => {
+      const btn = document.createElement('button');
+      btn.className = 'style-preset-btn px-3 py-1.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:border-zinc-700 hover:text-white transition-all flex items-center gap-1.5 whitespace-nowrap';
+      btn.setAttribute('data-style', key);
+      btn.title = preset.description;
+      btn.innerHTML = `<span>🎨</span><span>${preset.name}</span>`;
+      container.appendChild(btn);
+    });
+
+    // Style button clicks
+    container.querySelectorAll('.style-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        container.querySelectorAll('.style-preset-btn').forEach(b => {
+          b.classList.remove('active', 'border-indigo-500', 'bg-indigo-500/20', 'text-indigo-300');
+          b.classList.add('border-zinc-800', 'bg-zinc-900/60', 'text-zinc-300');
+        });
+        btn.classList.add('active', 'border-indigo-500', 'bg-indigo-500/20', 'text-indigo-300');
+        btn.classList.remove('border-zinc-800', 'bg-zinc-900/60', 'text-zinc-300');
+      });
+    });
+  }
+
+  /**
+   * Render Template Library Modal
+   */
+  renderTemplateLibrary() {
+    const list = document.getElementById('templates-list');
+    if (!list) return;
+
+    list.innerHTML = '';
+    PerchanceEngine.templates.forEach(tpl => {
+      const card = document.createElement('div');
+      card.className = 'p-4 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:border-indigo-500/50 hover:bg-zinc-900 transition-all cursor-pointer group flex flex-col justify-between';
+      card.innerHTML = `
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xl">${tpl.icon}</span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400">${tpl.category}</span>
+          </div>
+          <h4 class="font-medium text-sm text-zinc-200 group-hover:text-indigo-400 transition-colors mb-1.5">${tpl.title}</h4>
+          <p class="text-xs text-zinc-400 line-clamp-3 font-mono leading-relaxed bg-zinc-950/50 p-2 rounded-lg border border-zinc-800/50">${tpl.template}</p>
+        </div>
+        <div class="mt-3 flex items-center justify-between pt-2 border-t border-zinc-800/50">
+          <span class="text-xs text-indigo-400 font-medium">Use Template →</span>
+          <button class="roll-btn text-xs px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300" title="Evaluate immediately">🎲 Roll One</button>
+        </div>
+      `;
+
+      // Use raw template
+      card.addEventListener('click', (e) => {
+        if (e.target.classList.contains('roll-btn')) return;
+        const promptInput = document.getElementById('prompt-input');
+        if (promptInput) {
+          promptInput.value = tpl.template;
+          this.updateSyntaxPreview();
+          document.getElementById('templates-modal').classList.add('hidden');
+          this.showToast(`Loaded ${tpl.title} template!`);
+        }
+      });
+
+      // Roll evaluated option directly
+      const rollBtn = card.querySelector('.roll-btn');
+      if (rollBtn) {
+        rollBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const promptInput = document.getElementById('prompt-input');
+          if (promptInput) {
+            promptInput.value = PerchanceEngine.evaluate(tpl.template);
+            this.updateSyntaxPreview();
+            document.getElementById('templates-modal').classList.add('hidden');
+            this.showToast(`Evaluated ${tpl.title} prompt!`);
+          }
+        });
+      }
+
+      list.appendChild(card);
+    });
+  }
+
+  /**
+   * Render Tag Builder Modal
+   */
+  renderTagBuilder() {
+    const container = document.getElementById('tags-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+    const categories = PerchanceEngine.getTagCategories();
+
+    categories.forEach(cat => {
+      const section = document.createElement('div');
+      section.className = 'mb-4';
+      section.innerHTML = `
+        <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">${cat.name}</h4>
+        <div class="flex flex-wrap gap-1.5">
+          ${cat.tags.map(tag => `
+            <button class="tag-pill px-2.5 py-1 rounded-lg text-xs bg-zinc-800/80 hover:bg-indigo-600 hover:text-white text-zinc-300 transition-colors border border-zinc-700/50" data-tag="${tag}">
+              + ${tag}
+            </button>
+          `).join('')}
+        </div>
+      `;
+
+      section.querySelectorAll('.tag-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tag = btn.getAttribute('data-tag');
+          const promptInput = document.getElementById('prompt-input');
+          if (promptInput) {
+            const current = promptInput.value.trim();
+            promptInput.value = current ? `${current}, ${tag}` : tag;
+            this.updateSyntaxPreview();
+            this.showToast(`Added tag: ${tag}`);
+          }
+        });
+      });
+
+      container.appendChild(section);
+    });
+  }
+
+  /**
+   * Read all input parameters from UI
+   */
+  getGenerationParams() {
+    const promptInput = document.getElementById('prompt-input');
+    const prompt = promptInput ? promptInput.value.trim() : '';
+
+    const negativeInput = document.getElementById('negative-input');
+    const negativePrompt = negativeInput ? negativeInput.value.trim() : '';
+
+    // Active Style
+    const activeStyleBtn = document.querySelector('.style-preset-btn.active');
+    const style = activeStyleBtn ? activeStyleBtn.getAttribute('data-style') : '';
+
+    // Active Aspect Ratio
+    const activeAspectBtn = document.querySelector('.aspect-ratio-btn.active');
+    const aspectRatio = activeAspectBtn ? activeAspectBtn.getAttribute('data-ratio') : '2:3';
+
+    // Active Batch Count
+    const activeBatchBtn = document.querySelector('.batch-count-btn.active');
+    const batchCount = activeBatchBtn ? parseInt(activeBatchBtn.getAttribute('data-count'), 10) : 1;
+
+    // Guidance Scale
+    const guidanceSlider = document.getElementById('guidance-slider');
+    const guidanceScale = guidanceSlider ? parseFloat(guidanceSlider.value) : 7.5;
+
+    // Model selection
+    const modelSelect = document.getElementById('model-select');
+    const model = modelSelect ? modelSelect.value : 'flux';
+
+    // Quality Booster Checkbox
+    const boosterCheck = document.getElementById('quality-booster-toggle');
+    const enableBoosters = boosterCheck ? boosterCheck.checked : true;
+
+    return {
+      prompt,
+      negativePrompt,
+      style,
+      aspectRatio,
+      batchCount,
+      guidanceScale,
+      model,
+      enableBoosters,
+      seed: this.currentSeed
+    };
+  }
+
+  /**
+   * Handle the primary Generate action
+   */
+  async handleGenerate() {
+    if (this.isGenerating) return;
+
+    const params = this.getGenerationParams();
+    if (!params.prompt) {
+      this.showToast('Please enter a prompt or roll a random one! 🎲');
+      return;
+    }
+
+    this.isGenerating = true;
+    this.updateGeneratingUI(true);
+
+    // Setup preview area with placeholder skeleton cards
+    this.setupBatchPreviewGrid(params.batchCount, params.aspectRatio);
+
+    try {
+      const results = await ImageGenerator.generateBatch({
+        ...params,
+        onProgress: (progress) => {
+          this.handleImageItemProgress(progress);
+        }
+      });
+
+      // Save successful generations into storage and refresh gallery
+      for (const res of results) {
+        if (res.status === 'fulfilled' && res.value) {
+          await Storage.saveImage(res.value);
+        }
+      }
+
+      await this.loadGallery();
+      this.showToast('Generated image(s) successfully! ✨');
+
+      // Randomize seed if unlocked
+      if (!this.isSeedLocked) {
+        this.generateNewSeed();
+      }
+    } catch (err) {
+      console.error('Generation batch error:', err);
+      this.showToast(`Generation failed: ${err.message || 'Network error'}`);
+    } finally {
+      this.isGenerating = false;
+      this.updateGeneratingUI(false);
+    }
+  }
+
+  /**
+   * Setup placeholder skeleton cards in the live preview area
+   */
+  setupBatchPreviewGrid(count, aspectRatio) {
+    const grid = document.getElementById('live-preview-grid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+    const ratioInfo = ImageGenerator.aspectRatios[aspectRatio] || ImageGenerator.aspectRatios['2:3'];
+
+    // Adjust grid columns based on batch size
+    grid.className = count === 1 
+      ? 'grid grid-cols-1 max-w-lg mx-auto gap-4' 
+      : (count === 2 ? 'grid grid-cols-1 sm:grid-cols-2 gap-4' : 'grid grid-cols-2 sm:grid-cols-4 gap-4');
+
+    for (let i = 0; i < count; i++) {
+      const card = document.createElement('div');
+      card.id = `preview-card-${i}`;
+      card.className = 'relative rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-900 flex flex-col items-center justify-center shadow-xl group';
+      card.style.aspectRatio = ratioInfo.cssRatio;
+
+      card.innerHTML = `
+        <div class="absolute inset-0 bg-gradient-to-br from-indigo-950/20 to-zinc-950 animate-pulse flex flex-col items-center justify-center p-4 text-center">
+          <div class="w-10 h-10 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+          <span class="text-xs font-medium text-zinc-400">Rendering anime artwork #${i + 1}...</span>
+          <span class="text-[10px] text-zinc-500 mt-1">Applying FLUX attention layers</span>
+        </div>
+      `;
+
+      grid.appendChild(card);
+    }
+  }
+
+  /**
+   * Handle single item completion in a batch
+   */
+  handleImageItemProgress({ index, result, success, error }) {
+    const card = document.getElementById(`preview-card-${index}`);
+    if (!card) return;
+
+    if (success && result) {
+      const safeUrl = this.escapeHtml(Storage._sanitizeUrl(result.url));
+      const safeAlt = this.escapeHtml(result.prompt);
+      const safePrompt = this.escapeHtml(result.evaluatedPrompt || result.prompt);
+      const safeSeed = this.escapeHtml(result.seed);
+      const safeDuration = ((Number(result.durationMs) || 0) / 1000).toFixed(1);
+
+      card.innerHTML = `
+        <img src="${safeUrl}" alt="${safeAlt}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3 pointer-events-none">
+          <p class="text-xs text-white line-clamp-2 font-medium">${safePrompt}</p>
+          <div class="flex items-center justify-between text-[10px] text-zinc-300 mt-1">
+            <span>Seed: ${safeSeed}</span>
+            <span>${safeDuration}s</span>
+          </div>
+        </div>
+        <button class="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 backdrop-blur hover:bg-black text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity" title="Open Viewer">
+          🔍
+        </button>
+      `;
+
+      card.classList.remove('cursor-wait');
+      card.classList.add('cursor-pointer');
+      card.addEventListener('click', () => {
+        Viewer.open(result, this.galleryItems);
+      });
+    } else {
+      const safeErr = this.escapeHtml(error ? error.message : 'Timeout');
+      card.innerHTML = `
+        <div class="p-4 text-center">
+          <span class="text-2xl mb-2 block">⚠️</span>
+          <p class="text-xs text-rose-400 font-medium">Generation Failed</p>
+          <p class="text-[10px] text-zinc-500 mt-1 line-clamp-2">${safeErr}</p>
+        </div>
+      `;
+    }
+  }
+
+  /**
+   * Update UI generation state (button loading spinner, progress bar)
+   */
+  updateGeneratingUI(loading) {
+    const btn = document.getElementById('btn-generate');
+    const progressBar = document.getElementById('generation-progress-bar');
+    if (btn) {
+      if (loading) {
+        btn.disabled = true;
+        btn.innerHTML = `
+          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Generating Anime Art...
+        `;
+        if (progressBar) progressBar.classList.remove('hidden');
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Generate Anime</span><span class="text-xs opacity-75 font-normal ml-1">(Ctrl+↵)</span>`;
+        if (progressBar) progressBar.classList.add('hidden');
+      }
+    }
+  }
+
+  /**
+   * Load and render Gallery from storage
+   */
+  async loadGallery() {
+    const list = await Storage.getAllImages(
+      this.currentFilter === 'favorites',
+      this.searchQuery
+    );
+    this.galleryItems = list;
+
+    const countEl = document.getElementById('gallery-count');
+    if (countEl) countEl.textContent = `${list.length} item${list.length === 1 ? '' : 's'}`;
+
+    const container = document.getElementById('gallery-grid');
+    if (!container) return;
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div class="col-span-full py-16 text-center text-zinc-500">
+          <span class="text-4xl block mb-3">🎨</span>
+          <p class="text-sm font-medium text-zinc-400">No images yet</p>
+          <p class="text-xs text-zinc-500 mt-1">Roll a prompt and click "Generate Anime" to create your first masterpiece!</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = '';
+    list.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'relative rounded-xl overflow-hidden border border-zinc-800/80 bg-zinc-900 group cursor-pointer hover:border-indigo-500/50 transition-all';
+      
+      const ratioInfo = ImageGenerator.aspectRatios[item.aspectRatio] || ImageGenerator.aspectRatios['2:3'];
+      card.style.aspectRatio = ratioInfo.cssRatio;
+
+      const safeUrl = this.escapeHtml(Storage._sanitizeUrl(item.url));
+      const safeAlt = this.escapeHtml(item.prompt);
+      const safePrompt = this.escapeHtml(item.evaluatedPrompt || item.prompt);
+      const safeSeed = this.escapeHtml(item.seed);
+      const safeModel = this.escapeHtml(item.model || 'FLUX');
+
+      card.innerHTML = `
+        <img src="${safeUrl}" alt="${safeAlt}" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2.5">
+          <div class="flex justify-end gap-1">
+            <button class="fav-quick-btn p-1.5 rounded-lg bg-black/60 hover:bg-black/90 text-white" title="Favorite">
+              ${item.isFavorite ? '⭐' : '☆'}
+            </button>
+          </div>
+          <div>
+            <p class="text-[11px] text-white line-clamp-2 font-medium">${safePrompt}</p>
+            <div class="flex items-center justify-between text-[9px] text-zinc-400 mt-1">
+              <span>Seed: ${safeSeed}</span>
+              <span>${safeModel}</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Quick favorite
+      const favBtn = card.querySelector('.fav-quick-btn');
+      if (favBtn) {
+        favBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const isFav = await Storage.toggleFavorite(item.id);
+          item.isFavorite = isFav;
+          favBtn.textContent = isFav ? '⭐' : '☆';
+          if (this.currentFilter === 'favorites' && !isFav) {
+            this.loadGallery();
+          }
+        });
+      }
+
+      // Open Lightbox
+      card.addEventListener('click', () => {
+        Viewer.open(item, this.galleryItems);
+      });
+
+      container.appendChild(card);
+    });
+  }
+
+  /**
+   * Apply settings from an existing generation record
+   */
+  applySavedSettings(item) {
+    const promptInput = document.getElementById('prompt-input');
+    if (promptInput) promptInput.value = item.prompt;
+
+    const negInput = document.getElementById('negative-input');
+    if (negInput && item.negativePrompt) negInput.value = item.negativePrompt;
+
+    this.currentSeed = item.seed;
+    const seedInput = document.getElementById('seed-input');
+    if (seedInput) seedInput.value = item.seed;
+
+    if (item.aspectRatio) {
+      document.querySelectorAll('.aspect-ratio-btn').forEach(b => {
+        if (b.getAttribute('data-ratio') === item.aspectRatio) {
+          b.click();
+        }
+      });
+    }
+
+    if (item.style) {
+      document.querySelectorAll('.style-preset-btn').forEach(b => {
+        if (b.getAttribute('data-style') === item.style) {
+          b.click();
+        }
+      });
+    }
+
+    if (item.model) {
+      const modelSelect = document.getElementById('model-select');
+      if (modelSelect) modelSelect.value = item.model;
+    }
+
+    this.updateSyntaxPreview();
+  }
+
+  populateSettingsForm() {
+    const providerSelect = document.getElementById('settings-provider');
+    const pollinationsKeyInput = document.getElementById('settings-pollinations-key');
+    const hfTokenInput = document.getElementById('settings-hf-token');
+    const hfModelInput = document.getElementById('settings-hf-model');
+    const customEndpointInput = document.getElementById('settings-custom-endpoint');
+    const customApiKeyInput = document.getElementById('settings-custom-api-key');
+    const pollinationsSection = document.getElementById('settings-pollinations-section');
+    const hfSection = document.getElementById('settings-hf-section');
+    const customSection = document.getElementById('settings-custom-section');
+
+    if (providerSelect) {
+      providerSelect.value = ImageGenerator.settings.provider;
+
+      const updateSections = () => {
+        const val = providerSelect.value;
+        if (pollinationsSection) pollinationsSection.style.display = val === 'pollinations' ? 'block' : 'none';
+        if (hfSection) hfSection.style.display = val === 'huggingface' ? 'block' : 'none';
+        if (customSection) customSection.style.display = val === 'custom' ? 'block' : 'none';
+      };
+
+      updateSections();
+      providerSelect.onchange = updateSections;
+    }
+    if (pollinationsKeyInput) pollinationsKeyInput.value = ImageGenerator.settings.pollinationsKey || '';
+    if (hfTokenInput) hfTokenInput.value = ImageGenerator.settings.hfToken || '';
+    if (hfModelInput) hfModelInput.value = ImageGenerator.settings.hfModel || '';
+    if (customEndpointInput) customEndpointInput.value = ImageGenerator.settings.customEndpoint || '';
+    if (customApiKeyInput) customApiKeyInput.value = ImageGenerator.settings.customApiKey || '';
+  }
+
+  saveSettingsForm() {
+    const providerSelect = document.getElementById('settings-provider');
+    const pollinationsKeyInput = document.getElementById('settings-pollinations-key');
+    const hfTokenInput = document.getElementById('settings-hf-token');
+    const hfModelInput = document.getElementById('settings-hf-model');
+    const customEndpointInput = document.getElementById('settings-custom-endpoint');
+    const customApiKeyInput = document.getElementById('settings-custom-api-key');
+
+    ImageGenerator.saveSettings({
+      provider: providerSelect ? providerSelect.value : 'pollinations',
+      pollinationsKey: pollinationsKeyInput ? pollinationsKeyInput.value.trim() : '',
+      hfToken: hfTokenInput ? hfTokenInput.value.trim() : '',
+      hfModel: hfModelInput ? hfModelInput.value.trim() : '',
+      customEndpoint: customEndpointInput ? customEndpointInput.value.trim() : '',
+      customApiKey: customApiKeyInput ? customApiKeyInput.value.trim() : ''
+    });
+  }
+
+  showToast(msg) {
+    Viewer.showToast(msg);
+  }
+}
+
+// Bootstrap app on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+  const app = new App();
+  app.init();
+});
+
+})();
+</script>
+</body>
+</html>
