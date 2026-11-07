@@ -7,12 +7,24 @@
 const PresetManager = (() => {
     const STORAGE_KEY_FULL = "bychance_v2_custom_full_presets";
     const STORAGE_KEY_SECTION = "bychance_v2_custom_section_presets";
-    const STORAGE_KEY_LAST_STATE = "bychance_v2_last_workbench_state";
+    const STORAGE_KEY_LAST_STATE = "bychance_v3_last_workbench_state";
 
-    const DEFAULT_NEGATIVE = "lowres, worst quality, low quality, bad anatomy, bad hands, extra digits, fewer digits, blurry, watermark, signature, text, jpeg artifacts, deformed, mutated hands";
+    const DEFAULT_NEGATIVE = "3d, photorealistic, realistic photo, lowres, worst quality, low quality, bad anatomy, bad hands, extra digits, fewer digits, blurry, watermark, signature, text, jpeg artifacts, deformed, mutated hands";
 
     // Built-in Full Setup Presets
     const BUILTIN_FULL_PRESETS = [
+        {
+            id: "full_2d_pinup",
+            name: "2D Pinup Style (Default)",
+            builtin: true,
+            sections: {
+                character: "1girl, solo, stylized 2D pinup proportions, curvy figure, wide hips, thick thighs, narrow waist, stylized large head, large expressive eyes, long eyelashes, detailed iris catchlights, expressive facial features",
+                outfit: "confident pinup stance, hand on hip, playful expression, form-fitting stylized outfit, crisp fabric folds",
+                scene: "clean simple studio backdrop, subtle gradient background, soft framing vignette",
+                style: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, large head, curvy, large expressive eyes, bold clean lineart, smooth cel shading, vibrant saturated colors, glossy specular highlights, masterpiece, best quality, highres",
+                negative: DEFAULT_NEGATIVE
+            }
+        },
         {
             id: "full_rosalina",
             name: "Rosalina — Cosmic Observatory",
@@ -102,6 +114,11 @@ const PresetManager = (() => {
     // Built-in Modular Section Presets
     const BUILTIN_SECTION_PRESETS = {
         character: [
+            {
+                id: "char_2d_pinup",
+                name: "2D Pinup Proportions (Curvy / Expressive)",
+                value: "1girl, solo, stylized 2D pinup proportions, curvy figure, wide hips, thick thighs, narrow waist, stylized large head, large expressive eyes, long eyelashes, detailed iris catchlights, expressive facial features"
+            },
             {
                 id: "char_rosalina",
                 name: "Rosalina (Super Mario)",
@@ -218,6 +235,11 @@ const PresetManager = (() => {
             }
         ],
         style: [
+            {
+                id: "sty_2d_pinup",
+                name: "2D Pinup Style (Default)",
+                value: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, large head, curvy, large expressive eyes, bold clean lineart, smooth cel shading, vibrant saturated colors, glossy specular highlights, masterpiece, best quality, highres"
+            },
             {
                 id: "sty_modern_anime",
                 name: "Modern Anime Key Visual (Shinkai / KyoAni)",

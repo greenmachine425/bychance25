@@ -344,6 +344,17 @@ const PromptEngine = (() => {
             perchance: "{masterpiece, best quality, ultra-detailed, crisp focus|absurdres, studio quality, intricate textures}"
         },
         {
+            match: /\b(pinup|2d pinup|pin-up)\b/gi,
+            label: "2D pinup style",
+            category: "Style",
+            primary: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy figure, stylized large head, large expressive eyes, bold clean lineart, smooth cel shading, vibrant colors",
+            alternatives: [
+                "stylized 2D pinup proportions, exaggerated hourglass silhouette, wide hips, thick thighs, large expressive eyes, crisp ink lineart, glossy cel shading",
+                "modern 2D cartoon pinup aesthetic, curvy stylized anatomy, large head proportion, expressive eyes, clean vector-style linework"
+            ],
+            perchance: "{2D pinup illustration style, wide hips, thick thighs, curvy, stylized large head, large expressive eyes, bold lineart|stylized 2D pinup aesthetic, exaggerated curvy proportions, glossy cel shading}"
+        },
+        {
             match: /\b(anime|anime style)\b/gi,
             label: "anime style",
             category: "Style",
@@ -431,9 +442,10 @@ const PromptEngine = (() => {
     // 3. Curated Quick-Add Tag Chips per Section
     const SECTION_QUICK_TAGS = {
         character: [
+            { label: "+ 2D Pinup Proportions", value: "stylized 2D pinup proportions, curvy, wide hips, thick thighs, narrow waist, stylized large head, large expressive eyes" },
             { label: "+ 1girl, solo", value: "1girl, solo" },
             { label: "+ 1boy, solo", value: "1boy, solo" },
-            { label: "+ Expressive Eyes", value: "detailed iris texture, sparkling eye catchlights, long eyelashes" },
+            { label: "+ Expressive Eyes", value: "large expressive eyes, detailed iris texture, sparkling eye catchlights, long eyelashes" },
             { label: "+ Windswept Hair", value: "windswept hair, floating hair strands, fine hair detail" },
             { label: "+ Elf Ears", value: "pointed elf ears, ethereal elven features" },
             { label: "+ Perchance Hair Color", value: "{platinum blonde|silver-white|midnight black|pastel pink|crimson red} hair" },
@@ -457,6 +469,7 @@ const PromptEngine = (() => {
             { label: "+ Perchance Time", value: "{golden hour sunset|starlit midnight|crisp morning sunlight|twilight dusk}" }
         ],
         style: [
+            { label: "+ 2D Pinup Style", value: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy, stylized large head, large expressive eyes, bold clean lineart, smooth cel shading, glossy highlights" },
             { label: "+ Masterpiece Boosters", value: "masterpiece, best quality, ultra-detailed, sharp focus, intricate textures" },
             { label: "+ Modern Anime Key Visual", value: "modern anime key visual, vibrant cel shading, crisp lineart, luminous bloom" },
             { label: "+ 90s Retro Cel Anime", value: "1990s retro anime cel aesthetic, hand-painted background, subtle film grain" },
