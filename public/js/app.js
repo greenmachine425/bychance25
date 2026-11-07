@@ -38,24 +38,24 @@ class App {
 
   async init() {
     console.log('Initializing Bychance application & Built-In Window Server...');
-    await Storage.init();
-    await EmbeddedServer.init();
-    ImageGenerator.init();
 
-    Viewer.init((savedItem) => this.applySavedSettings(savedItem));
+    // 1. Bind all UI and button events IMMEDIATELY and synchronously so buttons always work
+    try { this.generateNewSeed(); } catch (e) { console.warn(e); }
+    try { Viewer.init((savedItem) => this.applySavedSettings(savedItem)); } catch (e) { console.warn(e); }
+    try { this.renderStylePresets(); } catch (e) { console.warn(e); }
+    try { this.renderTemplateLibrary(); } catch (e) { console.warn(e); }
+    try { this.renderTagBuilder(); } catch (e) { console.warn(e); }
+    try { this.renderModelGuideModal(); } catch (e) { console.warn(e); }
+    try { this.bindEvents(); } catch (e) { console.warn(e); }
+    try { this.updateSyntaxPreview(); } catch (e) { console.warn(e); }
+    try { this.updatePromptCoach(); } catch (e) { console.warn(e); }
 
-    this.renderStylePresets();
-    this.renderTemplateLibrary();
-    this.renderTagBuilder();
-    this.renderModelGuideModal();
-    await this.renderServerSecurityModal();
-    this.bindEvents();
-    this.updateSyntaxPreview();
-    this.updatePromptCoach();
-    await this.loadGallery();
-
-    // Default random seed
-    this.generateNewSeed();
+    // 2. Initialize storage, built-in window server, and gallery asynchronously with fault isolation
+    try { await Storage.init(); } catch (e) { console.warn('Storage init warning:', e); }
+    try { await EmbeddedServer.init(); } catch (e) { console.warn('EmbeddedServer init warning:', e); }
+    try { ImageGenerator.init(); } catch (e) { console.warn('ImageGenerator init warning:', e); }
+    try { await this.renderServerSecurityModal(); } catch (e) { console.warn(e); }
+    try { await this.loadGallery(); } catch (e) { console.warn(e); }
 
     // Listen for image deletion events from Viewer
     window.addEventListener('bychance:image-deleted', () => {
@@ -1652,8 +1652,17 @@ class App {
   }
 }
 
-// Bootstrap app on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
+// Bootstrap app immediately if DOM is already interactive/complete, or on DOMContentLoaded
+function bootstrapBychance() {
+  if (window.__bychanceBootstrapped) return;
+  window.__bychanceBootstrapped = true;
   const app = new App();
+  window.bychanceApp = app;
   app.init();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrapBychance);
+} else {
+  bootstrapBychance();
+}

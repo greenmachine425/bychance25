@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="no-referrer" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https: http://127.0.0.1:* http://localhost:*; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob: https: http://127.0.0.1:* http://localhost:*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com data: blob:; style-src 'self' 'unsafe-inline' https:; img-src * data: blob:; connect-src * data: blob:; font-src 'self' data: https:; object-src 'none';" />
   <title>Bychance — Anime AI Image Generator</title>
   <meta name="description" content="Clean, powerful anime AI image generation platform inspired by Perchance. Free, unlimited, featuring FLUX, Illustrious XL, Animagine XL, Pony V6 & Dynamic Syntax." />
   
@@ -36,7 +36,8 @@
   </script>
 
   <!-- Custom Stylesheet -->
-  <style>
+  <!-- BYCHANCE_STYLE_START -->
+<style>
 /* Bychance - Custom Styles & Design System */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -177,6 +178,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 </style>
+<!-- BYCHANCE_STYLE_END -->
 </head>
 <body class="bg-[#0b0b0f] text-zinc-100 min-h-screen flex flex-col selection:bg-indigo-500/30 selection:text-indigo-200">
 
@@ -468,6 +470,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
           <button
             id="btn-generate"
             type="button"
+            onclick="if(window.bychanceApp) window.bychanceApp.handleGenerate();"
             class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 text-white font-bold text-base sm:text-lg shadow-xl shadow-indigo-600/25 hover:shadow-indigo-600/40 transform active:scale-[0.99] transition-all flex items-center justify-center gap-2 glow-purple"
           >
             <span>Generate Anime</span>
@@ -932,7 +935,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
   </div>
 
   <!-- Bootstrap App Script -->
-  <script>
+  <!-- BYCHANCE_BUNDLE_START -->
+<script>
 (function() {
 // === MODULE: PerchanceEngine ===
 
@@ -2158,9 +2162,10 @@ const PerchanceEngine = {
 // === MODULE: Storage ===
 
 /**
- * Bychance - Storage Service (IndexedDB + LocalStorage)
+ * Bychance - Storage Service (IndexedDB + LocalStorage + In-Memory Fallback)
  * 
  * Preserves generated images, prompts, seeds, metadata, and user favorites locally.
+ * Resilient across http://, https://, file://, and Android content:// origins.
  */
 
 const DB_NAME = 'bychance_db';
@@ -2169,36 +2174,69 @@ const STORE_NAME = 'generations';
 
 const Storage = {
   db: null,
+  memoryStore: [],
 
   async init() {
     return new Promise((resolve) => {
-      if (!window.indexedDB) {
-        console.warn('IndexedDB not available, using localStorage fallback');
-        resolve(false);
-        return;
-      }
-
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-      request.onupgradeneeded = (event) => {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-          store.createIndex('timestamp', 'timestamp', { unique: false });
-          store.createIndex('isFavorite', 'isFavorite', { unique: false });
-          store.createIndex('model', 'model', { unique: false });
+      let settled = false;
+      const finish = (val) => {
+        if (!settled) {
+          settled = true;
+          resolve(val);
         }
       };
 
-      request.onsuccess = (event) => {
-        this.db = event.target.result;
-        resolve(true);
-      };
+      // Safety timeout so blocked IDB in restricted WebViews never hangs initialization
+      const timer = setTimeout(() => {
+        console.warn('IndexedDB init timed out, using fallback storage');
+        finish(false);
+      }, 1200);
 
-      request.onerror = (event) => {
-        console.error('IndexedDB open error:', event.target.error);
-        resolve(false);
-      };
+      try {
+        const idb = window.indexedDB;
+        if (!idb) {
+          clearTimeout(timer);
+          finish(false);
+          return;
+        }
+
+        const request = idb.open(DB_NAME, DB_VERSION);
+
+        request.onupgradeneeded = (event) => {
+          try {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+              const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+              store.createIndex('timestamp', 'timestamp', { unique: false });
+              store.createIndex('isFavorite', 'isFavorite', { unique: false });
+              store.createIndex('model', 'model', { unique: false });
+            }
+          } catch (upgradeErr) {
+            console.warn('IndexedDB upgrade warning:', upgradeErr);
+          }
+        };
+
+        request.onsuccess = (event) => {
+          clearTimeout(timer);
+          this.db = event.target.result;
+          finish(true);
+        };
+
+        request.onerror = () => {
+          clearTimeout(timer);
+          console.warn('IndexedDB unavailable in this origin, using fallback storage');
+          finish(false);
+        };
+
+        request.onblocked = () => {
+          clearTimeout(timer);
+          finish(false);
+        };
+      } catch (err) {
+        clearTimeout(timer);
+        console.warn('IndexedDB access denied in this context (e.g. file:// or content://), using fallback memory/localStorage');
+        finish(false);
+      }
     });
   },
 
@@ -2220,29 +2258,30 @@ const Storage = {
         ['key', 'api_key', 'apikey', 'token', 'access_token'].forEach(p => parsed.searchParams.delete(p));
         return parsed.toString();
       } catch {
-        return '';
+        return trimmed.replace(/([?&])(key|api_key|apikey|token|access_token)=[^&]*/gi, '$1').replace(/[?&]$/, '');
       }
     }
     return trimmed;
   },
 
   /**
-   * Save a newly generated image record
+   * Save a newly generated image record with automatic fallback to localStorage and RAM
    */
   async saveImage(item) {
     const record = {
-      id: item.id || 'img_' + Date.now(),
+      id: item.id || 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
       prompt: item.prompt || '',
       evaluatedPrompt: item.evaluatedPrompt || item.prompt || '',
       fullPrompt: item.fullPrompt || item.prompt || '',
       negativePrompt: item.negativePrompt || '',
       style: item.style || '',
       model: item.model || 'flux-anime',
+      modelName: item.modelName || item.model || 'FLUX.1 Anime',
       aspectRatio: item.aspectRatio || '2:3',
-      width: item.width || 832,
-      height: item.height || 1216,
+      width: item.width || 680,
+      height: item.height || 1024,
       seed: item.seed,
-      guidanceScale: item.guidanceScale || 7.5,
+      guidanceScale: item.guidanceScale || 5.5,
       durationMs: item.durationMs || 0,
       timestamp: item.timestamp || Date.now(),
       isFavorite: false,
@@ -2250,106 +2289,133 @@ const Storage = {
       blob: item.blob || null
     };
 
-    if (this.db) {
-      return new Promise((resolve, reject) => {
-        const tx = this.db.transaction([STORE_NAME], 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        const req = store.put(record);
+    // Always keep in-session memoryStore updated
+    this.memoryStore = [record, ...this.memoryStore.filter(i => i.id !== record.id)].slice(0, 60);
 
-        req.onsuccess = () => resolve(record);
-        req.onerror = (e) => reject(e.target.error);
-      });
-    } else {
-      // LocalStorage fallback (metadata only)
+    if (this.db) {
       try {
-        const items = this._getLocalStorageList();
-        const stripped = { ...record, blob: null };
-        items.unshift(stripped);
-        if (items.length > 50) items.pop();
-        localStorage.setItem('bychance_history', JSON.stringify(items));
+        await new Promise((resolve, reject) => {
+          const tx = this.db.transaction([STORE_NAME], 'readwrite');
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.put(record);
+          req.onsuccess = () => resolve(record);
+          req.onerror = (e) => reject(e.target.error);
+        });
         return record;
-      } catch (err) {
-        console.error('LocalStorage save error', err);
-        return record;
+      } catch (idbErr) {
+        console.warn('IndexedDB put fallback to localStorage/memory:', idbErr);
       }
     }
+
+    // LocalStorage fallback (metadata only)
+    try {
+      const items = this._getLocalStorageList();
+      const stripped = { ...record, blob: null };
+      const updated = [stripped, ...items.filter(i => i.id !== record.id)].slice(0, 50);
+      localStorage.setItem('bychance_history', JSON.stringify(updated));
+    } catch {
+      // In content:// or strict mode, memoryStore still holds the items
+    }
+    return record;
   },
 
   /**
    * Retrieve all saved images, sorted newest first
    */
   async getAllImages(onlyFavorites = false, searchQuery = '') {
+    let results = [];
+
     if (this.db) {
-      return new Promise((resolve, reject) => {
-        const tx = this.db.transaction([STORE_NAME], 'readonly');
-        const store = tx.objectStore(STORE_NAME);
-        const req = store.getAll();
-
-        req.onsuccess = () => {
-          let results = req.result || [];
-          results.sort((a, b) => b.timestamp - a.timestamp);
-
-          if (onlyFavorites) {
-            results = results.filter(i => i.isFavorite);
-          }
-
-          if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            results = results.filter(i => 
-              (i.prompt && i.prompt.toLowerCase().includes(q)) ||
-              (i.model && i.model.toLowerCase().includes(q)) ||
-              (i.style && i.style.toLowerCase().includes(q)) ||
-              (String(i.seed).includes(q))
-            );
-          }
-
-          // Ensure object URLs are active for records with blobs
-          results.forEach(item => {
-            if (item.blob && (!item.url || item.url.startsWith('blob:'))) {
-              item.url = URL.createObjectURL(item.blob);
-            }
-          });
-
-          resolve(results);
-        };
-
-        req.onerror = (e) => reject(e.target.error);
-      });
-    } else {
-      let items = this._getLocalStorageList();
-      if (onlyFavorites) items = items.filter(i => i.isFavorite);
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        items = items.filter(i => (i.prompt && i.prompt.toLowerCase().includes(q)));
+      try {
+        results = await new Promise((resolve, reject) => {
+          const tx = this.db.transaction([STORE_NAME], 'readonly');
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = (e) => reject(e.target.error);
+        });
+      } catch {
+        results = [];
       }
-      return items;
     }
+
+    if (!results || results.length === 0) {
+      const lsItems = this._getLocalStorageList();
+      // Merge memoryStore and localStorage items
+      const map = new Map();
+      [...this.memoryStore, ...lsItems].forEach(item => {
+        if (item && item.id && !map.has(item.id)) {
+          map.set(item.id, item);
+        }
+      });
+      results = Array.from(map.values());
+    }
+
+    results.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    if (onlyFavorites) {
+      results = results.filter(i => i.isFavorite);
+    }
+
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      results = results.filter(i => 
+        (i.prompt && i.prompt.toLowerCase().includes(q)) ||
+        (i.model && i.model.toLowerCase().includes(q)) ||
+        (i.style && i.style.toLowerCase().includes(q)) ||
+        (String(i.seed).includes(q))
+      );
+    }
+
+    // Ensure object URLs are active for records with blobs
+    results.forEach(item => {
+      if (item.blob && (!item.url || item.url.startsWith('blob:'))) {
+        try {
+          item.url = URL.createObjectURL(item.blob);
+        } catch {
+          // Ignore
+        }
+      }
+    });
+
+    return results;
   },
 
   /**
    * Toggle favorite status
    */
   async toggleFavorite(id) {
-    if (this.db) {
-      return new Promise((resolve, reject) => {
-        const tx = this.db.transaction([STORE_NAME], 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        const getReq = store.get(id);
+    const memItem = this.memoryStore.find(i => i.id === id);
+    if (memItem) {
+      memItem.isFavorite = !memItem.isFavorite;
+    }
 
-        getReq.onsuccess = () => {
-          const item = getReq.result;
-          if (!item) {
-            resolve(false);
-            return;
-          }
-          item.isFavorite = !item.isFavorite;
-          const putReq = store.put(item);
-          putReq.onsuccess = () => resolve(item.isFavorite);
-          putReq.onerror = (e) => reject(e.target.error);
-        };
-        getReq.onerror = (e) => reject(e.target.error);
-      });
-    } else {
+    if (this.db) {
+      try {
+        return await new Promise((resolve, reject) => {
+          const tx = this.db.transaction([STORE_NAME], 'readwrite');
+          const store = tx.objectStore(STORE_NAME);
+          const getReq = store.get(id);
+
+          getReq.onsuccess = () => {
+            const item = getReq.result;
+            if (!item) {
+              resolve(memItem ? memItem.isFavorite : false);
+              return;
+            }
+            item.isFavorite = !item.isFavorite;
+            const putReq = store.put(item);
+            putReq.onsuccess = () => resolve(item.isFavorite);
+            putReq.onerror = (e) => reject(e.target.error);
+          };
+          getReq.onerror = (e) => reject(e.target.error);
+        });
+      } catch {
+        // Fallback below
+      }
+    }
+
+    try {
       const items = this._getLocalStorageList();
       const item = items.find(i => i.id === id);
       if (item) {
@@ -2357,46 +2423,66 @@ const Storage = {
         localStorage.setItem('bychance_history', JSON.stringify(items));
         return item.isFavorite;
       }
-      return false;
+    } catch {
+      // Ignore
     }
+    return memItem ? memItem.isFavorite : false;
   },
 
   /**
    * Delete an image by ID
    */
   async deleteImage(id) {
+    this.memoryStore = this.memoryStore.filter(i => i.id !== id);
+
     if (this.db) {
-      return new Promise((resolve, reject) => {
-        const tx = this.db.transaction([STORE_NAME], 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        const req = store.delete(id);
-        req.onsuccess = () => resolve(true);
-        req.onerror = (e) => reject(e.target.error);
-      });
-    } else {
+      try {
+        await new Promise((resolve, reject) => {
+          const tx = this.db.transaction([STORE_NAME], 'readwrite');
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.delete(id);
+          req.onsuccess = () => resolve(true);
+          req.onerror = (e) => reject(e.target.error);
+        });
+      } catch {
+        // Fallback below
+      }
+    }
+
+    try {
       let items = this._getLocalStorageList();
       items = items.filter(i => i.id !== id);
       localStorage.setItem('bychance_history', JSON.stringify(items));
-      return true;
+    } catch {
+      // Ignore
     }
+    return true;
   },
 
   /**
    * Clear all history
    */
   async clearAll() {
+    this.memoryStore = [];
     if (this.db) {
-      return new Promise((resolve, reject) => {
-        const tx = this.db.transaction([STORE_NAME], 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        const req = store.clear();
-        req.onsuccess = () => resolve(true);
-        req.onerror = (e) => reject(e.target.error);
-      });
-    } else {
-      localStorage.removeItem('bychance_history');
-      return true;
+      try {
+        await new Promise((resolve, reject) => {
+          const tx = this.db.transaction([STORE_NAME], 'readwrite');
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.clear();
+          req.onsuccess = () => resolve(true);
+          req.onerror = (e) => reject(e.target.error);
+        });
+      } catch {
+        // Ignore
+      }
     }
+    try {
+      localStorage.removeItem('bychance_history');
+    } catch {
+      // Ignore
+    }
+    return true;
   },
 
   /**
@@ -2404,7 +2490,7 @@ const Storage = {
    */
   async exportBackup() {
     const list = await this.getAllImages();
-    // Exclude heavy blobs and redact any sensitive query params from JSON const cleanList = list.map(item => {
+    const cleanList = list.map(item => {
       const copy = { ...item };
       delete copy.blob;
       copy.url = this._sanitizeUrl(copy.url || '');
@@ -2543,7 +2629,8 @@ const EmbeddedServer = {
    * Check if a companion localhost server is present; if not, run 100% in-window
    */
   async _probeCompanionBackend() {
-    if (window.location.protocol === 'file:' || !this._originalFetch) {
+    const proto = (typeof window !== 'undefined' && window.location) ? window.location.protocol : '';
+    if ((proto !== 'http:' && proto !== 'https:') || !this._originalFetch) {
       this.localBackendOnline = false;
       this.mode = 'in-window';
       return;
@@ -2587,7 +2674,11 @@ const EmbeddedServer = {
       try {
         if (urlStr.startsWith('/')) {
           pathname = urlStr.split('?')[0];
-        } else if (urlStr.startsWith(window.location.origin)) {
+        } else if (
+          window.location.origin &&
+          window.location.origin !== 'null' &&
+          urlStr.startsWith(window.location.origin)
+        ) {
           pathname = new URL(urlStr).pathname;
         }
       } catch {
@@ -4034,24 +4125,24 @@ class App {
 
   async init() {
     console.log('Initializing Bychance application & Built-In Window Server...');
-    await Storage.init();
-    await EmbeddedServer.init();
-    ImageGenerator.init();
 
-    Viewer.init((savedItem) => this.applySavedSettings(savedItem));
+    // 1. Bind all UI and button events IMMEDIATELY and synchronously so buttons always work
+    try { this.generateNewSeed(); } catch (e) { console.warn(e); }
+    try { Viewer.init((savedItem) => this.applySavedSettings(savedItem)); } catch (e) { console.warn(e); }
+    try { this.renderStylePresets(); } catch (e) { console.warn(e); }
+    try { this.renderTemplateLibrary(); } catch (e) { console.warn(e); }
+    try { this.renderTagBuilder(); } catch (e) { console.warn(e); }
+    try { this.renderModelGuideModal(); } catch (e) { console.warn(e); }
+    try { this.bindEvents(); } catch (e) { console.warn(e); }
+    try { this.updateSyntaxPreview(); } catch (e) { console.warn(e); }
+    try { this.updatePromptCoach(); } catch (e) { console.warn(e); }
 
-    this.renderStylePresets();
-    this.renderTemplateLibrary();
-    this.renderTagBuilder();
-    this.renderModelGuideModal();
-    await this.renderServerSecurityModal();
-    this.bindEvents();
-    this.updateSyntaxPreview();
-    this.updatePromptCoach();
-    await this.loadGallery();
-
-    // Default random seed
-    this.generateNewSeed();
+    // 2. Initialize storage, built-in window server, and gallery asynchronously with fault isolation
+    try { await Storage.init(); } catch (e) { console.warn('Storage init warning:', e); }
+    try { await EmbeddedServer.init(); } catch (e) { console.warn('EmbeddedServer init warning:', e); }
+    try { ImageGenerator.init(); } catch (e) { console.warn('ImageGenerator init warning:', e); }
+    try { await this.renderServerSecurityModal(); } catch (e) { console.warn(e); }
+    try { await this.loadGallery(); } catch (e) { console.warn(e); }
 
     // Listen for image deletion events from Viewer
     window.addEventListener('bychance:image-deleted', () => {
@@ -5648,13 +5739,23 @@ class App {
   }
 }
 
-// Bootstrap app on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
+// Bootstrap app immediately if DOM is already interactive/complete, or on DOMContentLoaded
+function bootstrapBychance() {
+  if (window.__bychanceBootstrapped) return;
+  window.__bychanceBootstrapped = true;
   const app = new App();
+  window.bychanceApp = app;
   app.init();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrapBychance);
+} else {
+  bootstrapBychance();
+}
 
 })();
 </script>
+<!-- BYCHANCE_BUNDLE_END -->
 </body>
 </html>

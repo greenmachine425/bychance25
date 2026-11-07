@@ -112,7 +112,8 @@ export const EmbeddedServer = {
    * Check if a companion localhost server is present; if not, run 100% in-window
    */
   async _probeCompanionBackend() {
-    if (window.location.protocol === 'file:' || !this._originalFetch) {
+    const proto = (typeof window !== 'undefined' && window.location) ? window.location.protocol : '';
+    if ((proto !== 'http:' && proto !== 'https:') || !this._originalFetch) {
       this.localBackendOnline = false;
       this.mode = 'in-window';
       return;
@@ -156,7 +157,11 @@ export const EmbeddedServer = {
       try {
         if (urlStr.startsWith('/')) {
           pathname = urlStr.split('?')[0];
-        } else if (urlStr.startsWith(window.location.origin)) {
+        } else if (
+          window.location.origin &&
+          window.location.origin !== 'null' &&
+          urlStr.startsWith(window.location.origin)
+        ) {
           pathname = new URL(urlStr).pathname;
         }
       } catch {
