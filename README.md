@@ -1,57 +1,46 @@
 # ✨ Bychance — Anime AI Image Generator
 
-A clean, modern web application that functions like **Perchance**, utilizing the same high-tier anime models and combinatorial generation system for creating anime illustrations.
+A clean, modern web application that functions like **Perchance**, powered by model-aware conditioning profiles (**FLUX.1 Anime**, **Illustrious XL / NoobAI**, **Animagine XL 3.1/4.0**, **Pony Diffusion V6 XL**, **FLUX.1 Dev**, **FLUX 3D**, and **SDXL Turbo**), a real-time **Prompt Coach**, and a **350+ Model Identifier & Danbooru Lexicon**.
 
 ---
 
 ## 🌟 Highlights
 
-- **🎲 Full Perchance Syntax Engine**:
+- **🎲 Full Perchance Syntax & Wildcard Engine**:
   - Direct support for Perchance sets: `{option1|option2|option3}`
-  - Weighted probabilities: `{60% rare option|40% common}`
+  - Percentage & ratio weights: `{60% rare option|40% common}` and `{3::kimono|1::armor}`
   - Nested expressions: `{cute {cat|fox} girl|badass {samurai|ninja}}`
-  - Real-time syntax resolution preview as you type!
+  - Built-in dictionary `[wildcards]`: `[subject]`, `[hair]`, `[eyes]`, `[expression]`, `[pose]`, `[outfit]`, `[accessory]`, `[scenery]`, `[lighting]`, `[vfx]`, `[camera]`, `[studio]`, `[quality]`
+  - Real-time syntax resolution preview with instant re-roll!
 
-- **🎨 FLUX & Modern Anime Models**:
-  - **FLUX.1 Anime**: State-of-the-art Japanese animation key visual aesthetics with exceptional anatomy, lighting, and detail.
-  - **FLUX.1 Standard**: General high-fidelity open weights generation.
-  - **SDXL Turbo**: Lightning-fast rapid prototyping in seconds.
-  - **FLUX 3D Anime**: 3D CGI / anime figurine aesthetics.
+- **🧠 Model Intelligence & Conditioning Profiles (7 Architectures)**:
+  - **FLUX.1 Anime (`flux-anime`)**: Hybrid T5-XXL natural language + CLIP-L key visual studio conditioning (`anime key visual`, `official art`, `clean crisp lineart`, `cel shading`).
+  - **Illustrious XL / NoobAI (`illustrious-xl`)**: Canonical Danbooru tag conditioning (`masterpiece, best quality, amazing quality, very aesthetic, absurdres, newest, year 2024, anime coloring`).
+  - **Animagine XL 3.1 / 4.0 (`animagine-xl`)**: Structured quality, rating & era tag suffixes (`masterpiece, best quality, very aesthetic, newest, safe`).
+  - **Pony Diffusion V6 XL (`pony-xl`)**: Score-tag percentile conditioning (`score_9, score_8_up, score_7_up, score_6_up, source_anime, rating_safe`).
+  - **FLUX.1 Dev / Pro (`flux`)**: Natural language spatial composition, lens physics, and readable quoted text (`"NEO TOKYO"`).
+  - **FLUX 3D Anime & Figurine (`flux-3d`)**: Cel-shaded 3D game shaders (*Arc System Works* / *Honkai Star Rail*) and 1/7 scale painted PVC figurine renders (`subsurface scattering`, `octane render`).
+  - **SDXL Turbo / Lightning (`turbo`)**: Distilled 1–4 step fast prototyping (~2s) with front-loaded token prioritization and low CFG.
 
-- **📜 Curated Style Presets**:
-  - **Modern Digital Anime**: Sharp lines, 4K digital key visual, trending on Pixiv
-  - **90s Retro Cel Anime**: Hand-painted cels, film grain, vintage VHS warmth (Sailor Moon / Evangelion / Bebop)
-  - **Studio Ghibli Watercolor**: Whimsical pastoral landscapes, painterly gouache
-  - **Makoto Shinkai**: Radiant twilight skies, volumetric cumulus clouds, starlit reflections
-  - **Studio Trigger / Cyberpunk**: High energy, explosive neon saturation, angular action lines
-  - **Kyoto Animation (KyoAni)**: Glassy expressive eyes, delicate soft bloom, slice-of-life perfection
-  - **Ufotable Action**: High contrast darks, elemental particle VFX, glowing kinetic combat
-  - **Manga Monochrome Ink**: High contrast screentone inks, crosshatching, manga panels
-  - **Chibi & Kawaii Sticker**: Adorable proportions, thick outlines, sticker cutouts
-  - **Dark Fantasy Anime**: Ornate dark armor, glowing runes, eerie gothic mist
+- **⚡ Real-Time Prompt Coach & Auto-Tuner**:
+  - Evaluates your prompt live across **7 core pillars**: *Subject & Count*, *Hair/Eyes/Expression*, *Attire & Props*, *Pose/Angle/Framing*, *Environment*, *Lighting/VFX*, and *Model-Specific Trigger Identifiers*.
+  - One-click **`⚡ Optimize for Model`** and **`⚡ Auto-Tune Model Setup`** buttons that configure optimal Guidance (CFG), deduplicated model triggers, and model-calibrated negative prompts.
+
+- **🏷️ Searchable 350+ Model Identifier & Danbooru Lexicon**:
+  - 12 categorized collections: *Model Quality/Era/Score Identifiers*, *Subject Count & Archetypes*, *Camera Angles & Lenses*, *Haircuts & Bangs*, *Eyes & Micro-Expressions*, *Dynamic Poses*, *Outfits & Fabrics*, *Weapons & Props*, *Lighting Physics & VFX*, *Environments*, *Anime Studios & Mediums*, and *Negative Prompt Identifiers*.
+
+- **🎨 14 Curated Studio & Aesthetic Presets**:
+  - *Modern Digital Anime*, *Illustrious Booru Masterpiece*, *90s Retro Cel Anime*, *Studio Ghibli Watercolor*, *Makoto Shinkai (CoMix Wave)*, *Cyberpunk / Studio Trigger*, *Kyoto Animation (KyoAni)*, *Ufotable Action (VFX)*, *MAPPA Dark Cinematic*, *Manga Monochrome Ink*, *Light Novel / VN Key Art*, *3D Cel / Scale Figurine*, *Chibi & Kawaii Sticker*, and *Dark Fantasy / Gothic*.
 
 - **📜 Perchance Template Library**:
-  - One-click access to classic anime scenarios: *Magical Girl Awakening*, *Cyberpunk Street Ronin*, *Ghibli Countryside Afternoon*, *Shinkai Twilight Rooftop*, *Shonen Battle Awakening*, *Gothic Lolita Moonlight*, *Mecha Pilot Cockpit*, *Cozy Rainy Day Cafe*.
-  - Use templates directly or roll an evaluated prompt with one click.
-
-- **🏷️ Interactive Tag Builder**:
-  - Categorized one-click tags for Character, Hair & Face, Outfit, Scenery & Setting, Lighting & Effects, and Composition.
+  - 12 generator templates including *Astral Magical Girl*, *Cyberpunk Edgerunner Ronin*, *Illustrious XL Booru Formula*, *Pony V6 Score-9 Dynamic Action*, *Infinite `[Wildcard]` Sandbox*, *Ghibli Countryside*, *Makoto Shinkai Twilight*, *Ufotable Elemental Awakening*, *Gothic Lolita Cathedral*, *Mecha Cockpit*, *1/7 Scale Figurine*, and *KyoAni Rainy Cafe*.
 
 - **⚡ Batch Generation & Aspect Ratios**:
   - Render **1, 2, or 4 images** concurrently with live skeleton progress cards.
-  - Supported aspect ratios:
-    - **1:1** Square (1024×1024)
-    - **2:3** Portrait (832×1216)
-    - **3:4** Portrait (768×1024)
-    - **9:16** Phone Wallpaper / Story (720×1280)
-    - **16:9** Widescreen Cinematic (1280×720)
+  - Aspect ratios: **1:1** (1024×1024), **2:3** (680×1024), **3:4** (768×1024), **9:16** (576×1024), **16:9** (1024×576).
 
-- **🔍 Fullscreen Lightbox & Management**:
-  - Interactive pan & zoom (mouse wheel / buttons)
-  - Generation metadata inspector (Prompt, Evaluated template, Seed, Dimensions, Model, Render time)
-  - Quick actions: Download PNG, Copy Prompt, Copy Seed, Reuse Prompt & Settings, Favorite, Delete
-  - IndexedDB local storage: All generations and favorites persist across browser reloads without data loss!
-  - Export gallery history as JSON backup.
+- **🔍 Fullscreen Lightbox & Local Persistence**:
+  - Interactive pan & zoom, metadata inspector, PNG download, prompt/seed copy, settings reuse, IndexedDB persistence, and JSON backup export.
 
 ---
 
@@ -71,10 +60,13 @@ Or specify a custom port:
 python3 server.py 8080
 ```
 
-### 2. Open in Browser
+### 2. Rebuild Standalone Bundle (Optional)
 
-Open your browser and navigate to:
-**`http://localhost:8000`** (or the port displayed in terminal)
+To bundle everything into a single self-contained `standalone.html` file:
+
+```bash
+python3 build_standalone.py
+```
 
 ---
 
@@ -87,24 +79,3 @@ Open your browser and navigate to:
 | `Left / Right Arrow` | Navigate previous/next image in Lightbox |
 | `+` / `-` | Zoom In / Zoom Out in Lightbox |
 | `0` | Reset Zoom to 100% |
-
----
-
-## 📁 Project Structure
-
-```
-Bychance/
-├── server.py               # Multi-threaded Python HTTP server & API
-├── public/                 # Static web application files
-│   ├── index.html          # Main application page
-│   ├── css/
-│   │   └── style.css       # Design system, glassmorphism, animations
-│   └── js/
-│       ├── app.js          # Core application controller & event bindings
-│       ├── perchanceEngine.js # Perchance syntax parser, dictionary & templates
-│       ├── imageGenerator.js  # Multi-provider generation service (FLUX/Anime)
-│       ├── storage.js      # IndexedDB / localStorage persistence
-│       └── viewer.js       # Lightbox image viewer, zoom/pan & actions
-├── gallery/                # Local saved image outputs
-└── README.md               # Documentation
-```

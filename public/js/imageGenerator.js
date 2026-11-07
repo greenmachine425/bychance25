@@ -2,12 +2,13 @@
  * Bychance - Image Generation Service
  * 
  * Supports:
+ * - Model-aware prompt conditioning (FLUX.1 Anime, Illustrious XL, Animagine XL, Pony V6 XL, FLUX.1 Dev, FLUX 3D, SDXL Turbo)
  * - Pollinations.ai FLUX & Turbo models (Free, zero-key, high-res)
  * - Automatic host failover (image.pollinations.ai & gen.pollinations.ai)
- * - Hugging Face Inference API
- * - Custom WebUI / OpenAI-compatible image endpoints
+ * - Hugging Face Inference API with model-specific repository mapping & guidance_scale
+ * - Custom WebUI / A1111 / OpenAI-compatible image endpoints
  * - Optimized aspect ratio dimension mapping (max-edge 1024 to prevent GPU timeouts)
- * - Quality boosting & negative prompt enrichment
+ * - Deduplicated quality boosting & model-calibrated negative prompt enrichment
  * - Batch generation (1, 2, 4 images)
  */
 
@@ -17,7 +18,7 @@ export const ImageGenerator = {
   // Configurable settings
   settings: {
     provider: 'pollinations', // 'pollinations' | 'huggingface' | 'custom'
-    defaultModel: 'flux',
+    defaultModel: 'flux-anime',
     pollinationsKey: '',
     hfToken: '',
     hfModel: 'cagliostrolab/animagine-xl-3.1',
@@ -98,14 +99,37 @@ export const ImageGenerator = {
   },
 
   /**
-   * Prepare the final prompt by:
-   * 1. Resolving Perchance template syntax {a|b|c}
-   * 2. Appending style preset tokens if selected
-   * 3. Appending master anime quality boosters if enabled
+   * Deduplicate comma-separated prompt/negative tokens while preserving order
    */
-  preparePrompt(rawPrompt, styleKey = '', enableBoosters = true) {
-    // 1. Resolve Perchance curly brackets
+  _dedupeTokens(tokenStr) {
+    if (!tokenStr) return '';
+    const seen = new Set();
+    const result = [];
+    for (const part of tokenStr.split(',')) {
+      const trimmed = part.trim();
+      if (!trimmed) continue;
+      const key = trimmed.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        result.push(trimmed);
+      }
+    }
+    return result.join(', ');
+  },
+
+  /**
+   * Prepare the final prompt by:
+   * 1. Resolving Perchance template syntax {a|b|c}, weights, and [wildcards]
+   * 2. Applying model-specific prefix/suffix identifiers if Quality Booster is enabled
+   * 3. Appending style preset tokens if selected
+   * 4. Building a deduplicated model + style negative prompt
+   */
+  preparePrompt(rawPrompt, styleKey = '', enableBoosters = true, modelKey = 'flux-anime') {
+    const profile = PerchanceEngine.modelProfiles[modelKey] || PerchanceEngine.modelProfiles['flux-anime'];
+
+    // 1. Resolve Perchance curly brackets & [wildcards]
     let evaluated = PerchanceEngine.evaluate(rawPrompt);
+    const evalLower = evaluated.toLowerCase();
 
     // 2. Apply style preset
     let styleSuffix = '';
@@ -114,24 +138,50 @@ export const ImageGenerator = {
 
     if (styleKey && PerchanceEngine.stylePresets[styleKey]) {
       const preset = PerchanceEngine.stylePresets[styleKey];
-      styleSuffix = preset.promptSuffix;
-      styleNegative = preset.negativePrompt;
-      styleModel = preset.recommendedModel || 'flux';
+      styleSuffix = preset.promptSuffix || '';
+      styleNegative = preset.negativePrompt || '';
+      styleModel = preset.recommendedModel || modelKey;
     }
 
-    // 3. Apply Quality Booster if enabled
-    let boosterTokens = '';
-    if (enableBoosters) {
-      boosterTokens = ', masterpiece, best quality, ultra-detailed anime artstyle, vibrant colors, sharp focus';
+    // 3. Apply Model-Specific Quality & Conditioning Boosters if enabled
+    let prefixTokens = '';
+    let suffixTokens = '';
+
+    if (enableBoosters && profile) {
+      if (profile.qualityPrefix) {
+        // Only prepend prefix tokens that are not already in the prompt
+        const missingPrefix = profile.qualityPrefix
+          .split(',')
+          .map(s => s.trim())
+          .filter(s => s && !evalLower.includes(s.toLowerCase()));
+        if (missingPrefix.length > 0) {
+          prefixTokens = missingPrefix.join(', ') + ', ';
+        }
+      }
+
+      if (profile.qualitySuffix) {
+        const missingSuffix = profile.qualitySuffix
+          .split(',')
+          .map(s => s.trim())
+          .filter(s => s && !evalLower.includes(s.toLowerCase()));
+        if (missingSuffix.length > 0) {
+          suffixTokens = ', ' + missingSuffix.join(', ');
+        }
+      }
     }
 
-    const fullPrompt = `${evaluated}${styleSuffix}${boosterTokens}`.trim();
+    const rawFullPrompt = `${prefixTokens}${evaluated}${styleSuffix}${suffixTokens}`.trim();
+    const fullPrompt = this._dedupeTokens(rawFullPrompt);
+
+    const modelNegative = profile ? profile.defaultNegative : '';
+    const mergedNegative = this._dedupeTokens([styleNegative, modelNegative].filter(Boolean).join(', '));
 
     return {
       evaluatedPrompt: evaluated,
       fullPrompt: fullPrompt,
-      styleNegative: styleNegative,
-      recommendedModel: styleModel
+      styleNegative: mergedNegative,
+      recommendedModel: styleModel || modelKey,
+      modelProfile: profile
     };
   },
 
@@ -144,8 +194,8 @@ export const ImageGenerator = {
     style = '',
     aspectRatio = '2:3',
     seed = null,
-    model = 'flux',
-    guidanceScale = 7.5,
+    model = 'flux-anime',
+    guidanceScale = 6.0,
     enableBoosters = true,
     batchIndex = 0
   }) {
@@ -156,34 +206,60 @@ export const ImageGenerator = {
     const width = ratioConfig.width;
     const height = ratioConfig.height;
 
-    // Resolve prompt & style modifiers
-    const prepared = this.preparePrompt(prompt, style, enableBoosters);
+    const effectiveModelKey = PerchanceEngine.modelProfiles[model] ? model : 'flux-anime';
+    const profile = PerchanceEngine.modelProfiles[effectiveModelKey];
+
+    // Resolve prompt & model-aware style modifiers
+    const prepared = this.preparePrompt(prompt, style, enableBoosters, effectiveModelKey);
     const finalPrompt = prepared.fullPrompt;
 
-    // Combine user negative prompt with style negative prompt
-    const combinedNegative = [negativePrompt, prepared.styleNegative]
-      .filter(s => s && s.trim().length > 0)
-      .join(', ');
+    // Combine user negative prompt with model + style negative prompt
+    const combinedNegative = this._dedupeTokens(
+      [negativePrompt, prepared.styleNegative]
+        .filter(s => s && s.trim().length > 0)
+        .join(', ')
+    );
 
     // Determine seed (random if not specified)
     const effectiveSeed = (seed !== null && seed !== undefined && seed !== '')
       ? Number(seed) + batchIndex
       : Math.floor(Math.random() * 2147483647);
 
-    // Pick model (user selection overrides style recommended)
-    const effectiveModel = (model && model === 'turbo') ? 'turbo' : (prepared.recommendedModel || 'flux');
+    const pollinationsBackendModel = profile ? profile.pollinationsModel : 'flux';
 
     let imageUrl = '';
     let imageBlob = null;
 
     if (this.settings.provider === 'pollinations') {
-      imageUrl = await this._generatePollinationsWithFailover(finalPrompt, width, height, effectiveSeed, effectiveModel, combinedNegative);
+      imageUrl = await this._generatePollinationsWithFailover(
+        finalPrompt,
+        width,
+        height,
+        effectiveSeed,
+        pollinationsBackendModel,
+        combinedNegative
+      );
     } else if (this.settings.provider === 'huggingface') {
-      const result = await this._generateHuggingFace(finalPrompt, combinedNegative, width, height, effectiveSeed);
+      const result = await this._generateHuggingFace(
+        finalPrompt,
+        combinedNegative,
+        width,
+        height,
+        effectiveSeed,
+        guidanceScale,
+        profile
+      );
       imageUrl = result.url;
       imageBlob = result.blob;
     } else if (this.settings.provider === 'custom') {
-      const result = await this._generateCustom(finalPrompt, combinedNegative, width, height, effectiveSeed);
+      const result = await this._generateCustom(
+        finalPrompt,
+        combinedNegative,
+        width,
+        height,
+        effectiveSeed,
+        guidanceScale
+      );
       imageUrl = result.url;
       imageBlob = result.blob;
     }
@@ -215,7 +291,8 @@ export const ImageGenerator = {
       fullPrompt: finalPrompt,
       negativePrompt: combinedNegative,
       style: style,
-      model: effectiveModel,
+      model: effectiveModelKey,
+      modelName: profile ? profile.shortName : effectiveModelKey,
       aspectRatio: aspectRatio,
       width: width,
       height: height,
@@ -251,8 +328,8 @@ export const ImageGenerator = {
     style = '',
     aspectRatio = '2:3',
     seed = null,
-    model = 'flux',
-    guidanceScale = 7.5,
+    model = 'flux-anime',
+    guidanceScale = 6.0,
     enableBoosters = true,
     batchCount = 1,
     onProgress = null
@@ -361,7 +438,7 @@ export const ImageGenerator = {
       ? `https://gen.pollinations.ai/image/${encodedPrompt}`
       : `https://image.pollinations.ai/prompt/${encodedPrompt}`;
 
-    let url = `${baseUrl}?width=${width}&height=${height}&seed=${seed}&model=${validModel}&nologo=true`;
+    let url = `${baseUrl}?width=${width}&height=${height}&seed=${seed}&model=${validModel}&nologo=true&enhance=false`;
 
     if (this.settings.pollinationsKey) {
       url += `&key=${encodeURIComponent(this.settings.pollinationsKey)}`;
@@ -380,12 +457,13 @@ export const ImageGenerator = {
   /**
    * Hugging Face Inference API generator
    */
-  async _generateHuggingFace(prompt, negativePrompt, width, height, seed) {
+  async _generateHuggingFace(prompt, negativePrompt, width, height, seed, guidanceScale = 6.5, profile = null) {
     if (!this.settings.hfToken) {
       throw new Error('Hugging Face User Access Token is required. Please set it in Settings.');
     }
 
-    const modelName = (this.settings.hfModel || 'cagliostrolab/animagine-xl-3.1').trim();
+    const defaultRepo = (profile && profile.hfRepo) ? profile.hfRepo : 'cagliostrolab/animagine-xl-3.1';
+    const modelName = (this.settings.hfModel || defaultRepo).trim();
     if (!/^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/.test(modelName)) {
       throw new Error('Invalid Hugging Face model repository identifier.');
     }
@@ -403,6 +481,7 @@ export const ImageGenerator = {
           negative_prompt: negativePrompt,
           width: Math.min(width, 1024),
           height: Math.min(height, 1024),
+          guidance_scale: Number(guidanceScale) || 6.5,
           seed: seed
         }
       })
@@ -420,7 +499,7 @@ export const ImageGenerator = {
   /**
    * Custom Endpoint (WebUI / A1111 / OpenAI compatible)
    */
-  async _generateCustom(prompt, negativePrompt, width, height, seed) {
+  async _generateCustom(prompt, negativePrompt, width, height, seed, guidanceScale = 6.5) {
     if (!this.settings.customEndpoint) {
       throw new Error('Custom Endpoint URL is required. Please configure it in Settings.');
     }
@@ -448,8 +527,8 @@ export const ImageGenerator = {
       width: width,
       height: height,
       seed: seed,
-      steps: 25,
-      cfg_scale: 7.0
+      steps: 28,
+      cfg_scale: Number(guidanceScale) || 6.5
     } : {
       prompt: prompt,
       size: `${width}x${height}`,

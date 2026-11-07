@@ -182,7 +182,15 @@ class BychanceHandler(http.server.SimpleHTTPRequestHandler):
             "status": "online",
             "python_version": f"{sys.version_info.major}.{sys.version_info.minor}",
             "server_time": time.time(),
-            "models_available": ["flux-anime", "flux", "turbo", "flux-3d"]
+            "models_available": [
+                "flux-anime",
+                "illustrious-xl",
+                "animagine-xl",
+                "pony-xl",
+                "flux",
+                "flux-3d",
+                "turbo"
+            ]
         }
         self._send_json(200, data)
 

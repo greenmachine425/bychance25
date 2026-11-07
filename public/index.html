@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bychance — Anime AI Image Generator</title>
-  <meta name="description" content="Clean, powerful anime AI image generation platform inspired by Perchance. Free, unlimited, featuring FLUX and Anime models with template randomizer syntax." />
+  <meta name="description" content="Clean, powerful anime AI image generation platform inspired by Perchance. Free, unlimited, featuring FLUX, Illustrious XL, Animagine XL, Pony V6 & Dynamic Syntax." />
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -49,11 +49,17 @@
           <h1 class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-zinc-200 to-indigo-300 bg-clip-text text-transparent">Bychance</h1>
           <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Anime Studio</span>
         </div>
-        <p class="text-[11px] text-zinc-400 hidden sm:block">Perchance-inspired AI Anime Generator with FLUX & Dynamic Syntax</p>
+        <p class="text-[11px] text-zinc-400 hidden sm:block">Perchance-inspired AI Anime Generator with Model Intelligence & Identifier Lexicon</p>
       </div>
     </div>
 
     <div class="flex items-center gap-2">
+      <!-- Model & Prompting Guide Modal Button -->
+      <button id="btn-open-guide" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 transition-all" title="Model Profiles, Trigger Identifiers & Prompt Engineering Guide">
+        <span>📘</span>
+        <span class="hidden md:inline">Model & Prompt Guide</span>
+      </button>
+
       <!-- Templates Modal Button -->
       <button id="btn-open-templates" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 flex items-center gap-1.5 transition-all">
         <span>📜</span>
@@ -63,7 +69,7 @@
       <!-- Tag Builder Modal Button -->
       <button id="btn-open-tags" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 flex items-center gap-1.5 transition-all">
         <span>🏷️</span>
-        <span class="hidden md:inline">Tag Builder</span>
+        <span class="hidden md:inline">Identifier Lexicon</span>
       </button>
 
       <!-- Export History Button -->
@@ -89,21 +95,27 @@
 
       <!-- Prompt Input Block -->
       <div class="space-y-3 relative z-10">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <label for="prompt-input" class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
             <span>Anime Prompt</span>
-            <span class="text-[10px] lowercase text-zinc-500 font-normal">(supports Perchance <code class="text-indigo-400">{opt1|opt2}</code> syntax)</span>
+            <span class="text-[10px] lowercase text-zinc-500 font-normal">(supports <code class="text-indigo-400">{a|b}</code>, <code class="text-indigo-400">{60% a|40% b}</code> &amp; <code class="text-pink-400">[wildcards]</code>)</span>
           </label>
 
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <!-- Smart Optimize for Model Button -->
+            <button id="btn-optimize-prompt" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 transition-all" title="Inject model-specific trigger identifiers, framing, and lighting without losing your prompt">
+              <span>⚡</span>
+              <span>Optimize for Model</span>
+            </button>
+
             <!-- Random Prompt Button -->
-            <button id="btn-random-prompt" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/60 flex items-center gap-1.5 transition-all shadow-sm" title="Roll a random anime prompt from dictionary">
+            <button id="btn-random-prompt" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/60 flex items-center gap-1.5 transition-all shadow-sm" title="Roll a random model-tuned anime prompt from dictionary">
               <span>🎲</span>
               <span>Random Prompt</span>
             </button>
 
             <!-- Random Template Button -->
-            <button id="btn-random-template" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 transition-all" title="Generate Perchance template with options">
+            <button id="btn-random-template" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 transition-all" title="Generate Perchance template with {options}">
               <span>✨</span>
               <span>Syntax Roll</span>
             </button>
@@ -114,21 +126,76 @@
           <textarea
             id="prompt-input"
             rows="3"
-            placeholder="e.g. 1girl, {silver|sakura pink} hair, {cyberpunk jacket|school uniform}, {Tokyo night|ancient shrine}, anime key visual, masterpiece"
+            placeholder="e.g. 1girl, solo, {silver|sakura pink} hair, {cyberpunk jacket|serafuku sailor uniform}, {Neo-Tokyo alley|cherry blossom shrine}, cowboy shot, backlighting, anime key visual, masterpiece"
             class="w-full rounded-2xl bg-zinc-950/70 border border-zinc-800 p-4 text-sm sm:text-base text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-sans leading-relaxed resize-y"
-          >1girl, {sakura pink|silver white} hair with twin tails, glowing sapphire eyes, {school sailor uniform|cyberpunk techwear}, drifting cherry blossom petals, Japanese shrine courtyard, cinematic lighting, masterpiece anime artstyle</textarea>
+          >1girl, solo, {sakura pink|silver white} hair in long twintails, glowing sapphire eyes, gentle smile, looking at viewer, wearing {serafuku school sailor uniform|cyberpunk techwear jacket}, cowboy shot, drifting cherry blossom petals, Shinto shrine courtyard at twilight, cinematic backlighting, tyndall effect, anime key visual, official art, masterpiece</textarea>
+        </div>
+
+        <!-- Dynamic Wildcard Quick-Insert Bar -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[11px]">
+          <span class="text-zinc-500 font-medium whitespace-nowrap mr-1">Insert Wildcard:</span>
+          <button type="button" data-wildcard="[subject]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[subject]</button>
+          <button type="button" data-wildcard="[hair]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[hair]</button>
+          <button type="button" data-wildcard="[eyes]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[eyes]</button>
+          <button type="button" data-wildcard="[expression]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[expression]</button>
+          <button type="button" data-wildcard="[pose]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[pose]</button>
+          <button type="button" data-wildcard="[outfit]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[outfit]</button>
+          <button type="button" data-wildcard="[accessory]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[accessory]</button>
+          <button type="button" data-wildcard="[scenery]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[scenery]</button>
+          <button type="button" data-wildcard="[lighting]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[lighting]</button>
+          <button type="button" data-wildcard="[vfx]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[vfx]</button>
+          <button type="button" data-wildcard="[camera]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[camera]</button>
+          <button type="button" data-wildcard="[studio]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[studio]</button>
         </div>
 
         <!-- Perchance Syntax Live Evaluation Preview -->
-        <div id="syntax-preview-container" class="hidden flex items-center gap-2 p-2.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 text-xs text-indigo-300">
-          <span class="text-sm">🎲</span>
-          <span class="font-medium text-zinc-400 whitespace-nowrap">Evaluated preview:</span>
-          <span id="syntax-preview-text" class="text-zinc-200 truncate italic"></span>
+        <div id="syntax-preview-container" class="hidden flex items-center justify-between gap-2 p-2.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 text-xs text-indigo-300">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-sm">🎲</span>
+            <span class="font-medium text-zinc-400 whitespace-nowrap">Live Syntax Preview:</span>
+            <span id="syntax-preview-text" class="text-zinc-200 truncate italic"></span>
+          </div>
+          <button id="btn-reroll-preview" type="button" class="px-2 py-0.5 rounded bg-indigo-500/20 hover:bg-indigo-500/30 text-[11px] text-indigo-200 whitespace-nowrap">Re-roll ↻</button>
+        </div>
+
+        <!-- Smart Prompt Coach & Model Identifier Advisor -->
+        <div id="prompt-coach-panel" class="rounded-2xl bg-zinc-950/60 border border-zinc-800/90 p-3.5 space-y-2.5">
+          <!-- Top Row: Prompt Readiness Score + Active Model Profile Summary -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Prompt Strength:</span>
+              <div class="w-24 h-2 rounded-full bg-zinc-800 overflow-hidden">
+                <div id="coach-score-bar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-300" style="width: 85%"></div>
+              </div>
+              <span id="coach-score-badge" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Studio Masterpiece (7/7)</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span id="coach-model-badge" class="text-[11px] text-indigo-300 font-medium">FLUX.1 Anime • CFG 5.5</span>
+              <button id="btn-apply-model-defaults" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 transition-all" title="Set recommended Guidance Scale, Negative Prompt, and Model Trigger tokens">
+                ⚡ Auto-Tune Model Setup
+              </button>
+            </div>
+          </div>
+
+          <!-- 7 Prompt Pillars Checklist & Quick Suggestions -->
+          <div id="coach-pillars-grid" class="flex flex-wrap items-center gap-1.5">
+            <!-- Dynamically populated pillar chips -->
+          </div>
+
+          <!-- Missing Pillar / Model Trigger Quick-Insert Recommendations -->
+          <div id="coach-recommendations-row" class="flex flex-wrap items-center gap-1.5 pt-1 border-t border-zinc-800/60 text-[11px]">
+            <!-- Dynamically populated clickable identifier recommendations -->
+          </div>
+
+          <!-- Model Diagnostic Warnings (if any) -->
+          <div id="coach-warnings-row" class="hidden text-[11px] text-amber-300/90 bg-amber-950/30 border border-amber-500/30 rounded-xl px-3 py-1.5">
+          </div>
         </div>
 
         <!-- Style Presets Carousel -->
         <div>
-          <label class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block mb-2">Art Styles & Aesthetic Presets</label>
+          <label class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block mb-2">Art Styles &amp; Studio Presets</label>
           <div id="style-presets-container" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
             <!-- Dynamically populated style buttons -->
           </div>
@@ -168,10 +235,15 @@
 
           <!-- Model Switcher (3 cols) -->
           <div class="lg:col-span-3 space-y-1.5">
-            <label for="model-select" class="text-[11px] font-medium text-zinc-400 block">AI Model Engine</label>
+            <label for="model-select" class="text-[11px] font-medium text-zinc-400 block">AI Model Profile &amp; Conditioning</label>
             <select id="model-select" class="w-full rounded-xl bg-zinc-950/70 border border-zinc-800 px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500">
-              <option value="flux" selected>FLUX.1 (High Aesthetic Anime)</option>
-              <option value="turbo">SDXL Turbo (Ultra Fast ~2s)</option>
+              <option value="flux-anime" selected>FLUX.1 Anime (Key Visual Studio)</option>
+              <option value="illustrious-xl">Illustrious XL / NoobAI (Danbooru Tags)</option>
+              <option value="animagine-xl">Animagine XL 3.1/4.0 (Era &amp; Quality)</option>
+              <option value="pony-xl">Pony Diffusion V6 XL (Score-9 Anime)</option>
+              <option value="flux">FLUX.1 Dev / Pro (Natural Language)</option>
+              <option value="flux-3d">FLUX 3D Anime &amp; Figurine (Cel-CG)</option>
+              <option value="turbo">SDXL Turbo / Lightning (Fast ~2s)</option>
             </select>
           </div>
 
@@ -215,26 +287,29 @@
             </button>
 
             <!-- Quality Booster Checkbox -->
-            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white select-none">
+            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white select-none" title="Automatically injects model-specific quality, score, and aesthetic identifiers during generation">
               <input type="checkbox" id="quality-booster-toggle" checked class="rounded bg-zinc-900 border-zinc-700 text-indigo-600 focus:ring-indigo-500" />
-              <span>Anime Quality Booster</span>
+              <span>Model Quality &amp; Identifier Booster</span>
             </label>
           </div>
 
           <!-- Guidance Scale Slider -->
           <div class="flex items-center gap-3">
-            <span class="text-zinc-400">Guidance Scale:</span>
-            <input type="range" id="guidance-slider" min="3" max="15" step="0.5" value="7.5" class="w-24 sm:w-32" />
-            <span id="guidance-val" class="font-mono text-zinc-300 w-8">7.5</span>
+            <span class="text-zinc-400">Guidance (CFG):</span>
+            <input type="range" id="guidance-slider" min="1" max="15" step="0.5" value="5.5" class="w-24 sm:w-32" />
+            <span id="guidance-val" class="font-mono text-zinc-300 w-8">5.5</span>
           </div>
         </div>
 
-        <div id="negative-prompt-container" class="hidden pt-2">
-          <label for="negative-input" class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block mb-1">Negative Prompt (Things to exclude)</label>
+        <div id="negative-prompt-container" class="hidden pt-2 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="negative-input" class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Negative Prompt (Excluded Identifiers)</label>
+            <button id="btn-fill-model-negative" type="button" class="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium">Load Recommended Negative for Model</button>
+          </div>
           <input
             id="negative-input"
             type="text"
-            placeholder="e.g. low quality, blurry, deformed hands, extra fingers, bad anatomy, text, watermark"
+            placeholder="e.g. worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, blurry, text, watermark"
             class="w-full rounded-xl bg-zinc-950/70 border border-zinc-800 px-3.5 py-2 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500"
           />
         </div>
@@ -311,7 +386,7 @@
   <!-- Footer -->
   <footer class="mt-auto border-t border-zinc-800/60 py-6 px-4 text-center text-xs text-zinc-500">
     <p>Bychance — Free Anime Image Generator inspired by Perchance.</p>
-    <p class="mt-1 text-[11px] text-zinc-600">Built with FLUX.1 & Perchance Template Syntactic Expansion.</p>
+    <p class="mt-1 text-[11px] text-zinc-600">Built with FLUX.1, Illustrious XL, Animagine XL, Pony V6 &amp; Perchance Syntactic Expansion.</p>
   </footer>
 
   <!-- Lightbox Fullscreen Modal -->
@@ -408,7 +483,7 @@
           </button>
           
           <button id="lightbox-apply-settings-btn" class="w-full py-2.5 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 font-semibold text-xs transition-all flex items-center justify-center gap-2">
-            <span>🔄 Reuse Prompt & Settings</span>
+            <span>🔄 Reuse Prompt &amp; Settings</span>
           </button>
 
           <button id="lightbox-delete-btn" class="w-full py-2 px-4 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-950/20 text-xs transition-all">
@@ -421,15 +496,35 @@
     </div>
   </div>
 
+  <!-- Model Intelligence & Prompt Engineering Guide Modal -->
+  <div id="guide-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-5xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[88vh]">
+      <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">📘</span>
+          <div>
+            <h3 class="font-bold text-base text-white">Model Intelligence, Trigger Identifiers &amp; Prompting Best Practices</h3>
+            <p class="text-xs text-zinc-400">How each anime model understands prompts, recommended CFG scales, trigger words, and Perchance syntax</p>
+          </div>
+        </div>
+        <button data-close-modal="guide-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+      </div>
+
+      <div id="guide-content" class="p-5 overflow-y-auto space-y-6 text-xs">
+        <!-- Dynamically populated by app.js -->
+      </div>
+    </div>
+  </div>
+
   <!-- Template Library Modal -->
   <div id="templates-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-    <div class="w-full max-w-3xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[85vh]">
+    <div class="w-full max-w-4xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[85vh]">
       <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <span class="text-xl">📜</span>
           <div>
             <h3 class="font-bold text-base text-white">Perchance Template Library</h3>
-            <p class="text-xs text-zinc-400">Pre-built generator formulas with rich anime combinatorial lists</p>
+            <p class="text-xs text-zinc-400">Pre-built generator formulas with combinatorial sets, weights, and [wildcards]</p>
           </div>
         </div>
         <button data-close-modal="templates-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
@@ -441,21 +536,34 @@
     </div>
   </div>
 
-  <!-- Tag Builder Modal -->
+  <!-- Interactive Identifier Lexicon & Tag Builder Modal -->
   <div id="tags-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-    <div class="w-full max-w-3xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[85vh]">
-      <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
+    <div class="w-full max-w-4xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[88vh]">
+      <div class="p-5 border-b border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div class="flex items-center gap-2.5">
           <span class="text-xl">🏷️</span>
           <div>
-            <h3 class="font-bold text-base text-white">Interactive Tag Builder</h3>
-            <p class="text-xs text-zinc-400">Click any tag pill to append it to your active anime prompt</p>
+            <h3 class="font-bold text-base text-white">Model Identifier Lexicon &amp; Danbooru Tag Builder</h3>
+            <p class="text-xs text-zinc-400">350+ recognized model triggers, Booru tags, camera angles, shaders &amp; negative identifiers</p>
           </div>
         </div>
-        <button data-close-modal="tags-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+        <div class="flex items-center gap-2">
+          <input
+            id="tag-search-input"
+            type="text"
+            placeholder="Filter 350+ identifiers (e.g. score_9, bokeh, hime)..."
+            class="rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 w-56 sm:w-64"
+          />
+          <button data-close-modal="tags-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+        </div>
       </div>
 
-      <div id="tags-container" class="p-5 overflow-y-auto">
+      <!-- Category Quick-Filter Tabs -->
+      <div id="tag-category-tabs" class="px-5 py-2.5 border-b border-zinc-800/80 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+        <!-- Populated dynamically -->
+      </div>
+
+      <div id="tags-container" class="p-5 overflow-y-auto space-y-5">
         <!-- Rendered tag categories -->
       </div>
     </div>
@@ -468,7 +576,7 @@
         <div class="flex items-center gap-2.5">
           <span class="text-xl">⚙️</span>
           <div>
-            <h3 class="font-bold text-base text-white">Generation Settings & Providers</h3>
+            <h3 class="font-bold text-base text-white">Generation Settings &amp; Providers</h3>
             <p class="text-xs text-zinc-400">Configure AI providers and API keys</p>
           </div>
         </div>
@@ -479,7 +587,7 @@
         <div>
           <label for="settings-provider" class="block font-medium text-zinc-300 mb-1">Inference Provider</label>
           <select id="settings-provider" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2.5 text-zinc-200">
-            <option value="pollinations">Pollinations.ai (Free, High-Res FLUX & Anime, No Key)</option>
+            <option value="pollinations">Pollinations.ai (Free, High-Res FLUX &amp; Anime, No Key)</option>
             <option value="huggingface">Hugging Face Inference API</option>
             <option value="custom">Custom WebUI / OpenAI Compatible Endpoint</option>
           </select>

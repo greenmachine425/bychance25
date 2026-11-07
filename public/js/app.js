@@ -16,6 +16,8 @@ class App {
     this.galleryItems = [];
     this.currentFilter = 'all'; // 'all' | 'favorites'
     this.searchQuery = '';
+    this.activeTagCategory = 'all';
+    this.tagSearchQuery = '';
   }
 
   escapeHtml(str) {
@@ -28,6 +30,11 @@ class App {
       .replace(/'/g, '&#39;');
   }
 
+  getActiveModelKey() {
+    const modelSelect = document.getElementById('model-select');
+    return (modelSelect && modelSelect.value) ? modelSelect.value : 'flux-anime';
+  }
+
   async init() {
     console.log('Initializing Bychance application...');
     ImageGenerator.init();
@@ -38,7 +45,10 @@ class App {
     this.renderStylePresets();
     this.renderTemplateLibrary();
     this.renderTagBuilder();
+    this.renderModelGuideModal();
     this.bindEvents();
+    this.updateSyntaxPreview();
+    this.updatePromptCoach();
     await this.loadGallery();
 
     // Default random seed
@@ -65,15 +75,55 @@ class App {
       }
     });
 
+    // Optimize Prompt for Active Model Button
+    const btnOptimize = document.getElementById('btn-optimize-prompt');
+    if (btnOptimize) {
+      btnOptimize.addEventListener('click', () => {
+        const promptInput = document.getElementById('prompt-input');
+        const modelKey = this.getActiveModelKey();
+        const profile = PerchanceEngine.modelProfiles[modelKey] || PerchanceEngine.modelProfiles['flux-anime'];
+        if (promptInput) {
+          promptInput.value = PerchanceEngine.optimizePromptForModel(promptInput.value, modelKey);
+          this.updateSyntaxPreview();
+          this.updatePromptCoach();
+          this.showToast(`Optimized prompt with ${profile.shortName} identifiers! ⚡`);
+        }
+      });
+    }
+
+    // Auto-Tune Model Setup (CFG + Negative + Triggers)
+    const btnApplyDefaults = document.getElementById('btn-apply-model-defaults');
+    if (btnApplyDefaults) {
+      btnApplyDefaults.addEventListener('click', () => {
+        this.applyModelBestPractices(this.getActiveModelKey(), true);
+      });
+    }
+
+    // Fill Recommended Negative Prompt for Active Model
+    const btnFillNegative = document.getElementById('btn-fill-model-negative');
+    if (btnFillNegative) {
+      btnFillNegative.addEventListener('click', () => {
+        const modelKey = this.getActiveModelKey();
+        const profile = PerchanceEngine.modelProfiles[modelKey] || PerchanceEngine.modelProfiles['flux-anime'];
+        const negInput = document.getElementById('negative-input');
+        if (negInput && profile) {
+          negInput.value = profile.defaultNegative;
+          this.showToast(`Loaded ${profile.shortName} negative identifiers!`);
+        }
+      });
+    }
+
     // Random Prompt Button (Dice)
     const btnRandom = document.getElementById('btn-random-prompt');
     if (btnRandom) {
       btnRandom.addEventListener('click', () => {
         const promptInput = document.getElementById('prompt-input');
+        const modelKey = this.getActiveModelKey();
         if (promptInput) {
-          promptInput.value = PerchanceEngine.generateRandomPrompt();
+          promptInput.value = PerchanceEngine.generateRandomPrompt(modelKey);
           this.updateSyntaxPreview();
-          this.showToast('Rolled a new random anime scenario! 🎲');
+          this.updatePromptCoach();
+          this.showToast('Rolled a new model-tuned anime scenario! 🎲');
         }
       });
     }
@@ -83,11 +133,51 @@ class App {
     if (btnRandomTemplate) {
       btnRandomTemplate.addEventListener('click', () => {
         const promptInput = document.getElementById('prompt-input');
+        const modelKey = this.getActiveModelKey();
         if (promptInput) {
-          promptInput.value = PerchanceEngine.generateRandomTemplate();
+          promptInput.value = PerchanceEngine.generateRandomTemplate(modelKey);
           this.updateSyntaxPreview();
-          this.showToast('Created random Perchance template with {options}! ✨');
+          this.updatePromptCoach();
+          this.showToast('Created Perchance syntax template with {options}! ✨');
         }
+      });
+    }
+
+    // Wildcard Quick-Insert Buttons
+    document.querySelectorAll('.wildcard-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const token = btn.getAttribute('data-wildcard');
+        if (token) {
+          this.appendTokenToPrompt(token);
+          this.showToast(`Inserted dynamic wildcard ${token} 🎲`);
+        }
+      });
+    });
+
+    // Re-roll Syntax Preview Button
+    const btnRerollPreview = document.getElementById('btn-reroll-preview');
+    if (btnRerollPreview) {
+      btnRerollPreview.addEventListener('click', () => {
+        this.updateSyntaxPreview();
+      });
+    }
+
+    // Model Select change -> update coach & guidance recommendation
+    const modelSelect = document.getElementById('model-select');
+    if (modelSelect) {
+      modelSelect.addEventListener('change', () => {
+        const modelKey = this.getActiveModelKey();
+        const profile = PerchanceEngine.modelProfiles[modelKey];
+        if (profile) {
+          const guidanceSlider = document.getElementById('guidance-slider');
+          const guidanceVal = document.getElementById('guidance-val');
+          if (guidanceSlider && guidanceVal) {
+            guidanceSlider.value = profile.recommendedGuidance;
+            guidanceVal.textContent = Number(profile.recommendedGuidance).toFixed(1);
+          }
+          this.showToast(`Switched to ${profile.shortName} (Recommended CFG: ${profile.recommendedGuidance})`);
+        }
+        this.updatePromptCoach();
       });
     }
 
@@ -117,11 +207,12 @@ class App {
       });
     }
 
-    // Live Syntax Preview on prompt typing
+    // Live Syntax Preview & Coach on prompt typing
     const promptInput = document.getElementById('prompt-input');
     if (promptInput) {
       promptInput.addEventListener('input', () => {
         this.updateSyntaxPreview();
+        this.updatePromptCoach();
       });
     }
 
@@ -195,6 +286,15 @@ class App {
       });
     }
 
+    // Tag / Identifier Lexicon Search Filter
+    const tagSearchInput = document.getElementById('tag-search-input');
+    if (tagSearchInput) {
+      tagSearchInput.addEventListener('input', (e) => {
+        this.tagSearchQuery = e.target.value.trim().toLowerCase();
+        this.renderTagBuilder();
+      });
+    }
+
     // Clear History Button
     const btnClearHistory = document.getElementById('btn-clear-history');
     if (btnClearHistory) {
@@ -217,12 +317,19 @@ class App {
 
     // Modal Close Buttons
     document.querySelectorAll('[data-close-modal]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         const targetModalId = btn.getAttribute('data-close-modal');
         const modal = document.getElementById(targetModalId);
         if (modal) modal.classList.add('hidden');
       });
     });
+
+    // Model & Prompt Guide Modal toggle
+    const btnOpenGuide = document.getElementById('btn-open-guide');
+    const guideModal = document.getElementById('guide-modal');
+    if (btnOpenGuide && guideModal) {
+      btnOpenGuide.addEventListener('click', () => guideModal.classList.remove('hidden'));
+    }
 
     // Tag Builder Modal toggle
     const btnOpenTags = document.getElementById('btn-open-tags');
@@ -305,6 +412,87 @@ class App {
   }
 
   /**
+   * Append a token cleanly to the prompt input without duplicate commas
+   */
+  appendTokenToPrompt(token) {
+    const promptInput = document.getElementById('prompt-input');
+    if (!promptInput || !token) return;
+
+    const current = promptInput.value.trim();
+    if (!current) {
+      promptInput.value = token;
+    } else if (current.toLowerCase().includes(token.toLowerCase())) {
+      this.showToast(`"${token}" is already in your prompt`);
+      return;
+    } else {
+      const cleaned = current.replace(/,\s*$/, '');
+      promptInput.value = `${cleaned}, ${token}`;
+    }
+
+    this.updateSyntaxPreview();
+    this.updatePromptCoach();
+  }
+
+  /**
+   * Append a negative identifier to the negative prompt input and reveal the drawer
+   */
+  appendTokenToNegative(token) {
+    const negInput = document.getElementById('negative-input');
+    const negContainer = document.getElementById('negative-prompt-container');
+    const toggleBtn = document.getElementById('toggle-negative-btn');
+    if (!negInput || !token) return;
+
+    if (negContainer && negContainer.classList.contains('hidden')) {
+      negContainer.classList.remove('hidden');
+      if (toggleBtn) toggleBtn.textContent = 'Hide Negative Prompt ▲';
+    }
+
+    const current = negInput.value.trim();
+    if (!current) {
+      negInput.value = token;
+    } else if (!current.toLowerCase().includes(token.toLowerCase())) {
+      negInput.value = `${current.replace(/,\s*$/, '')}, ${token}`;
+    }
+  }
+
+  /**
+   * Apply model's recommended CFG, negative prompt, aspect ratio, and trigger optimization
+   */
+  applyModelBestPractices(modelKey, optimizePromptText = true) {
+    const profile = PerchanceEngine.modelProfiles[modelKey] || PerchanceEngine.modelProfiles['flux-anime'];
+    if (!profile) return;
+
+    const modelSelect = document.getElementById('model-select');
+    if (modelSelect && modelSelect.value !== modelKey) {
+      modelSelect.value = modelKey;
+    }
+
+    // Set recommended guidance scale
+    const guidanceSlider = document.getElementById('guidance-slider');
+    const guidanceVal = document.getElementById('guidance-val');
+    if (guidanceSlider && guidanceVal) {
+      guidanceSlider.value = profile.recommendedGuidance;
+      guidanceVal.textContent = Number(profile.recommendedGuidance).toFixed(1);
+    }
+
+    // Set recommended negative prompt
+    const negInput = document.getElementById('negative-input');
+    if (negInput) {
+      negInput.value = profile.defaultNegative;
+    }
+
+    // Optimize prompt text if requested
+    const promptInput = document.getElementById('prompt-input');
+    if (optimizePromptText && promptInput) {
+      promptInput.value = PerchanceEngine.optimizePromptForModel(promptInput.value, modelKey);
+    }
+
+    this.updateSyntaxPreview();
+    this.updatePromptCoach();
+    this.showToast(`Applied ${profile.shortName} best practices (CFG ${profile.recommendedGuidance} + Negative + Triggers)! ⚡`);
+  }
+
+  /**
    * Update Perchance Syntax Preview pill under prompt box
    */
   updateSyntaxPreview() {
@@ -314,12 +502,135 @@ class App {
     if (!promptInput || !previewContainer || !previewText) return;
 
     const val = promptInput.value;
-    if (val.includes('{') && val.includes('}')) {
+    const hasCurly = val.includes('{') && val.includes('}');
+    const hasWildcard = /\[(subject|hair|haircolor|hairstyle|eyes|expression|pose|outfit|attire|accessory|scenery|setting|lighting|vfx|camera|angle|studio|quality)\]/i.test(val);
+
+    if (hasCurly || hasWildcard) {
       const resolved = PerchanceEngine.evaluate(val);
       previewText.textContent = resolved;
       previewContainer.classList.remove('hidden');
     } else {
       previewContainer.classList.add('hidden');
+    }
+  }
+
+  /**
+   * Update the Real-Time Prompt Coach & Model Identifier Advisor panel
+   */
+  updatePromptCoach() {
+    const promptInput = document.getElementById('prompt-input');
+    const scoreBar = document.getElementById('coach-score-bar');
+    const scoreBadge = document.getElementById('coach-score-badge');
+    const modelBadge = document.getElementById('coach-model-badge');
+    const pillarsGrid = document.getElementById('coach-pillars-grid');
+    const recsRow = document.getElementById('coach-recommendations-row');
+    const warningsRow = document.getElementById('coach-warnings-row');
+
+    if (!promptInput || !pillarsGrid || !recsRow) return;
+
+    const modelKey = this.getActiveModelKey();
+    const analysis = PerchanceEngine.analyzePrompt(promptInput.value, modelKey);
+    const profile = analysis.profile;
+
+    if (scoreBar) {
+      scoreBar.style.width = `${analysis.score}%`;
+    }
+
+    if (scoreBadge) {
+      scoreBadge.textContent = `${analysis.level} (${analysis.presentCount}/${analysis.totalPillars})`;
+      if (analysis.score >= 80) {
+        scoreBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+      } else if (analysis.score >= 50) {
+        scoreBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30';
+      } else {
+        scoreBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30';
+      }
+    }
+
+    if (modelBadge && profile) {
+      modelBadge.textContent = `${profile.shortName} • Optimal CFG ${profile.recommendedGuidance}`;
+    }
+
+    // Render 7 Pillar status chips
+    pillarsGrid.innerHTML = analysis.pillars.map(p => {
+      if (p.present) {
+        return `
+          <span class="px-2 py-0.5 rounded-lg text-[11px] font-medium bg-emerald-950/50 text-emerald-300 border border-emerald-500/30 flex items-center gap-1" title="Detected: ${this.escapeHtml(p.matchedWord)}">
+            <span>✓</span>
+            <span>${this.escapeHtml(p.label)}</span>
+          </span>
+        `;
+      } else {
+        const firstSug = p.suggestions[0] || '';
+        return `
+          <button type="button" data-suggest="${this.escapeHtml(firstSug)}" class="coach-pillar-add-btn px-2 py-0.5 rounded-lg text-[11px] font-medium bg-zinc-900 hover:bg-indigo-950/60 text-zinc-400 hover:text-indigo-200 border border-zinc-800 border-dashed hover:border-indigo-500/40 flex items-center gap-1 transition-all" title="Missing ${this.escapeHtml(p.label)} — Click to add '${this.escapeHtml(firstSug)}'">
+            <span>+</span>
+            <span>${this.escapeHtml(p.label)}</span>
+          </button>
+        `;
+      }
+    }).join('');
+
+    pillarsGrid.querySelectorAll('.coach-pillar-add-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sug = btn.getAttribute('data-suggest');
+        if (sug) {
+          this.appendTokenToPrompt(sug);
+          this.showToast(`Added ${sug} to strengthen prompt!`);
+        }
+      });
+    });
+
+    // Collect recommended identifiers to display (missing model triggers + missing pillar suggestions)
+    const missingPillars = analysis.pillars.filter(p => !p.present);
+    const quickChips = [];
+
+    // First include up to 4 missing model-specific trigger words
+    analysis.missingModelTriggers.slice(0, 4).forEach(trig => {
+      quickChips.push({ token: trig, type: 'model' });
+    });
+
+    // Then include suggestions from any missing pillars
+    missingPillars.forEach(mp => {
+      mp.suggestions.slice(0, 2).forEach(s => {
+        if (!quickChips.some(c => c.token.toLowerCase() === s.toLowerCase())) {
+          quickChips.push({ token: s, type: 'pillar' });
+        }
+      });
+    });
+
+    if (quickChips.length > 0) {
+      recsRow.innerHTML = `
+        <span class="text-zinc-500 font-medium mr-1">Recommended Identifiers:</span>
+        ${quickChips.slice(0, 8).map(c => `
+          <button type="button" data-token="${this.escapeHtml(c.token)}" class="coach-token-btn px-2 py-0.5 rounded-md text-[11px] ${c.type === 'model' ? 'bg-indigo-950/50 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-600 hover:text-white' : 'bg-zinc-900 text-zinc-300 border border-zinc-800 hover:bg-zinc-800 hover:text-white'} transition-all">
+            + ${this.escapeHtml(c.token)}
+          </button>
+        `).join('')}
+      `;
+
+      recsRow.querySelectorAll('.coach-token-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tok = btn.getAttribute('data-token');
+          if (tok) {
+            this.appendTokenToPrompt(tok);
+            this.showToast(`Added identifier: ${tok}`);
+          }
+        });
+      });
+      recsRow.classList.remove('hidden');
+    } else {
+      recsRow.innerHTML = `<span class="text-emerald-400">✨ All core ${this.escapeHtml(profile.shortName)} trigger identifiers and prompt pillars are active!</span>`;
+    }
+
+    // Warnings
+    if (warningsRow) {
+      if (analysis.warnings.length > 0) {
+        warningsRow.innerHTML = analysis.warnings.map(w => `<div>💡 ${this.escapeHtml(w)}</div>`).join('');
+        warningsRow.classList.remove('hidden');
+      } else {
+        warningsRow.classList.add('hidden');
+      }
     }
   }
 
@@ -366,8 +677,9 @@ class App {
       const btn = document.createElement('button');
       btn.className = 'style-preset-btn px-3 py-1.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:border-zinc-700 hover:text-white transition-all flex items-center gap-1.5 whitespace-nowrap';
       btn.setAttribute('data-style', key);
-      btn.title = preset.description;
-      btn.innerHTML = `<span>🎨</span><span>${preset.name}</span>`;
+      const triggersInfo = preset.triggerIdentifiers ? ` [Triggers: ${preset.triggerIdentifiers.join(', ')}]` : '';
+      btn.title = `${preset.description}${triggersInfo}`;
+      btn.innerHTML = `<span>🎨</span><span>${this.escapeHtml(preset.name)}</span>`;
       container.appendChild(btn);
     });
 
@@ -380,6 +692,18 @@ class App {
         });
         btn.classList.add('active', 'border-indigo-500', 'bg-indigo-500/20', 'text-indigo-300');
         btn.classList.remove('border-zinc-800', 'bg-zinc-900/60', 'text-zinc-300');
+
+        const styleKey = btn.getAttribute('data-style');
+        if (styleKey && PerchanceEngine.stylePresets[styleKey]) {
+          const preset = PerchanceEngine.stylePresets[styleKey];
+          if (preset.recommendedModel && PerchanceEngine.modelProfiles[preset.recommendedModel]) {
+            const modelSelect = document.getElementById('model-select');
+            if (modelSelect && modelSelect.value !== preset.recommendedModel) {
+              modelSelect.value = preset.recommendedModel;
+              this.updatePromptCoach();
+            }
+          }
+        }
       });
     });
   }
@@ -393,22 +717,36 @@ class App {
 
     list.innerHTML = '';
     PerchanceEngine.templates.forEach(tpl => {
+      const recModel = tpl.recommendedModel && PerchanceEngine.modelProfiles[tpl.recommendedModel]
+        ? PerchanceEngine.modelProfiles[tpl.recommendedModel].shortName
+        : 'FLUX.1 Anime';
+
       const card = document.createElement('div');
       card.className = 'p-4 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:border-indigo-500/50 hover:bg-zinc-900 transition-all cursor-pointer group flex flex-col justify-between';
       card.innerHTML = `
         <div>
           <div class="flex items-center justify-between mb-2">
             <span class="text-xl">${tpl.icon}</span>
-            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400">${tpl.category}</span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/20">${this.escapeHtml(recModel)}</span>
+              <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400">${this.escapeHtml(tpl.category)}</span>
+            </div>
           </div>
-          <h4 class="font-medium text-sm text-zinc-200 group-hover:text-indigo-400 transition-colors mb-1.5">${tpl.title}</h4>
-          <p class="text-xs text-zinc-400 line-clamp-3 font-mono leading-relaxed bg-zinc-950/50 p-2 rounded-lg border border-zinc-800/50">${tpl.template}</p>
+          <h4 class="font-medium text-sm text-zinc-200 group-hover:text-indigo-400 transition-colors mb-1.5">${this.escapeHtml(tpl.title)}</h4>
+          <p class="text-xs text-zinc-400 line-clamp-3 font-mono leading-relaxed bg-zinc-950/50 p-2 rounded-lg border border-zinc-800/50">${this.escapeHtml(tpl.template)}</p>
         </div>
         <div class="mt-3 flex items-center justify-between pt-2 border-t border-zinc-800/50">
-          <span class="text-xs text-indigo-400 font-medium">Use Template →</span>
-          <button class="roll-btn text-xs px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300" title="Evaluate immediately">🎲 Roll One</button>
+          <span class="text-xs text-indigo-400 font-medium">Use Template Formula →</span>
+          <button class="roll-btn text-xs px-2.5 py-1 rounded bg-zinc-800 hover:bg-indigo-600 text-zinc-300 hover:text-white transition-colors" title="Evaluate immediately into a resolved prompt">🎲 Roll Single</button>
         </div>
       `;
+
+      const applyTplModel = () => {
+        if (tpl.recommendedModel && PerchanceEngine.modelProfiles[tpl.recommendedModel]) {
+          const modelSelect = document.getElementById('model-select');
+          if (modelSelect) modelSelect.value = tpl.recommendedModel;
+        }
+      };
 
       // Use raw template
       card.addEventListener('click', (e) => {
@@ -416,9 +754,11 @@ class App {
         const promptInput = document.getElementById('prompt-input');
         if (promptInput) {
           promptInput.value = tpl.template;
+          applyTplModel();
           this.updateSyntaxPreview();
+          this.updatePromptCoach();
           document.getElementById('templates-modal').classList.add('hidden');
-          this.showToast(`Loaded ${tpl.title} template!`);
+          this.showToast(`Loaded "${tpl.title}" template!`);
         }
       });
 
@@ -430,9 +770,11 @@ class App {
           const promptInput = document.getElementById('prompt-input');
           if (promptInput) {
             promptInput.value = PerchanceEngine.evaluate(tpl.template);
+            applyTplModel();
             this.updateSyntaxPreview();
+            this.updatePromptCoach();
             document.getElementById('templates-modal').classList.add('hidden');
-            this.showToast(`Evaluated ${tpl.title} prompt!`);
+            this.showToast(`Evaluated "${tpl.title}" prompt!`);
           }
         });
       }
@@ -442,24 +784,67 @@ class App {
   }
 
   /**
-   * Render Tag Builder Modal
+   * Render Interactive Identifier Lexicon & Tag Builder Modal with Search & Category Tabs
    */
   renderTagBuilder() {
     const container = document.getElementById('tags-container');
+    const tabsContainer = document.getElementById('tag-category-tabs');
     if (!container) return;
 
-    container.innerHTML = '';
     const categories = PerchanceEngine.getTagCategories();
 
+    // Render Category Tabs
+    if (tabsContainer) {
+      const allActive = this.activeTagCategory === 'all';
+      let tabsHtml = `
+        <button type="button" data-cat-id="all" class="tag-cat-tab px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${allActive ? 'bg-indigo-600 text-white' : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'}">
+          All Categories (${categories.reduce((acc, c) => acc + c.tags.length, 0)})
+        </button>
+      `;
+
+      categories.forEach(cat => {
+        const isActive = this.activeTagCategory === cat.id;
+        tabsHtml += `
+          <button type="button" data-cat-id="${this.escapeHtml(cat.id)}" class="tag-cat-tab px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${isActive ? 'bg-indigo-600 text-white' : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'}">
+            ${this.escapeHtml(cat.name)}
+          </button>
+        `;
+      });
+
+      tabsContainer.innerHTML = tabsHtml;
+      tabsContainer.querySelectorAll('.tag-cat-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          this.activeTagCategory = tab.getAttribute('data-cat-id') || 'all';
+          this.renderTagBuilder();
+        });
+      });
+    }
+
+    container.innerHTML = '';
+    const query = this.tagSearchQuery;
+
     categories.forEach(cat => {
+      if (this.activeTagCategory !== 'all' && this.activeTagCategory !== cat.id) return;
+
+      const filteredTags = query
+        ? cat.tags.filter(t => t.toLowerCase().includes(query) || cat.name.toLowerCase().includes(query))
+        : cat.tags;
+
+      if (filteredTags.length === 0) return;
+
       const section = document.createElement('div');
-      section.className = 'mb-4';
+      section.className = 'p-3.5 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 space-y-2.5';
+      const isNegative = Boolean(cat.isNegative);
+
       section.innerHTML = `
-        <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">${cat.name}</h4>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <h4 class="text-xs font-bold uppercase tracking-wider ${isNegative ? 'text-rose-400' : 'text-indigo-300'}">${this.escapeHtml(cat.name)}</h4>
+          <span class="text-[11px] text-zinc-500">${this.escapeHtml(cat.description || '')}</span>
+        </div>
         <div class="flex flex-wrap gap-1.5">
-          ${cat.tags.map(tag => `
-            <button class="tag-pill px-2.5 py-1 rounded-lg text-xs bg-zinc-800/80 hover:bg-indigo-600 hover:text-white text-zinc-300 transition-colors border border-zinc-700/50" data-tag="${tag}">
-              + ${tag}
+          ${filteredTags.map(tag => `
+            <button type="button" class="tag-pill px-2.5 py-1 rounded-lg text-xs ${isNegative ? 'bg-rose-950/40 hover:bg-rose-600 text-rose-200 border border-rose-500/30' : 'bg-zinc-800/80 hover:bg-indigo-600 text-zinc-200 border border-zinc-700/50'} hover:text-white transition-colors" data-tag="${this.escapeHtml(tag)}" data-negative="${isNegative}">
+              ${isNegative ? '−' : '+'} ${this.escapeHtml(tag)}
             </button>
           `).join('')}
         </div>
@@ -468,17 +853,142 @@ class App {
       section.querySelectorAll('.tag-pill').forEach(btn => {
         btn.addEventListener('click', () => {
           const tag = btn.getAttribute('data-tag');
-          const promptInput = document.getElementById('prompt-input');
-          if (promptInput) {
-            const current = promptInput.value.trim();
-            promptInput.value = current ? `${current}, ${tag}` : tag;
-            this.updateSyntaxPreview();
-            this.showToast(`Added tag: ${tag}`);
+          const isNeg = btn.getAttribute('data-negative') === 'true';
+          if (isNeg) {
+            this.appendTokenToNegative(tag);
+            this.showToast(`Added "${tag}" to Negative Prompt 🚫`);
+          } else {
+            this.appendTokenToPrompt(tag);
+            this.showToast(`Added identifier: ${tag}`);
           }
         });
       });
 
       container.appendChild(section);
+    });
+
+    if (!container.children.length) {
+      container.innerHTML = `<p class="text-center text-zinc-500 py-8 text-xs">No identifiers matched "${this.escapeHtml(query)}".</p>`;
+    }
+  }
+
+  /**
+   * Render Model Intelligence & Prompt Engineering Guide Modal
+   */
+  renderModelGuideModal() {
+    const container = document.getElementById('guide-content');
+    if (!container) return;
+
+    const profiles = Object.values(PerchanceEngine.modelProfiles);
+
+    const modelCardsHtml = profiles.map(p => `
+      <div class="p-4 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-3 flex flex-col justify-between">
+        <div class="space-y-2.5">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <h4 class="text-sm font-bold text-white">${this.escapeHtml(p.name)}</h4>
+              <p class="text-[11px] text-indigo-400 font-medium">${this.escapeHtml(p.encoder)}</p>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 whitespace-nowrap">
+              CFG ${p.recommendedGuidance} (${p.guidanceRange[0]}–${p.guidanceRange[1]})
+            </span>
+          </div>
+
+          <p class="text-xs text-zinc-300 leading-relaxed">${this.escapeHtml(p.description)}</p>
+
+          <div class="p-2.5 rounded-xl bg-zinc-950/80 border border-zinc-800/80 space-y-1">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 block">Recommended Prompt Formula</span>
+            <p class="font-mono text-[11px] text-emerald-300">${this.escapeHtml(p.promptFormula)}</p>
+          </div>
+
+          <div>
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 block mb-1.5">Recognized Model Trigger Identifiers (Click to Insert)</span>
+            <div class="flex flex-wrap gap-1">
+              ${p.triggerWords.map(tw => `
+                <button type="button" data-guide-trigger="${this.escapeHtml(tw)}" class="guide-trigger-btn px-2 py-0.5 rounded-md bg-indigo-950/60 hover:bg-indigo-600 text-indigo-200 hover:text-white border border-indigo-500/30 text-[11px] font-mono transition-colors">
+                  + ${this.escapeHtml(tw)}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-rose-950/20 border border-rose-500/20 space-y-1">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-rose-300 block">Recommended Negative Identifiers</span>
+            <p class="font-mono text-[11px] text-zinc-400 line-clamp-2">${this.escapeHtml(p.defaultNegative)}</p>
+          </div>
+
+          <ul class="space-y-1 text-[11px] text-zinc-400 list-disc list-inside">
+            ${p.tips.map(t => `<li>${this.escapeHtml(t)}</li>`).join('')}
+          </ul>
+        </div>
+
+        <div class="pt-3 border-t border-zinc-800/80 flex items-center justify-end">
+          <button type="button" data-select-model="${this.escapeHtml(p.id)}" class="guide-select-model-btn w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-all">
+            ⚡ Activate ${this.escapeHtml(p.shortName)} &amp; Auto-Tune Setup
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    container.innerHTML = `
+      <!-- Perchance Syntax & Wildcards Cheat Sheet -->
+      <div class="p-4 rounded-2xl bg-indigo-950/25 border border-indigo-500/30 space-y-3">
+        <h4 class="text-sm font-bold text-white flex items-center gap-2">
+          <span>🎲</span>
+          <span>Perchance Dynamic Syntax &amp; Wildcards Reference</span>
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div class="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800">
+            <span class="text-[11px] font-semibold text-indigo-300 block mb-1">1. Choice Sets</span>
+            <code class="text-xs text-zinc-200 font-mono block mb-1">{silver|pink|aqua} hair</code>
+            <p class="text-[11px] text-zinc-400">Randomly picks one option per image in a batch.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800">
+            <span class="text-[11px] font-semibold text-indigo-300 block mb-1">2. Percentage &amp; Ratio Weights</span>
+            <code class="text-xs text-zinc-200 font-mono block mb-1">{70% common|30% rare}</code>
+            <p class="text-[11px] text-zinc-400">Also supports ratio weights like <code class="text-indigo-300">{3::kimono|1::armor}</code>.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800">
+            <span class="text-[11px] font-semibold text-indigo-300 block mb-1">3. Nested Expressions</span>
+            <code class="text-xs text-zinc-200 font-mono block mb-1">{cute {cat|fox} girl|ronin}</code>
+            <p class="text-[11px] text-zinc-400">Evaluates from the innermost curly braces outward.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800">
+            <span class="text-[11px] font-semibold text-pink-300 block mb-1">4. Built-in [Wildcards]</span>
+            <code class="text-xs text-pink-200 font-mono block mb-1">[subject], [hair], [scenery]</code>
+            <p class="text-[11px] text-zinc-400">Pulls curated phrases from Bychance's anime dictionary.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model Architecture Cards -->
+      <div>
+        <h4 class="text-sm font-bold text-white mb-3">Supported Anime Model Profiles &amp; Conditioning Architectures</h4>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          ${modelCardsHtml}
+        </div>
+      </div>
+    `;
+
+    container.querySelectorAll('.guide-trigger-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const trig = btn.getAttribute('data-guide-trigger');
+        if (trig) {
+          this.appendTokenToPrompt(trig);
+          this.showToast(`Inserted trigger identifier: ${trig}`);
+        }
+      });
+    });
+
+    container.querySelectorAll('.guide-select-model-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mId = btn.getAttribute('data-select-model');
+        if (mId) {
+          this.applyModelBestPractices(mId, true);
+          const modal = document.getElementById('guide-modal');
+          if (modal) modal.classList.add('hidden');
+        }
+      });
     });
   }
 
@@ -506,11 +1016,10 @@ class App {
 
     // Guidance Scale
     const guidanceSlider = document.getElementById('guidance-slider');
-    const guidanceScale = guidanceSlider ? parseFloat(guidanceSlider.value) : 7.5;
+    const guidanceScale = guidanceSlider ? parseFloat(guidanceSlider.value) : 5.5;
 
     // Model selection
-    const modelSelect = document.getElementById('model-select');
-    const model = modelSelect ? modelSelect.value : 'flux';
+    const model = this.getActiveModelKey();
 
     // Quality Booster Checkbox
     const boosterCheck = document.getElementById('quality-booster-toggle');
@@ -587,6 +1096,8 @@ class App {
 
     grid.innerHTML = '';
     const ratioInfo = ImageGenerator.aspectRatios[aspectRatio] || ImageGenerator.aspectRatios['2:3'];
+    const profile = PerchanceEngine.modelProfiles[this.getActiveModelKey()];
+    const modelLabel = profile ? profile.shortName : 'FLUX.1 Anime';
 
     // Adjust grid columns based on batch size
     grid.className = count === 1 
@@ -603,7 +1114,7 @@ class App {
         <div class="absolute inset-0 bg-gradient-to-br from-indigo-950/20 to-zinc-950 animate-pulse flex flex-col items-center justify-center p-4 text-center">
           <div class="w-10 h-10 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3"></div>
           <span class="text-xs font-medium text-zinc-400">Rendering anime artwork #${i + 1}...</span>
-          <span class="text-[10px] text-zinc-500 mt-1">Applying FLUX attention layers</span>
+          <span class="text-[10px] text-zinc-500 mt-1">Conditioning with ${this.escapeHtml(modelLabel)} identifiers</span>
         </div>
       `;
 
@@ -720,7 +1231,7 @@ class App {
       const safeAlt = this.escapeHtml(item.prompt);
       const safePrompt = this.escapeHtml(item.evaluatedPrompt || item.prompt);
       const safeSeed = this.escapeHtml(item.seed);
-      const safeModel = this.escapeHtml(item.model || 'FLUX');
+      const safeModel = this.escapeHtml(item.modelName || item.model || 'FLUX.1 Anime');
 
       card.innerHTML = `
         <img src="${safeUrl}" alt="${safeAlt}" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
@@ -795,10 +1306,13 @@ class App {
 
     if (item.model) {
       const modelSelect = document.getElementById('model-select');
-      if (modelSelect) modelSelect.value = item.model;
+      if (modelSelect && PerchanceEngine.modelProfiles[item.model]) {
+        modelSelect.value = item.model;
+      }
     }
 
     this.updateSyntaxPreview();
+    this.updatePromptCoach();
   }
 
   populateSettingsForm() {

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bychance — Anime AI Image Generator</title>
-  <meta name="description" content="Clean, powerful anime AI image generation platform inspired by Perchance. Free, unlimited, featuring FLUX and Anime models with template randomizer syntax." />
+  <meta name="description" content="Clean, powerful anime AI image generation platform inspired by Perchance. Free, unlimited, featuring FLUX, Illustrious XL, Animagine XL, Pony V6 & Dynamic Syntax." />
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -189,11 +189,17 @@ input[type="range"]::-webkit-slider-thumb:hover {
           <h1 class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-zinc-200 to-indigo-300 bg-clip-text text-transparent">Bychance</h1>
           <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Anime Studio</span>
         </div>
-        <p class="text-[11px] text-zinc-400 hidden sm:block">Perchance-inspired AI Anime Generator with FLUX & Dynamic Syntax</p>
+        <p class="text-[11px] text-zinc-400 hidden sm:block">Perchance-inspired AI Anime Generator with Model Intelligence & Identifier Lexicon</p>
       </div>
     </div>
 
     <div class="flex items-center gap-2">
+      <!-- Model & Prompting Guide Modal Button -->
+      <button id="btn-open-guide" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 transition-all" title="Model Profiles, Trigger Identifiers & Prompt Engineering Guide">
+        <span>📘</span>
+        <span class="hidden md:inline">Model & Prompt Guide</span>
+      </button>
+
       <!-- Templates Modal Button -->
       <button id="btn-open-templates" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 flex items-center gap-1.5 transition-all">
         <span>📜</span>
@@ -203,7 +209,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
       <!-- Tag Builder Modal Button -->
       <button id="btn-open-tags" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 flex items-center gap-1.5 transition-all">
         <span>🏷️</span>
-        <span class="hidden md:inline">Tag Builder</span>
+        <span class="hidden md:inline">Identifier Lexicon</span>
       </button>
 
       <!-- Export History Button -->
@@ -229,21 +235,27 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
       <!-- Prompt Input Block -->
       <div class="space-y-3 relative z-10">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <label for="prompt-input" class="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
             <span>Anime Prompt</span>
-            <span class="text-[10px] lowercase text-zinc-500 font-normal">(supports Perchance <code class="text-indigo-400">{opt1|opt2}</code> syntax)</span>
+            <span class="text-[10px] lowercase text-zinc-500 font-normal">(supports <code class="text-indigo-400">{a|b}</code>, <code class="text-indigo-400">{60% a|40% b}</code> &amp; <code class="text-pink-400">[wildcards]</code>)</span>
           </label>
 
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <!-- Smart Optimize for Model Button -->
+            <button id="btn-optimize-prompt" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 transition-all" title="Inject model-specific trigger identifiers, framing, and lighting without losing your prompt">
+              <span>⚡</span>
+              <span>Optimize for Model</span>
+            </button>
+
             <!-- Random Prompt Button -->
-            <button id="btn-random-prompt" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/60 flex items-center gap-1.5 transition-all shadow-sm" title="Roll a random anime prompt from dictionary">
+            <button id="btn-random-prompt" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/60 flex items-center gap-1.5 transition-all shadow-sm" title="Roll a random model-tuned anime prompt from dictionary">
               <span>🎲</span>
               <span>Random Prompt</span>
             </button>
 
             <!-- Random Template Button -->
-            <button id="btn-random-template" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 transition-all" title="Generate Perchance template with options">
+            <button id="btn-random-template" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 transition-all" title="Generate Perchance template with {options}">
               <span>✨</span>
               <span>Syntax Roll</span>
             </button>
@@ -254,21 +266,76 @@ input[type="range"]::-webkit-slider-thumb:hover {
           <textarea
             id="prompt-input"
             rows="3"
-            placeholder="e.g. 1girl, {silver|sakura pink} hair, {cyberpunk jacket|school uniform}, {Tokyo night|ancient shrine}, anime key visual, masterpiece"
+            placeholder="e.g. 1girl, solo, {silver|sakura pink} hair, {cyberpunk jacket|serafuku sailor uniform}, {Neo-Tokyo alley|cherry blossom shrine}, cowboy shot, backlighting, anime key visual, masterpiece"
             class="w-full rounded-2xl bg-zinc-950/70 border border-zinc-800 p-4 text-sm sm:text-base text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-sans leading-relaxed resize-y"
-          >1girl, {sakura pink|silver white} hair with twin tails, glowing sapphire eyes, {school sailor uniform|cyberpunk techwear}, drifting cherry blossom petals, Japanese shrine courtyard, cinematic lighting, masterpiece anime artstyle</textarea>
+          >1girl, solo, {sakura pink|silver white} hair in long twintails, glowing sapphire eyes, gentle smile, looking at viewer, wearing {serafuku school sailor uniform|cyberpunk techwear jacket}, cowboy shot, drifting cherry blossom petals, Shinto shrine courtyard at twilight, cinematic backlighting, tyndall effect, anime key visual, official art, masterpiece</textarea>
+        </div>
+
+        <!-- Dynamic Wildcard Quick-Insert Bar -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[11px]">
+          <span class="text-zinc-500 font-medium whitespace-nowrap mr-1">Insert Wildcard:</span>
+          <button type="button" data-wildcard="[subject]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[subject]</button>
+          <button type="button" data-wildcard="[hair]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[hair]</button>
+          <button type="button" data-wildcard="[eyes]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[eyes]</button>
+          <button type="button" data-wildcard="[expression]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[expression]</button>
+          <button type="button" data-wildcard="[pose]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[pose]</button>
+          <button type="button" data-wildcard="[outfit]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[outfit]</button>
+          <button type="button" data-wildcard="[accessory]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[accessory]</button>
+          <button type="button" data-wildcard="[scenery]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[scenery]</button>
+          <button type="button" data-wildcard="[lighting]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[lighting]</button>
+          <button type="button" data-wildcard="[vfx]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[vfx]</button>
+          <button type="button" data-wildcard="[camera]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[camera]</button>
+          <button type="button" data-wildcard="[studio]" class="wildcard-btn px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-indigo-950/70 text-pink-300 border border-zinc-800 hover:border-pink-500/40 font-mono whitespace-nowrap transition-all">[studio]</button>
         </div>
 
         <!-- Perchance Syntax Live Evaluation Preview -->
-        <div id="syntax-preview-container" class="hidden flex items-center gap-2 p-2.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 text-xs text-indigo-300">
-          <span class="text-sm">🎲</span>
-          <span class="font-medium text-zinc-400 whitespace-nowrap">Evaluated preview:</span>
-          <span id="syntax-preview-text" class="text-zinc-200 truncate italic"></span>
+        <div id="syntax-preview-container" class="hidden flex items-center justify-between gap-2 p-2.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 text-xs text-indigo-300">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-sm">🎲</span>
+            <span class="font-medium text-zinc-400 whitespace-nowrap">Live Syntax Preview:</span>
+            <span id="syntax-preview-text" class="text-zinc-200 truncate italic"></span>
+          </div>
+          <button id="btn-reroll-preview" type="button" class="px-2 py-0.5 rounded bg-indigo-500/20 hover:bg-indigo-500/30 text-[11px] text-indigo-200 whitespace-nowrap">Re-roll ↻</button>
+        </div>
+
+        <!-- Smart Prompt Coach & Model Identifier Advisor -->
+        <div id="prompt-coach-panel" class="rounded-2xl bg-zinc-950/60 border border-zinc-800/90 p-3.5 space-y-2.5">
+          <!-- Top Row: Prompt Readiness Score + Active Model Profile Summary -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Prompt Strength:</span>
+              <div class="w-24 h-2 rounded-full bg-zinc-800 overflow-hidden">
+                <div id="coach-score-bar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-300" style="width: 85%"></div>
+              </div>
+              <span id="coach-score-badge" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Studio Masterpiece (7/7)</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span id="coach-model-badge" class="text-[11px] text-indigo-300 font-medium">FLUX.1 Anime • CFG 5.5</span>
+              <button id="btn-apply-model-defaults" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 transition-all" title="Set recommended Guidance Scale, Negative Prompt, and Model Trigger tokens">
+                ⚡ Auto-Tune Model Setup
+              </button>
+            </div>
+          </div>
+
+          <!-- 7 Prompt Pillars Checklist & Quick Suggestions -->
+          <div id="coach-pillars-grid" class="flex flex-wrap items-center gap-1.5">
+            <!-- Dynamically populated pillar chips -->
+          </div>
+
+          <!-- Missing Pillar / Model Trigger Quick-Insert Recommendations -->
+          <div id="coach-recommendations-row" class="flex flex-wrap items-center gap-1.5 pt-1 border-t border-zinc-800/60 text-[11px]">
+            <!-- Dynamically populated clickable identifier recommendations -->
+          </div>
+
+          <!-- Model Diagnostic Warnings (if any) -->
+          <div id="coach-warnings-row" class="hidden text-[11px] text-amber-300/90 bg-amber-950/30 border border-amber-500/30 rounded-xl px-3 py-1.5">
+          </div>
         </div>
 
         <!-- Style Presets Carousel -->
         <div>
-          <label class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block mb-2">Art Styles & Aesthetic Presets</label>
+          <label class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block mb-2">Art Styles &amp; Studio Presets</label>
           <div id="style-presets-container" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
             <!-- Dynamically populated style buttons -->
           </div>
@@ -308,10 +375,15 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
           <!-- Model Switcher (3 cols) -->
           <div class="lg:col-span-3 space-y-1.5">
-            <label for="model-select" class="text-[11px] font-medium text-zinc-400 block">AI Model Engine</label>
+            <label for="model-select" class="text-[11px] font-medium text-zinc-400 block">AI Model Profile &amp; Conditioning</label>
             <select id="model-select" class="w-full rounded-xl bg-zinc-950/70 border border-zinc-800 px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500">
-              <option value="flux" selected>FLUX.1 (High Aesthetic Anime)</option>
-              <option value="turbo">SDXL Turbo (Ultra Fast ~2s)</option>
+              <option value="flux-anime" selected>FLUX.1 Anime (Key Visual Studio)</option>
+              <option value="illustrious-xl">Illustrious XL / NoobAI (Danbooru Tags)</option>
+              <option value="animagine-xl">Animagine XL 3.1/4.0 (Era &amp; Quality)</option>
+              <option value="pony-xl">Pony Diffusion V6 XL (Score-9 Anime)</option>
+              <option value="flux">FLUX.1 Dev / Pro (Natural Language)</option>
+              <option value="flux-3d">FLUX 3D Anime &amp; Figurine (Cel-CG)</option>
+              <option value="turbo">SDXL Turbo / Lightning (Fast ~2s)</option>
             </select>
           </div>
 
@@ -355,26 +427,29 @@ input[type="range"]::-webkit-slider-thumb:hover {
             </button>
 
             <!-- Quality Booster Checkbox -->
-            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white select-none">
+            <label class="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white select-none" title="Automatically injects model-specific quality, score, and aesthetic identifiers during generation">
               <input type="checkbox" id="quality-booster-toggle" checked class="rounded bg-zinc-900 border-zinc-700 text-indigo-600 focus:ring-indigo-500" />
-              <span>Anime Quality Booster</span>
+              <span>Model Quality &amp; Identifier Booster</span>
             </label>
           </div>
 
           <!-- Guidance Scale Slider -->
           <div class="flex items-center gap-3">
-            <span class="text-zinc-400">Guidance Scale:</span>
-            <input type="range" id="guidance-slider" min="3" max="15" step="0.5" value="7.5" class="w-24 sm:w-32" />
-            <span id="guidance-val" class="font-mono text-zinc-300 w-8">7.5</span>
+            <span class="text-zinc-400">Guidance (CFG):</span>
+            <input type="range" id="guidance-slider" min="1" max="15" step="0.5" value="5.5" class="w-24 sm:w-32" />
+            <span id="guidance-val" class="font-mono text-zinc-300 w-8">5.5</span>
           </div>
         </div>
 
-        <div id="negative-prompt-container" class="hidden pt-2">
-          <label for="negative-input" class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block mb-1">Negative Prompt (Things to exclude)</label>
+        <div id="negative-prompt-container" class="hidden pt-2 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="negative-input" class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Negative Prompt (Excluded Identifiers)</label>
+            <button id="btn-fill-model-negative" type="button" class="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium">Load Recommended Negative for Model</button>
+          </div>
           <input
             id="negative-input"
             type="text"
-            placeholder="e.g. low quality, blurry, deformed hands, extra fingers, bad anatomy, text, watermark"
+            placeholder="e.g. worst quality, low quality, lowres, bad anatomy, bad hands, extra digits, blurry, text, watermark"
             class="w-full rounded-xl bg-zinc-950/70 border border-zinc-800 px-3.5 py-2 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500"
           />
         </div>
@@ -451,7 +526,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   <!-- Footer -->
   <footer class="mt-auto border-t border-zinc-800/60 py-6 px-4 text-center text-xs text-zinc-500">
     <p>Bychance — Free Anime Image Generator inspired by Perchance.</p>
-    <p class="mt-1 text-[11px] text-zinc-600">Built with FLUX.1 & Perchance Template Syntactic Expansion.</p>
+    <p class="mt-1 text-[11px] text-zinc-600">Built with FLUX.1, Illustrious XL, Animagine XL, Pony V6 &amp; Perchance Syntactic Expansion.</p>
   </footer>
 
   <!-- Lightbox Fullscreen Modal -->
@@ -548,7 +623,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
           </button>
           
           <button id="lightbox-apply-settings-btn" class="w-full py-2.5 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 font-semibold text-xs transition-all flex items-center justify-center gap-2">
-            <span>🔄 Reuse Prompt & Settings</span>
+            <span>🔄 Reuse Prompt &amp; Settings</span>
           </button>
 
           <button id="lightbox-delete-btn" class="w-full py-2 px-4 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-950/20 text-xs transition-all">
@@ -561,15 +636,35 @@ input[type="range"]::-webkit-slider-thumb:hover {
     </div>
   </div>
 
+  <!-- Model Intelligence & Prompt Engineering Guide Modal -->
+  <div id="guide-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-5xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[88vh]">
+      <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">📘</span>
+          <div>
+            <h3 class="font-bold text-base text-white">Model Intelligence, Trigger Identifiers &amp; Prompting Best Practices</h3>
+            <p class="text-xs text-zinc-400">How each anime model understands prompts, recommended CFG scales, trigger words, and Perchance syntax</p>
+          </div>
+        </div>
+        <button data-close-modal="guide-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+      </div>
+
+      <div id="guide-content" class="p-5 overflow-y-auto space-y-6 text-xs">
+        <!-- Dynamically populated by app.js -->
+      </div>
+    </div>
+  </div>
+
   <!-- Template Library Modal -->
   <div id="templates-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-    <div class="w-full max-w-3xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[85vh]">
+    <div class="w-full max-w-4xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[85vh]">
       <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <span class="text-xl">📜</span>
           <div>
             <h3 class="font-bold text-base text-white">Perchance Template Library</h3>
-            <p class="text-xs text-zinc-400">Pre-built generator formulas with rich anime combinatorial lists</p>
+            <p class="text-xs text-zinc-400">Pre-built generator formulas with combinatorial sets, weights, and [wildcards]</p>
           </div>
         </div>
         <button data-close-modal="templates-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
@@ -581,21 +676,34 @@ input[type="range"]::-webkit-slider-thumb:hover {
     </div>
   </div>
 
-  <!-- Tag Builder Modal -->
+  <!-- Interactive Identifier Lexicon & Tag Builder Modal -->
   <div id="tags-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-    <div class="w-full max-w-3xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[85vh]">
-      <div class="p-5 border-b border-zinc-800 flex items-center justify-between">
+    <div class="w-full max-w-4xl glass-panel rounded-3xl overflow-hidden border border-zinc-700/60 shadow-2xl flex flex-col max-h-[88vh]">
+      <div class="p-5 border-b border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div class="flex items-center gap-2.5">
           <span class="text-xl">🏷️</span>
           <div>
-            <h3 class="font-bold text-base text-white">Interactive Tag Builder</h3>
-            <p class="text-xs text-zinc-400">Click any tag pill to append it to your active anime prompt</p>
+            <h3 class="font-bold text-base text-white">Model Identifier Lexicon &amp; Danbooru Tag Builder</h3>
+            <p class="text-xs text-zinc-400">350+ recognized model triggers, Booru tags, camera angles, shaders &amp; negative identifiers</p>
           </div>
         </div>
-        <button data-close-modal="tags-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+        <div class="flex items-center gap-2">
+          <input
+            id="tag-search-input"
+            type="text"
+            placeholder="Filter 350+ identifiers (e.g. score_9, bokeh, hime)..."
+            class="rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 w-56 sm:w-64"
+          />
+          <button data-close-modal="tags-modal" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white">✕</button>
+        </div>
       </div>
 
-      <div id="tags-container" class="p-5 overflow-y-auto">
+      <!-- Category Quick-Filter Tabs -->
+      <div id="tag-category-tabs" class="px-5 py-2.5 border-b border-zinc-800/80 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+        <!-- Populated dynamically -->
+      </div>
+
+      <div id="tags-container" class="p-5 overflow-y-auto space-y-5">
         <!-- Rendered tag categories -->
       </div>
     </div>
@@ -608,7 +716,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
         <div class="flex items-center gap-2.5">
           <span class="text-xl">⚙️</span>
           <div>
-            <h3 class="font-bold text-base text-white">Generation Settings & Providers</h3>
+            <h3 class="font-bold text-base text-white">Generation Settings &amp; Providers</h3>
             <p class="text-xs text-zinc-400">Configure AI providers and API keys</p>
           </div>
         </div>
@@ -619,7 +727,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
         <div>
           <label for="settings-provider" class="block font-medium text-zinc-300 mb-1">Inference Provider</label>
           <select id="settings-provider" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-2.5 text-zinc-200">
-            <option value="pollinations">Pollinations.ai (Free, High-Res FLUX & Anime, No Key)</option>
+            <option value="pollinations">Pollinations.ai (Free, High-Res FLUX &amp; Anime, No Key)</option>
             <option value="huggingface">Hugging Face Inference API</option>
             <option value="custom">Custom WebUI / OpenAI Compatible Endpoint</option>
           </select>
@@ -679,31 +787,297 @@ input[type="range"]::-webkit-slider-thumb:hover {
 // === MODULE: PerchanceEngine ===
 
 /**
- * Bychance - Perchance-style Template Syntax & Anime Generator Engine
+ * Bychance - Perchance-style Template Syntax, Model Intelligence & Anime Generator Engine
  * 
  * Implements:
- * 1. Perchance syntax parsing ({a|b|c}, weighted choices, nested sets)
- * 2. Comprehensive anime generation dictionary & prompt randomizer
- * 3. Pre-made generator templates (Ghibli, Shinkai, 90s Cel, Cyberpunk, etc.)
- * 4. Tag builder catalog for interactive prompt construction
+ * 1. Perchance syntax parsing ({a|b|c}, percentage weights {60% a|40% b}, ratio weights {3::a|1::b}, nested sets, and [wildcard] tokens)
+ * 2. Model Intelligence Profiles (FLUX.1 Anime, Illustrious XL / NoobAI, Animagine XL, Pony Diffusion V6 XL, FLUX.1 Dev, FLUX 3D, SDXL Turbo)
+ * 3. Real-time Prompt Analyzer, Pillar Coach & Model-Specific Prompt Optimizer
+ * 4. Comprehensive Danbooru / FLUX Identifier Lexicon (350+ model-recognized tokens across 13 categories)
+ * 5. Pre-made generator templates & curated aesthetic style presets
  */
 
 const PerchanceEngine = {
   /**
+   * Model Intelligence Profiles
+   * Defines how each anime/illustration model understands text, its trigger identifiers,
+   * recommended guidance scale (CFG), prompt ordering rules, and default negative prompts.
+   */
+  modelProfiles: {
+    "flux-anime": {
+      id: "flux-anime",
+      name: "FLUX.1 Anime (Key Visual Studio)",
+      shortName: "FLUX.1 Anime",
+      badge: "Recommended • Hybrid T5 + CLIP",
+      encoder: "T5-XXL Natural Language + CLIP-L Tags",
+      pollinationsModel: "flux",
+      hfRepo: "black-forest-labs/FLUX.1-schnell",
+      recommendedGuidance: 5.5,
+      guidanceRange: [3.5, 7.5],
+      optimalAspect: "2:3",
+      syntaxStyle: "Hybrid: Natural descriptive clauses + high-signal anime studio & Booru identifiers",
+      promptFormula: "[Subject & Count] + [Character Appearance & Expression] + [Detailed Attire & Props] + [Action & Camera Framing] + [Environment & Atmosphere] + [Lighting, Studio & Key Visual Identifiers]",
+      description: "Excels at complex spatial instructions, exact colors, multi-layered outfits, and modern 4K anime key visual aesthetics without needing heavy parentheses weighting.",
+      triggerWords: [
+        "anime key visual",
+        "official art",
+        "masterpiece anime illustration",
+        "crisp cel shading",
+        "clean lineart",
+        "expressive luminous eyes",
+        "subsurface scattering",
+        "volumetric lighting",
+        "trending on Pixiv",
+        "high production value"
+      ],
+      qualityPrefix: "",
+      qualitySuffix: ", masterpiece anime key visual, official art, clean crisp lineart, vibrant cel-shaded colors, expressive detailed eyes, high production value, 4k anime illustration",
+      defaultNegative: "low quality, worst quality, blurry, photorealistic, 3d cgi, deformed hands, extra fingers, bad anatomy, watermark, text, signature, ugly, washed out",
+      tips: [
+        "Combine natural sentences ('holding a glowing katana above her head') with canonical anime identifiers ('anime key visual, Ufotable style').",
+        "Avoid SD1.5-style parentheses weights like ((masterpiece:1.4)) — FLUX's T5 encoder reads natural emphasis words like 'prominent', 'vibrant', and 'intricate'.",
+        "Specify lighting physics explicitly ('backlighting', 'tyndall effect', 'rim light', 'chromatic aberration') for studio-grade compositing."
+      ]
+    },
+
+    "illustrious-xl": {
+      id: "illustrious-xl",
+      name: "Illustrious XL / NoobAI (Danbooru Master)",
+      shortName: "Illustrious XL",
+      badge: "Booru Tag Specialist",
+      encoder: "Dual CLIP SDXL (Danbooru / e621 Tag Conditioning)",
+      pollinationsModel: "flux",
+      hfRepo: "OnomaAIResearch/Illustrious-xl-early-release-v0",
+      recommendedGuidance: 6.0,
+      guidanceRange: [4.5, 7.5],
+      optimalAspect: "2:3",
+      syntaxStyle: "Comma-separated canonical Danbooru tags ordered from quality/count to environment",
+      promptFormula: "[Quality & Era Meta Tags] + [1girl/1boy, solo] + [Character/Archetype] + [Hair, Eyes & Expression Tags] + [Costume & Accessory Tags] + [Pose & Camera Angle Tags] + [Background & Lighting Tags]",
+      description: "Trained directly on millions of Danbooru tags. Responds strongly to exact Booru taxonomy, camera angle identifiers ('dutch angle', 'cowboy shot', 'from below'), and era identifiers ('newest', 'year 2024').",
+      triggerWords: [
+        "masterpiece",
+        "best quality",
+        "amazing quality",
+        "very aesthetic",
+        "absurdres",
+        "newest",
+        "year 2024",
+        "year 2025",
+        "anime coloring",
+        "official style",
+        "detailed background",
+        "dynamic angle"
+      ],
+      qualityPrefix: "masterpiece, best quality, amazing quality, very aesthetic, absurdres, newest, year 2024, ",
+      qualitySuffix: ", anime coloring, crisp lineart, detailed background, highres",
+      defaultNegative: "worst quality, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, extra digits, fewer digits, bad anatomy, anatomical nonsense, blurry, watermark, text",
+      tips: [
+        "Start prompts with quality & era identifiers: 'masterpiece, best quality, amazing quality, very aesthetic, absurdres, newest'.",
+        "Always include subject count tags early ('1girl, solo' or '1boy, solo') and exact framing tags ('cowboy shot', 'upper body', 'full body').",
+        "Put 'old, early, worst quality, lowres, bad hands, extra digits' in the Negative Prompt to lock in modern sharp linework."
+      ]
+    },
+
+    "animagine-xl": {
+      id: "animagine-xl",
+      name: "Animagine XL 3.1 / 4.0 (CagliostroLab)",
+      shortName: "Animagine XL",
+      badge: "Structured Anime SDXL",
+      encoder: "SDXL Structured Tag & Era Conditioning",
+      pollinationsModel: "flux",
+      hfRepo: "cagliostrolab/animagine-xl-3.1",
+      recommendedGuidance: 6.5,
+      guidanceRange: [5.0, 7.5],
+      optimalAspect: "2:3",
+      syntaxStyle: "Structured Booru tags with explicit quality, aesthetic, and era suffixes",
+      promptFormula: "[1girl/1boy, solo] + [Character & Series/Archetype] + [Appearance & Outfit Tags] + [Action, Angle & Environment Tags] + [masterpiece, best quality, very aesthetic, newest, safe]",
+      description: "Industry-standard open anime SDXL checkpoint trained with strict quality ('masterpiece, best quality'), aesthetic ('very aesthetic'), and era ('newest', 'recent', 'early') conditioning.",
+      triggerWords: [
+        "masterpiece",
+        "best quality",
+        "great quality",
+        "very aesthetic",
+        "newest",
+        "recent",
+        "safe",
+        "general",
+        "1girl",
+        "solo",
+        "depth of field",
+        "cinematic lighting"
+      ],
+      qualityPrefix: "",
+      qualitySuffix: ", masterpiece, best quality, very aesthetic, newest, safe, absurdres",
+      defaultNegative: "nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]",
+      tips: [
+        "Animagine XL places quality & era tags at the END of the prompt: '... , masterpiece, best quality, very aesthetic, newest'.",
+        "Use era identifiers to shift art styles: 'newest' (2021-2025 modern digital), 'recent' (2018-2020), 'mid' (2015-2017), or 'old' (retro 2000s).",
+        "Keep Guidance Scale between 5.5 and 7.0 to prevent oversaturated contrast."
+      ]
+    },
+
+    "pony-xl": {
+      id: "pony-xl",
+      name: "Pony Diffusion V6 XL (Score-Tag Anime)",
+      shortName: "Pony V6 XL",
+      badge: "Score-Tag System",
+      encoder: "SDXL Score-Tag & Source Conditioning",
+      pollinationsModel: "flux",
+      hfRepo: "LyliaEngine/Pony_Diffusion_V6_XL",
+      recommendedGuidance: 6.5,
+      guidanceRange: [5.5, 7.5],
+      optimalAspect: "2:3",
+      syntaxStyle: "Mandatory score_9 prefix + source_anime + Booru character & pose tags",
+      promptFormula: "score_9, score_8_up, score_7_up, score_6_up, source_anime, rating_safe, [1girl/1boy], [Appearance & Outfit], [Dynamic Pose & Camera Angle], [Environment & Lighting]",
+      description: "Uses aesthetic percentile score identifiers ('score_9, score_8_up, source_anime') to unlock extraordinary dynamic poses, expressive faces, and dramatic lighting.",
+      triggerWords: [
+        "score_9",
+        "score_8_up",
+        "score_7_up",
+        "score_6_up",
+        "source_anime",
+        "rating_safe",
+        "break",
+        "dynamic pose",
+        "expressive face",
+        "dramatic lighting"
+      ],
+      qualityPrefix: "score_9, score_8_up, score_7_up, score_6_up, source_anime, rating_safe, ",
+      qualitySuffix: ", masterpiece, highres, detailed anime art",
+      defaultNegative: "score_4, score_5, score_6, source_furry, source_pony, source_cartoon, 3d, photorealistic, ugly, deformed, blurry, lowres, bad anatomy, bad hands, extra fingers, text, watermark, signature",
+      tips: [
+        "Always prefix prompts with 'score_9, score_8_up, score_7_up, source_anime, rating_safe' — without score tags, quality drops sharply.",
+        "Include 'score_4, score_5, score_6, source_cartoon, source_furry' in the Negative Prompt to enforce pure high-tier anime aesthetics.",
+        "Excels at extreme perspective ('foreshortening', 'worm\\'s-eye view', 'dynamic action pose')."
+      ]
+    },
+
+    "flux": {
+      id: "flux",
+      name: "FLUX.1 Dev / Pro (Cinematic & Hybrid Art)",
+      shortName: "FLUX.1 Standard",
+      badge: "Natural Language + Text",
+      encoder: "T5-XXL (512 tokens) + CLIP-L",
+      pollinationsModel: "flux",
+      hfRepo: "black-forest-labs/FLUX.1-dev",
+      recommendedGuidance: 4.5,
+      guidanceRange: [3.0, 6.5],
+      optimalAspect: "16:9",
+      syntaxStyle: "Rich natural prose describing subject, materials, camera lens, and lighting",
+      promptFormula: "[Medium & Style Declaration] + [Detailed Subject & Pose Prose] + [Materials, Textures & Color Palette] + [Environment & Spatial Layout] + [Camera Lens, Depth of Field & Lighting]",
+      description: "High-precision natural language diffusion model capable of complex multi-character interactions, accurate readable text in quotes, and breathtaking environmental lighting.",
+      triggerWords: [
+        "cinematic anime illustration",
+        "volumetric god rays",
+        "raytraced reflections",
+        "85mm f/1.4 lens",
+        "shallow depth of field",
+        "intricate textures",
+        "dramatic chiaroscuro",
+        "color graded",
+        "masterpiece"
+      ],
+      qualityPrefix: "",
+      qualitySuffix: ", masterpiece illustration, ultra-detailed, cinematic lighting, sharp focus, rich color grading, high resolution",
+      defaultNegative: "blurry, low resolution, low quality, deformed anatomy, mutated hands, watermark, ugly, oversaturated",
+      tips: [
+        "To render readable text on signs, hoodies, or posters, put the exact words in quotation marks (e.g. a neon sign reading \"NEO TOKYO\").",
+        "Describe spatial relationships clearly ('on the left', 'in the foreground', 'reflected in the rain puddle below').",
+        "Works best at lower Guidance Scales (3.5–5.5) for natural contrast and smooth gradients."
+      ]
+    },
+
+    "flux-3d": {
+      id: "flux-3d",
+      name: "FLUX 3D Anime & Figurine (Cel-CG / UE5)",
+      shortName: "FLUX 3D Anime",
+      badge: "3D Cel / Scale Figure",
+      encoder: "T5-XXL + 3D Rendering & Shader Identifiers",
+      pollinationsModel: "flux",
+      hfRepo: "black-forest-labs/FLUX.1-schnell",
+      recommendedGuidance: 5.5,
+      guidanceRange: [4.0, 7.0],
+      optimalAspect: "2:3",
+      syntaxStyle: "Subject + 3D shader/engine identifiers (Arc System Works, Genshin/HSR cel render, or Good Smile PVC figure)",
+      promptFormula: "[Subject & Character Design] + [3D Cel-Shaded / PVC Figurine Material Identifiers] + [Dynamic Pose & Base/Environment] + [Subsurface Scattering, Rim Light & Octane/UE5 Render Tags]",
+      description: "Specialized profile for stylized 3D anime game visuals (Guilty Gear Strive / Honkai Star Rail cel-shaded 3D) and collectible 1/7 scale anime figurine photography.",
+      triggerWords: [
+        "3D anime render",
+        "cel-shaded 3D",
+        "Arc System Works style",
+        "Honkai Star Rail 3D model style",
+        "1/7 scale PVC anime figure",
+        "Good Smile Company aesthetic",
+        "subsurface scattering",
+        "global illumination",
+        "octane render",
+        "studio rim lighting"
+      ],
+      qualityPrefix: "",
+      qualitySuffix: ", 3D anime render, stylized cel-shaded 3D character art, subsurface scattering, global illumination, soft studio rim lighting, octane render, Unreal Engine 5 anime shader, 8k resolution",
+      defaultNegative: "flat 2D sketch, rough lineart, low poly, blurry, pixelated, deformed hands, bad anatomy, watermark, text, noisy",
+      tips: [
+        "Use 'cel-shaded 3D, Arc System Works style' for anime fighting/RPG game graphics, or '1/7 scale painted PVC figure on acrylic display base, macro studio photography' for figurine looks.",
+        "Add 'subsurface scattering, translucent hair tips, anisotropic hair highlights' for lifelike anime shader materials."
+      ]
+    },
+
+    "turbo": {
+      id: "turbo",
+      name: "SDXL Turbo / Lightning (Ultra-Fast ~2s)",
+      shortName: "SDXL Turbo",
+      badge: "Instant Prototyping",
+      encoder: "Distilled 4-Step SDXL (77 CLIP Token Window)",
+      pollinationsModel: "turbo",
+      hfRepo: "stabilityai/sdxl-turbo",
+      recommendedGuidance: 2.0,
+      guidanceRange: [1.0, 3.5],
+      optimalAspect: "1:1",
+      syntaxStyle: "Concise, front-loaded high-impact keywords under 60 words",
+      promptFormula: "[Core Subject & Archetype] + [Key Hair/Eye/Outfit Feature] + [Primary Setting] + [Lighting & Style Identifier]",
+      description: "Adversarially distilled high-speed model that generates in 1–4 steps (~2 seconds). Prioritizes the first 40–60 tokens and requires low guidance scale.",
+      triggerWords: [
+        "anime masterpiece",
+        "1girl",
+        "vibrant anime art",
+        "sharp focus",
+        "studio key visual",
+        "cinematic lighting",
+        "clean lineart",
+        "highly detailed"
+      ],
+      qualityPrefix: "",
+      qualitySuffix: ", anime masterpiece, vibrant colors, sharp focus, studio key visual",
+      defaultNegative: "blurry, low quality, deformed, bad anatomy, extra fingers, watermark, text",
+      tips: [
+        "Front-load your most important subject and style words in the first 15 words — SDXL Turbo weighs early tokens much more heavily.",
+        "Keep Guidance Scale low (1.5–3.0) to avoid burned-in contrast artifacts.",
+        "Great for rapid composition & Perchance template testing before switching to FLUX.1 Anime for final 4K rendering."
+      ]
+    }
+  },
+
+  /**
    * Parse and evaluate Perchance syntax in a text string.
    * Supports:
+   * - Wildcard tokens: [subject], [hair], [hairColor], [hairStyle], [eyes], [expression], [pose], [outfit], [accessory], [scenery], [lighting], [vfx], [camera], [studio], [quality]
    * - Basic sets: {apple|banana|cherry}
    * - Nested sets: {cute {cat|fox} girl|badass {samurai|ninja}}
-   * - Weighted chances: {50% high chance|25% medium|25% rare}
+   * - Percentage weights: {50% high chance|25% medium|25% rare}
+   * - Relative numeric weights: {3::common|1::rare} or {3*common|1*rare}
    */
   evaluate(template) {
     if (!template || typeof template !== 'string') return '';
 
     let text = template;
-    const maxIterations = 20;
+
+    // 1. Resolve known [wildcard] category tokens first (leaves unknown [brackets] intact for SD de-emphasis syntax)
+    text = this._resolveWildcards(text);
+
+    // 2. Iteratively resolve innermost { ... } blocks
+    const maxIterations = 30;
     let iteration = 0;
 
-    // Iteratively resolve innermost { ... } blocks
     while (iteration < maxIterations) {
       const match = text.match(/\{([^{}]+)\}/);
       if (!match) break;
@@ -716,28 +1090,71 @@ const PerchanceEngine = {
       iteration++;
     }
 
-    return text.trim();
+    // 3. Resolve any wildcards that were inside chosen { ... } branches
+    text = this._resolveWildcards(text);
+
+    return text.replace(/\s+/g, ' ').trim();
+  },
+
+  /**
+   * Resolves [wildcard] placeholders matching dictionary categories
+   */
+  _resolveWildcards(text) {
+    if (!text.includes('[')) return text;
+
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    const wildcardMap = {
+      subject: () => pick(this.dictionary.subjects),
+      hair: () => `${pick(this.dictionary.hairColors)} ${pick(this.dictionary.hairStyles)}`,
+      haircolor: () => pick(this.dictionary.hairColors),
+      hairstyle: () => pick(this.dictionary.hairStyles),
+      eyes: () => pick(this.dictionary.eyeStyles),
+      expression: () => pick(this.dictionary.expressions),
+      pose: () => pick(this.dictionary.poses),
+      outfit: () => pick(this.dictionary.attire),
+      attire: () => pick(this.dictionary.attire),
+      accessory: () => pick(this.dictionary.accessories),
+      scenery: () => pick(this.dictionary.scenery),
+      setting: () => pick(this.dictionary.scenery),
+      lighting: () => pick(this.dictionary.lighting),
+      vfx: () => pick(this.dictionary.vfx),
+      camera: () => pick(this.dictionary.cameraAndComposition),
+      angle: () => pick(this.dictionary.cameraAndComposition),
+      studio: () => pick(this.dictionary.studios),
+      quality: () => pick(this.dictionary.qualityBoosters)
+    };
+
+    return text.replace(/\[([a-zA-Z]+)\]/g, (full, key) => {
+      const lower = key.toLowerCase();
+      if (wildcardMap[lower]) {
+        return wildcardMap[lower]();
+      }
+      return full;
+    });
   },
 
   /**
    * Helper to pick one option from a pipe-delimited string
-   * Handles weighted options like '50% a|50% b' or plain 'a|b|c'
+   * Handles weighted options like '50% a|50% b', '3::a|1::b', '3*a|1*b', or plain 'a|b|c'
    */
   _chooseFromSet(innerContent) {
     const rawOptions = innerContent.split('|').map(s => s.trim()).filter(s => s.length > 0);
     if (rawOptions.length === 0) return '';
 
-    // Check for percentage weights (e.g., "60% option A")
     let hasWeights = false;
     const weightedOptions = [];
     let totalWeight = 0;
 
     for (const opt of rawOptions) {
-      const weightMatch = opt.match(/^(\d+(?:\.\d+)?)\s*%\s*(.*)$/);
-      if (weightMatch) {
+      // Match "60% option", "3::option", or "3*option"
+      const pctMatch = opt.match(/^(\d+(?:\.\d+)?)\s*%\s*(.*)$/);
+      const ratioMatch = !pctMatch ? opt.match(/^(\d+(?:\.\d+)?)\s*(?:::|\*)\s*(.*)$/) : null;
+
+      if (pctMatch || ratioMatch) {
         hasWeights = true;
-        const weight = parseFloat(weightMatch[1]);
-        const val = weightMatch[2].trim();
+        const m = pctMatch || ratioMatch;
+        const weight = parseFloat(m[1]);
+        const val = m[2].trim();
         weightedOptions.push({ value: val, weight });
         totalWeight += weight;
       } else {
@@ -763,267 +1180,574 @@ const PerchanceEngine = {
   },
 
   /**
-   * Comprehensive anime dictionary for prompt construction & randomization
+   * Comprehensive anime dictionary for prompt construction, wildcards & randomization
    */
   dictionary: {
     subjects: [
-      "1girl, beautiful anime heroine",
-      "1girl, cyberpunk blade runner",
-      "1girl, magical girl in ornate dress",
-      "1girl, shrine maiden (miko)",
-      "1girl, kuudere elf sorceress",
-      "1girl, tsundere academy student",
-      "1girl, mecha pilot in plugsuit",
-      "1girl, gothic lolita princess",
-      "1girl, wandering ronin swordsman",
-      "1girl, cyberpunk hacker with tech visor",
-      "1girl, celestial dragon princess",
-      "1girl, cozy slice-of-life barista",
-      "1girl, ethereal fairy with translucent wings",
-      "1boy, charismatic shonen protagonist",
-      "1boy, stoic dark fantasy swordsman",
-      "1boy, futuristic cyber vigilante",
-      "1boy, mysterious academy prodigy",
-      "1girl and 1boy, romantic anime couple under umbrella",
-      "chibi anime mascot with adorable companion"
+      "1girl, solo, beautiful anime heroine",
+      "1girl, solo, cyberpunk netrunner samurai",
+      "1girl, solo, celestial magical girl in astral regalia",
+      "1girl, solo, shrine maiden (miko) exorcist",
+      "1girl, solo, kuudere silver-haired elf archmage",
+      "1girl, solo, tsundere academy student council president",
+      "1girl, solo, elite mecha pilot in neural plugsuit",
+      "1girl, solo, gothic lolita vampire noblewoman",
+      "1girl, solo, wandering ronin swordswoman",
+      "1girl, solo, kitsune spirit princess with nine tails",
+      "1girl, solo, valkyrie knight in winged silver armor",
+      "1girl, solo, cozy slice-of-life bookshop barista",
+      "1girl, solo, steampunk airship navigator",
+      "1girl, solo, alchemist witch in oversized pointed hat",
+      "1boy, solo, charismatic shonen lightning warrior",
+      "1boy, solo, stoic dark fantasy dragon knight",
+      "1boy, solo, futuristic cybernetic bounty hunter",
+      "1boy, solo, mysterious onmyoji spirit mage",
+      "1girl and 1boy, romantic anime couple under translucent umbrella",
+      "chibi, solo, adorable anime mascot with floating star companion"
     ],
 
     hairColors: [
-      "silver white", "sakura pastel pink", "midnight raven black", "golden blonde",
-      "glowing cyan", "crimson red", "twilight violet", "emerald green",
-      "two-tone pastel lavender and mint", "fiery gradient orange"
+      "silver white", "sakura pastel pink", "midnight raven black", "platinum blonde",
+      "glowing aqua cyan", "crimson scarlet", "twilight amethyst violet", "emerald jade",
+      "gradient lavender and mint", "fiery sunset orange", "cobalt sapphire blue",
+      "inner-color black and neon magenta", "snowy iridescent white"
     ],
 
     hairStyles: [
-      "twin tails with fluttering ribbons", "flowing long hair with intricate braid",
-      "messy short bob with side fringe", "hime cut with blunt bangs",
-      "high ponytail tied with silk cord", "loose wavy hair drifting in wind",
-      "elaborate braided bun with floral hairpins", "spiky dynamic anime hair"
+      "long twintails with fluttering silk ribbons",
+      "flowing waist-length hair with intricate crown braid",
+      "messy wolf cut with swept bangs and sidelocks",
+      "classic hime cut with blunt bangs and hair intakes",
+      "high combat ponytail tied with ornate cord and ahoge",
+      "windblown wavy hair with floating hair strands",
+      "luxurious twin drill curls with lace hairband",
+      "sleek asymmetrical bob cut with hair over one eye",
+      "twin braids resting over shoulders with floral hairpins"
     ],
 
     eyeStyles: [
-      "gem-like crimson eyes", "deep ocean sapphire blue eyes", "glowing electric violet eyes",
-      "heterochromia (one gold eye, one turquoise eye)", "star-shaped pupils with cosmic sparkle",
-      "warm honey amber eyes", "emerald green eyes with soft specular highlights"
+      "gem-like crimson red eyes with intricate iris highlights",
+      "deep ocean sapphire blue eyes with luminous reflections",
+      "glowing electric violet eyes with star-shaped pupils",
+      "heterochromia (one golden amber eye, one turquoise cyan eye)",
+      "radiant emerald green eyes with long colored eyelashes",
+      "warm honey gold eyes with soft specular bloom",
+      "slit dragon pupils glowing with ethereal cyan light",
+      "expressive rose-pink eyes with heart-shaped catchlights"
     ],
 
     expressions: [
-      "gentle serene smile", "smug playful smirk", "intense focused combat gaze",
-      "tsundere pout with faint blush", "mysterious melancholic gaze",
-      "confident radiant grin", "winking playfully at the viewer",
-      "calm stoic expression"
+      "gentle serene smile, looking at viewer",
+      "smug playful smirk, tilted head",
+      "intense focused combat gaze, parted lips",
+      "tsundere pout with soft blush on cheeks",
+      "mysterious melancholic expression, half-closed eyes (jitome)",
+      "confident radiant grin, sparkling eyes",
+      "playful wink with peace sign",
+      "calm stoic kuudere expression, composed gaze"
+    ],
+
+    poses: [
+      "dynamic action pose, reaching towards viewer with foreshortening",
+      "standing gracefully with hand on hip, wind-blown posture",
+      "unsheathing a glowing katana in mid-air leap",
+      "seated on a stone ledge looking back over shoulder",
+      "casting a radiant spell with floating magic circle around hands",
+      "leaning against a rain-streaked balcony railing",
+      "dramatic contrapposto stance with billowing cape",
+      "holding an antique parasol while looking up at the sky"
     ],
 
     attire: [
-      "futuristic glowing techwear jacket and pleated skirt",
-      "elaborate ceremonial white and crimson miko kimono",
-      "ornate gothic lolita dress with black lace and velvet ribbons",
-      "sleek sci-fi pilot plugsuit with glowing circuitry",
-      "traditional Japanese school sailor uniform with red neckerchief",
-      "ornate golden-trimmed fantasy armor with flowing royal cape",
-      "oversized streetwear hoodie with headphone around neck",
-      "enchanted sorceress robe adorned with star constellations",
-      "flowing summer sundress with straw hat",
-      "cyberpunk combat gear with tactical harness and holographic badges"
+      "futuristic techwear jacket with glowing neon seams and pleated skirt",
+      "ceremonial white and crimson miko kimono with gold-embroidered obi",
+      "extravagant gothic lolita dress with black velvet ribbons and lace corsetry",
+      "sleek neural-link mecha pilot plugsuit with luminescent circuit lines",
+      "traditional serafuku sailor uniform with red neckerchief and thighhighs",
+      "ornate filigree valkyrie plate armor with flowing royal cape",
+      "oversized knitted off-shoulder sweater with headphones around neck",
+      "celestial sorceress robe woven with glowing starlight constellations",
+      "breezy white summer sundress with ribbon-tied straw hat",
+      "steampunk tailored coat with brass gears, leather harness, and corset"
     ],
 
     accessories: [
-      "fluffy kemonomimi cat ears and tail",
-      "glowing celestial halo floating above head",
-      "futuristic holographic visor over one eye",
-      "ancient katana with glowing runes along the edge",
-      "ornate magical crystal staff radiating starlight",
-      "translucent cherry blossom hairpin",
-      "vintage round glasses catching lens glare",
-      "silver cross earrings and choker",
-      "delicate butterfly hairpin fluttering"
+      "fluffy kemonomimi fox ears and nine glowing tails",
+      "luminous geometric halo floating above head",
+      "translucent holographic tactical visor over one eye",
+      "ancient rune-etched katana with drifting cherry blossom aura",
+      "crystalline astral staff radiating cosmic stardust",
+      "delicate kanzashi cherry blossom hairpin with dangling chimes",
+      "vintage round wire-frame glasses catching lens flare",
+      "floating grimoire spellbook with glowing golden pages",
+      "black lace choker and silver cross earrings"
     ],
 
     scenery: [
-      "ancient Japanese shrine courtyard with drifting sakura cherry blossoms",
-      "rain-slicked Neo-Tokyo cyberpunk alley illuminated by vibrant neon signs",
-      "breathtaking floating sky island with ancient overgrown ruins and waterfalls",
-      "dreamy sunset train platform overlooking a sparkling coastal sea",
-      "enchanted bioluminescent fantasy forest with floating ethereal spirits",
-      "rooftop garden at twilight overlooking an endless metropolis of light",
-      "cozy sunlit greenhouse cafe filled with blooming plants and vintage books",
-      "grand celestial observatory with massive crystal telescope under starry Milky Way",
-      "snowy mountain shrine gate under a brilliant aurora borealis",
-      "traditional Japanese tatami room with open shoji doors facing autumn maple garden"
+      "ancient Shinto shrine courtyard with vermilion torii gates and drifting sakura petals",
+      "rain-slicked Neo-Tokyo cyberpunk alley reflecting holographic kanji billboards",
+      "colossal floating sky island with overgrown marble ruins and cascading waterfalls",
+      "coastal Japanese train station platform at golden sunset overlooking sparkling ocean waves",
+      "enchanted bioluminescent forest filled with glowing spirit wisps and giant crystal flora",
+      "high school rooftop at twilight overlooking a sprawling city skyline under a split comet",
+      "cozy sunlit botanical greenhouse cafe with hanging ferns and warm wooden bookshelves",
+      "grand celestial astral observatory under a vivid Milky Way galaxy and colossal moon",
+      "snow-blanketed mountain shrine illuminated by paper lanterns and aurora borealis",
+      "gothic cathedral interior with towering stained glass windows and moonlit mist"
     ],
 
     lighting: [
-      "cinematic golden hour rim lighting, soft warm sunlight",
-      "vibrant neon backlight with cyan and magenta bloom",
-      "ethereal volumetric god rays filtering through clouds",
-      "magical starlight and gentle glowing particle bokeh",
-      "dramatic dynamic chiaroscuro lighting with sharp highlights",
-      "soft diffused anime studio lighting, clean specular highlights",
-      "romantic sunset twilight with gradient pastel hues",
-      "mystical glowing blue bioluminescent ambience"
+      "cinematic golden hour backlighting, warm rim light, tyndall effect",
+      "vibrant cyberpunk neon dual-lighting in electric cyan and magenta bloom",
+      "ethereal volumetric god rays (crepuscular rays) piercing through twilight clouds",
+      "magical bioluminescent starlight with soft depth-of-field bokeh",
+      "high-contrast dramatic chiaroscuro lighting with razor-sharp specular highlights",
+      "dappled sunlight filtering through tree leaves, soft studio bloom",
+      "Makoto Shinkai twilight sky gradient with lens flare and water reflections",
+      "mystical crimson moonlight casting long atmospheric shadows"
+    ],
+
+    vfx: [
+      "drifting cherry blossom petals, soft chromatic aberration",
+      "swirling elemental lightning sparks and glowing energy embers",
+      "floating golden magic runes and geometric spell circles",
+      "rain droplets frozen in mid-air with puddle mirror reflections",
+      "ethereal butterflies made of glowing blue starlight",
+      "anamorphic lens flare, subtle film grain, depth of field bokeh"
     ],
 
     cameraAndComposition: [
-      "portrait close-up, expressive eyes in sharp focus",
-      "medium shot, dynamic pose with flowing fabrics",
-      "wide cinematic angle, breathtaking environmental composition",
-      "dramatic low angle hero shot, expansive sky backdrop",
-      "intimate over-the-shoulder perspective with depth of field",
-      "side profile with hair fluttering across the wind"
+      "cowboy shot, dynamic angle, shallow depth of field, sharp focus on eyes",
+      "portrait close-up, expressive eyes in razor-sharp focus, creamy bokeh background",
+      "dramatic low angle (from below), heroic foreshortening, expansive sky backdrop",
+      "dutch angle (tilted frame), high-energy kinetic action composition",
+      "wide cinematic establishing shot, rule of thirds, intricate background detail",
+      "over-the-shoulder perspective looking back at viewer, windblown hair in foreground",
+      "high angle (from above), character looking up at camera, dramatic perspective"
+    ],
+
+    studios: [
+      "Ufotable style, high-contrast elemental VFX",
+      "Kyoto Animation (KyoAni) style, luminous glassy eyes and soft bloom",
+      "Makoto Shinkai / CoMix Wave Films style, hyper-detailed clouds and twilight",
+      "Studio Ghibli / Hayao Miyazaki style, painterly gouache background",
+      "Studio Trigger / Cyberpunk Edgerunners style, bold neon angular linework",
+      "MAPPA cinematic dark fantasy style, gritty atmospheric shading",
+      "CloverWorks luminous slice-of-life style, delicate pastel lighting",
+      "Shaft / Monogatari style, avant-garde geometric composition"
     ],
 
     qualityBoosters: [
-      "masterpiece", "best quality", "ultra-detailed anime artstyle",
-      "sharp focus", "intricate lineart", "vibrant color palette",
-      "studio anime key visual", "clean illustration"
+      "masterpiece, best quality, very aesthetic, absurdres, newest",
+      "anime key visual, official art, clean crisp lineart, vibrant colors",
+      "score_9, score_8_up, score_7_up, source_anime, masterpiece",
+      "ultra-detailed anime illustration, trending on Pixiv, 4k resolution"
     ]
   },
 
   /**
    * Pre-configured style definitions that map to specific prompt modifiers,
-   * negative prompts, and aesthetic tunings.
+   * negative prompts, trigger identifiers, and aesthetic tunings.
    */
   stylePresets: {
     "flux-anime": {
       name: "Modern Digital Anime",
-      description: "Crisp lines, vibrant colors, 4K key visual aesthetic",
-      promptSuffix: ", modern anime key visual, clean crisp lineart, vibrant rich colors, polished digital illustration, high production value, trending on pixiv",
-      negativePrompt: "low quality, worst quality, blurry, deformed, bad anatomy, extra limbs, watermark, text, signature, rough sketch",
-      recommendedModel: "flux"
+      description: "Crisp lines, vibrant colors, 4K key visual aesthetic (Pixiv / Key Visual)",
+      triggerIdentifiers: ["anime key visual", "official art", "clean crisp lineart", "trending on pixiv"],
+      promptSuffix: ", modern anime key visual, official art, clean crisp lineart, vibrant rich cel-shaded colors, polished digital illustration, high production value, trending on pixiv, absurdres",
+      negativePrompt: "low quality, worst quality, blurry, deformed, bad anatomy, extra limbs, watermark, text, signature, rough sketch, photorealistic, 3d",
+      recommendedModel: "flux-anime"
+    },
+    "illustrious-booru": {
+      name: "Illustrious Booru Masterpiece",
+      description: "Pure Danbooru tag aesthetic with modern 2024/2025 crisp anime coloring",
+      triggerIdentifiers: ["very aesthetic", "absurdres", "newest", "year 2024", "anime coloring"],
+      promptSuffix: ", masterpiece, best quality, amazing quality, very aesthetic, absurdres, newest, year 2024, anime coloring, official style, intricate details, sharp focus",
+      negativePrompt: "worst quality, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, extra digits, fewer digits, anatomical nonsense",
+      recommendedModel: "illustrious-xl"
     },
     "retro-90s": {
       name: "90s Retro Cel Anime",
-      description: "Classic hand-painted animation cels, vintage grain & warm hues",
-      promptSuffix: ", 1990s anime aesthetic, classic hand-painted animation cel style, retro anime color palette, film grain, soft cel shading, nostalgia, vintage anime screencap, studio art from 1995",
-      negativePrompt: "3D render, digital CGI, modern oversaturated digital art, plastic texture, low quality, blurry",
-      recommendedModel: "flux"
+      description: "Classic hand-painted animation cels, VHS grain & warm nostalgic hues",
+      triggerIdentifiers: ["1990s (style)", "animation cel", "retro artstyle", "anime screencap"],
+      promptSuffix: ", 1990s (style), retro artstyle, classic hand-painted animation cel, vintage anime screencap, cel shading, VHS film grain, muted warm retro color palette, 90s OVA aesthetic",
+      negativePrompt: "3D render, digital CGI, modern oversaturated digital art, newest, year 2024, plastic texture, low quality, blurry",
+      recommendedModel: "flux-anime"
     },
     "studio-ghibli": {
       name: "Studio Ghibli Watercolor",
       description: "Whimsical, lush pastoral backgrounds, hand-drawn painterly feel",
-      promptSuffix: ", Hayao Miyazaki Studio Ghibli style, lush painterly background, whimsical gouache and watercolor textures, warm emotional lighting, hand-drawn traditional animation masterpiece",
+      triggerIdentifiers: ["Studio Ghibli style", "watercolor (medium)", "painterly background"],
+      promptSuffix: ", Hayao Miyazaki Studio Ghibli style, lush painterly gouache and watercolor background, whimsical pastoral atmosphere, warm natural sunlight, hand-drawn traditional animation masterpiece",
       negativePrompt: "dark, gritty, photo, 3D, CGI, plastic, harsh neon, deformed, low quality",
-      recommendedModel: "flux"
+      recommendedModel: "flux-anime"
     },
     "makoto-shinkai": {
-      name: "Makoto Shinkai (Your Name / Weathering)",
-      description: "Radiant skies, dramatic clouds, hyper-detailed twilight lighting",
-      promptSuffix: ", Makoto Shinkai visual style, CoMix Wave Films aesthetic, dramatic volumetric cumulus clouds, radiant twilight sky, hyper-detailed sparkling environmental reflections, emotional cinematic atmosphere",
-      negativePrompt: "flat colors, low detail, washed out, dull lighting, low quality, bad anatomy",
-      recommendedModel: "flux"
+      name: "Makoto Shinkai (CoMix Wave)",
+      description: "Radiant twilight skies, towering cumulus clouds, emotional lens flare",
+      triggerIdentifiers: ["Makoto Shinkai style", "CoMix Wave Films", "volumetric cumulus clouds", "twilight"],
+      promptSuffix: ", Makoto Shinkai visual style, CoMix Wave Films aesthetic, dramatic volumetric cumulus clouds, radiant twilight sky, hyper-detailed sparkling reflections, anamorphic lens flare, emotional cinematic anime",
+      negativePrompt: "flat colors, simple background, low detail, washed out, dull lighting, low quality, bad anatomy",
+      recommendedModel: "flux-anime"
     },
     "cyberpunk-trigger": {
       name: "Cyberpunk / Studio Trigger",
-      description: "High saturation, angular action lines, neon futuristic pop",
-      promptSuffix: ", Studio Trigger dynamic anime style, Cyberpunk Edgerunners aesthetic, bold sharp angular linework, explosive neon saturation, dynamic action framing, electric energy",
-      negativePrompt: "dull, muted, pastel, washed out, realism, blurry, low resolution",
-      recommendedModel: "flux"
+      description: "High saturation, angular action lines, neon futuristic pop (Edgerunners)",
+      triggerIdentifiers: ["Studio Trigger style", "Cyberpunk Edgerunners", "chromatic aberration", "neon"],
+      promptSuffix: ", Studio Trigger dynamic anime style, Cyberpunk Edgerunners aesthetic, Hiroyuki Imaishi bold angular linework, explosive neon cyan and magenta saturation, chromatic aberration, kinetic action framing",
+      negativePrompt: "dull, muted, pastel, washed out, realism, blurry, low resolution, static",
+      recommendedModel: "flux-anime"
     },
     "kyoto-animation": {
       name: "Kyoto Animation (KyoAni)",
-      description: "Luminous glassy eyes, delicate soft bloom, slice-of-life warmth",
-      promptSuffix: ", Kyoto Animation style, delicate expressive character design, luminous glassy eye reflections, soft bloom lighting, warm heartfelt atmosphere, intricate hair movement",
-      negativePrompt: "rough, messy, harsh, grotesque, bad anatomy, deformed face, low quality",
-      recommendedModel: "flux"
+      description: "Luminous glassy eyes, delicate soft bloom, slice-of-life perfection",
+      triggerIdentifiers: ["Kyoto Animation style", "luminous eyes", "soft bloom", "intricate hair"],
+      promptSuffix: ", Kyoto Animation (KyoAni) style, delicate expressive character design, luminous multi-layered glassy eye reflections, soft bloom lighting, tyndall effect, intricate floating hair strands",
+      negativePrompt: "rough, messy, harsh shadows, grotesque, bad anatomy, deformed face, low quality",
+      recommendedModel: "flux-anime"
     },
     "ufotable-action": {
-      name: "Ufotable Action (Demon Slayer)",
-      description: "High contrast darks, dynamic particle VFX, dramatic impact lighting",
-      promptSuffix: ", Ufotable anime style, high contrast dramatic lighting, brilliant elemental particle effects, glowing kinetic energy aura, cinematic anime battle scene, intense atmosphere",
-      negativePrompt: "flat, low contrast, washed out, static, boring, deformed, low quality",
-      recommendedModel: "flux"
+      name: "Ufotable Action (VFX)",
+      description: "High contrast darks, dynamic elemental particle VFX, digital compositing",
+      triggerIdentifiers: ["Ufotable style", "elemental particle VFX", "backlighting", "glowing aura"],
+      promptSuffix: ", Ufotable anime style, high contrast dramatic digital compositing, brilliant elemental particle effects, glowing kinetic energy aura, volumetric embers, cinematic anime battle screencap",
+      negativePrompt: "flat lighting, low contrast, washed out, static, boring, deformed, low quality",
+      recommendedModel: "flux-anime"
+    },
+    "mappa-dark": {
+      name: "MAPPA Dark Cinematic",
+      description: "Gritty atmospheric shading, intense eyes, cinematic camera perspective",
+      triggerIdentifiers: ["MAPPA style", "dark cinematic anime", "crosshatching", "dramatic shadows"],
+      promptSuffix: ", MAPPA studio anime style, dark cinematic atmosphere, gritty detailed shading, intense expressive eyes, dynamic wide-angle perspective, dramatic chiaroscuro lighting, anime key visual",
+      negativePrompt: "pastel, childish, flat shading, low quality, blurry, deformed hands",
+      recommendedModel: "flux-anime"
     },
     "manga-ink": {
       name: "Manga Monochrome Ink",
-      description: "Crisp black and white ink, screentone shading, manga panel",
-      promptSuffix: ", Japanese manga illustration, high contrast black and white ink drawing, meticulous screentones, cross-hatching, dramatic manga lineart, clean monochrome panel",
-      negativePrompt: "color, full color, watercolor, blurry, messy, low quality, photorealistic",
-      recommendedModel: "flux"
+      description: "Crisp black and white G-pen ink, screentone shading, manga panel",
+      triggerIdentifiers: ["monochrome", "greyscale", "screentones", "manga lineart"],
+      promptSuffix: ", monochrome, greyscale, Japanese manga illustration, high contrast black and white G-pen ink drawing, meticulous screentones, speed lines, crosshatching, dramatic manga page art",
+      negativePrompt: "color, colorful, watercolor, 3d, photorealistic, blurry, messy, low quality",
+      recommendedModel: "illustrious-xl"
+    },
+    "light-novel-cg": {
+      name: "Light Novel / VN Key Art",
+      description: "Ultra-polished character illustration with intricate frills, lace & sparkles",
+      triggerIdentifiers: ["light novel illustration", "visual novel CG", "intricate details", "sparkling"],
+      promptSuffix: ", light novel cover illustration, visual novel CG masterpiece, ultra-detailed hair highlights, intricate clothing folds and lace trim, sparkling atmospheric particles, vibrant rim lighting",
+      negativePrompt: "simple, flat colors, rough sketch, lowres, bad anatomy, extra fingers, watermark",
+      recommendedModel: "illustrious-xl"
+    },
+    "cel-3d-figure": {
+      name: "3D Cel / Scale Figurine",
+      description: "Stylized 3D anime shader or collectible 1/7 painted PVC scale figure",
+      triggerIdentifiers: ["3D anime render", "1/7 scale figure", "subsurface scattering", "octane render"],
+      promptSuffix: ", stylized 3D anime render, 1/7 scale painted PVC anime figure aesthetic, subsurface scattering, smooth cel-shaded 3D materials, studio rim lighting, shallow depth of field, octane render",
+      negativePrompt: "flat 2D sketch, messy lineart, low poly, pixelated, blurry, deformed",
+      recommendedModel: "flux-3d"
     },
     "chibi-sticker": {
       name: "Chibi & Kawaii Sticker",
-      description: "Adorable oversized head, cute proportions, pastel sticker art",
-      promptSuffix: ", cute chibi anime character, kawaii proportions, large expressive sparkling eyes, sticker design with clean white outline, bright pastel colors, adorable playful charm",
-      negativePrompt: "realistic proportions, scary, grim, dark, low quality, bad anatomy, deformed",
-      recommendedModel: "flux"
+      description: "Adorable super-deformed proportions, thick outlines, die-cut sticker art",
+      triggerIdentifiers: ["chibi", "super deformed", "sticker", "white outline"],
+      promptSuffix: ", chibi, super deformed kawaii anime character, large sparkling eyes, die-cut vinyl sticker design with clean white outline, bright pastel pop colors, adorable playful charm",
+      negativePrompt: "realistic proportions, tall, grim, dark, gritty, low quality, bad anatomy",
+      recommendedModel: "flux-anime"
     },
     "dark-fantasy": {
-      name: "Dark Fantasy Anime",
-      description: "Moody gothic ambiance, glowing ethereal runes, ornate dark armor",
-      promptSuffix: ", dark fantasy anime aesthetic, gothic atmosphere, intricate ornate dark armor, glowing ethereal magic runes, misty cinematic lighting, moody epic composition",
-      negativePrompt: "cheerful, pastel, comedic, low quality, deformed, blurry",
-      recommendedModel: "flux"
+      name: "Dark Fantasy / Gothic",
+      description: "Moody gothic ambiance, glowing ethereal runes, ornate dark filigree armor",
+      triggerIdentifiers: ["dark fantasy", "gothic", "ornate filigree armor", "glowing runes"],
+      promptSuffix: ", dark fantasy anime masterpiece, gothic atmosphere, intricate ornate dark filigree armor, glowing ethereal magic runes, misty volumetric moonlight, moody epic composition",
+      negativePrompt: "cheerful, bright pastel, comedic, modern casual, low quality, deformed, blurry",
+      recommendedModel: "flux-anime"
     }
   },
 
   /**
    * Pre-built Perchance Template Library
-   * Allows users to load, inspect, and randomize classic Perchance-style templates
+   * Includes classic {a|b|c} syntax, weighted {60% a|40% b} syntax, and [wildcard] syntax
    */
   templates: [
     {
       id: "magical-girl",
-      title: "Magical Girl Awakening",
+      title: "Astral Magical Girl Awakening",
       category: "Fantasy",
+      recommendedModel: "flux-anime",
       icon: "✨",
-      template: "1girl, magical girl in {ornate white and pink lace dress|flowing celestial starry gown|fluttering ribbons and frills}, {sakura pink|golden blonde|silver} hair styled into {flowing twin tails|elaborate braided curls|long floating waves}, {radiant ruby|sparkling sapphire|golden amber} eyes, wielding a {glowing crystal star wand|radiant magical scepter}, surrounded by {floating magical glyphs and starlight|fluttering glowing cherry blossoms|swirling cosmic sparkles}, {ancient shrine courtyard at dusk|floating cloud palace|mystical crystal sanctuary}, cinematic lighting, masterpiece"
+      template: "1girl, solo, magical girl in {ornate white and rose-gold frilled dress|flowing celestial starry gown with translucent ribbons}, {sakura pink|platinum blonde|iridescent silver} hair in {long flowing twintails|elaborate twin drill curls|windblown waves with hair intakes}, {radiant ruby|sparkling sapphire|star-shaped violet} eyes, wielding a {glowing crystal star scepter|winged astral staff}, surrounded by {floating geometric magic circles and starlight|swirling glowing cherry blossoms|cosmic nebula sparkles}, {ancient Shinto shrine at twilight|floating marble sky sanctuary}, dramatic backlighting, tyndall effect, anime key visual, masterpiece"
     },
     {
       id: "cyberpunk-ronin",
-      title: "Cyberpunk Street Ronin",
+      title: "Cyberpunk Edgerunner Ronin",
       category: "Sci-Fi",
+      recommendedModel: "flux-anime",
       icon: "⚡",
-      template: "1girl, badass cyberpunk ronin, {raven black|neon cyan|crimson} hair with {an asymmetrical undercut|messy bob with cyber wires|high combat ponytail}, {glowing cybernetic optics|electric blue eyes}, wearing {oversized techwear trenchcoat with glowing holographic collar|sleek carbon fiber armor and pleated skirt}, holding a {futuristic thermal katana glowing neon red|dual high-frequency plasma blades}, in a {rain-drenched Shinjuku neon back-alley with puddle reflections|skyline rooftop overlooking holographic billboards}, steam rising, volumetric fog, rim lighting, 4K anime key visual"
+      template: "1girl, solo, cyberpunk street ronin, {midnight black|neon aqua cyan|crimson} hair in {an asymmetrical wolf cut|high combat ponytail|sleek bob cut with glowing neural hairpins}, {glowing cybernetic optics|slit neon violet eyes}, wearing {oversized techwear trenchcoat with illuminated holographic collar|sleek carbon-fiber tactical armor and pleated skirt}, unsheathing a {thermal katana wreathed in plasma arcs|dual high-frequency neon blades}, {rain-drenched Neo-Tokyo alley with neon kanji reflections in puddles|skyline megastructure rooftop in pouring rain}, dutch angle, chromatic aberration, volumetric neon fog, Studio Trigger aesthetic"
+    },
+    {
+      id: "illustrious-booru-pro",
+      title: "Illustrious XL Canonical Booru Formula",
+      category: "Model Showcase",
+      recommendedModel: "illustrious-xl",
+      icon: "🏷️",
+      template: "masterpiece, best quality, amazing quality, very aesthetic, absurdres, newest, year 2024, 1girl, solo, {silver hair|sakura pink hair|aqua hair}, {long twintails|hime cut|floating hair}, {blunt bangs|swept bangs}, {red eyes|blue eyes|heterochromia}, {gentle smile|smug smirk|tsundere pout}, {looking at viewer}, {serafuku sailor uniform|gothic lolita dress|miko kimono}, {cowboy shot|upper body}, {from below|dutch angle}, {cherry blossom shrine courtyard|sunset train station platform|starry observatory}, backlighting, bloom, depth of field, chromatic aberration, anime coloring"
+    },
+    {
+      id: "pony-v6-dynamic",
+      title: "Pony V6 XL Score-9 Dynamic Action",
+      category: "Model Showcase",
+      recommendedModel: "pony-xl",
+      icon: "🐎",
+      template: "score_9, score_8_up, score_7_up, score_6_up, source_anime, rating_safe, 1girl, solo, {valkyrie knight|kitsune spirit swordswoman|dark elf archmage}, {platinum blonde|silver white|crimson} windblown hair, {glowing golden eyes|fierce emerald eyes}, wearing {ornate silver filigree armor with tattered royal cape|ceremonial battle kimono with glowing runes}, {dynamic mid-air combat pose with foreshortening|casting an explosive elemental spell towards camera}, {worm's-eye view|tilted dutch angle}, {shattered floating temple ruins|stormy lightning battlefield}, volumetric god rays, flying embers, masterpiece"
+    },
+    {
+      id: "wildcard-sandbox",
+      title: "Infinite [Wildcard] Combinatorial Generator",
+      category: "Wildcard Engine",
+      recommendedModel: "flux-anime",
+      icon: "🎲",
+      template: "[subject], [hair], [eyes], [expression], [pose], wearing [outfit], [accessory], in a [scenery], [lighting], [vfx], [camera], [studio], [quality]"
     },
     {
       id: "ghibli-countryside",
-      title: "Ghibli Countryside Afternoon",
+      title: "Ghibli Pastoral Summer Afternoon",
       category: "Slice of Life",
+      recommendedModel: "flux-anime",
       icon: "🍃",
-      template: "1girl in {loose floral sundress and straw hat|cozy vintage apron over white blouse}, {chestnut brown|soft black} hair with {breezy bangs|cute braided pigtails}, looking with {wonder|warm peaceful smile} toward the horizon, sitting in {a lush green meadow overlooking rural Japanese train tracks|a rustic hillside cottage garden blooming with sunflowers}, {giant fluffy cumulus clouds in brilliant azure sky|soft golden late-afternoon sunlight}, Studio Ghibli painterly watercolor artstyle, nostalgic peaceful mood"
+      template: "1girl, solo, wearing {breezy floral sundress and ribbon straw hat|vintage linen apron over puffed-sleeve blouse}, {chestnut brown|soft raven black} hair with {wind-tousled bangs|twin braided pigtails}, {warm peaceful smile|curious wonder-filled gaze}, {standing on a grassy hillside overlooking coastal train tracks and sparkling blue sea|tending a sunlit greenhouse overflowing with sunflowers and climbing ivy}, {towering white cumulus clouds in deep azure summer sky|warm golden late-afternoon sunlight}, Hayao Miyazaki Studio Ghibli style, lush painterly gouache background, nostalgic emotional atmosphere"
     },
     {
       id: "shinkai-twilight",
-      title: "Makoto Shinkai Twilight Rooftop",
+      title: "Makoto Shinkai Comet & Twilight Sky",
       category: "Cinematic",
+      recommendedModel: "flux-anime",
       icon: "🌆",
-      template: "{1girl|1girl and 1boy standing close}, {wind-blown hair|fluttering school uniform}, gazing up at {a brilliant split comet streaking through twilight sky|spectacular purple and gold sunset clouds reflecting in rooftop rainwater}, Tokyo skyline silhouette in distance, Makoto Shinkai CoMix Wave visual style, hyper-detailed cloud physics, emotional cinematic atmosphere, dazzling light lens flare"
+      template: "{60% 1girl, solo|40% 1girl and 1boy standing side by side}, {windblown school uniform and fluttering scarf|casual summer festival yukata}, gazing up at {a breathtaking split comet streaking across a violet-and-amber twilight sky|colossal illuminated cumulus clouds reflecting in rain-soaked rooftop puddles}, distant Tokyo tower skyline silhouette, Makoto Shinkai CoMix Wave Films visual style, hyper-detailed sky physics, anamorphic lens flare, emotional cinematic key visual"
     },
     {
       id: "shonen-awakening",
-      title: "Shonen Battle Awakening",
+      title: "Ufotable Shonen Elemental Awakening",
       category: "Action",
+      recommendedModel: "flux-anime",
       icon: "🔥",
-      template: "{1boy|1girl}, anime warrior in combat stance, {spiky crimson hair|electric blue hair} standing on end, {fierce determined eyes glowing with elemental power}, {shredded battle armor with glowing energy crests|dark combat gi}, enveloped in {surging azure lightning aura|swirling dragon flames and embers}, cracked battlefield ground, high dynamic range, dynamic perspective, Ufotable anime action sequence, intense particle effects"
+      template: "{1boy|1girl}, solo, anime warrior in low combat stance, {spiky crimson hair|flowing silver hair} surging upward, {fierce glowing eyes with slit pupils}, wearing {battle-worn haori coat over dark demon-slayer uniform|ornate dragon-scale armor}, unleashing {swirling Hinokami dragon flames and glowing embers|crackling azure lightning breathing aura}, shattered stone ground, extreme foreshortening, dramatic low angle, Ufotable digital compositing, high-contrast particle VFX"
     },
     {
       id: "gothic-moonlight",
-      title: "Gothic Lolita Moonlight",
+      title: "Gothic Lolita Blood-Moon Cathedral",
       category: "Gothic",
+      recommendedModel: "illustrious-xl",
       icon: "🌙",
-      template: "1girl, gothic lolita noble, {porcelain pale skin}, {silver white|obsidian black} hair in {luxurious twin drill curls|cascading waves with black lace headpiece}, {crimson vampire eyes|heterochromia gold and red}, wearing {extravagant Victorian mourning dress with velvet ribbons and corsetry}, holding {a vintage antique parasol|a single blooming dark rose}, inside {a gothic cathedral courtyard under a blood red full moon|an overgrown graveyard with stone gargoyles}, eerie mist, ethereal moonlight, dark romantic anime aesthetic"
+      template: "1girl, solo, gothic lolita vampire aristocrat, porcelain skin, {silver white|obsidian black} hair in {extravagant twin drill curls|waist-length waves with black rose headdress}, {glowing crimson eyes|heterochromia red and gold eyes}, wearing {layered Victorian velvet mourning dress with lace parasol}, surrounded by {fluttering scarlet butterflies and drifting rose petals}, inside {a ruined gothic cathedral under a colossal blood-red full moon|a candlelit baroque throne room with stained glass}, chiaroscuro moonlight, dark romantic anime masterpiece"
     },
     {
       id: "mecha-cockpit",
-      title: "Mecha Pilot Sync Rate 100%",
+      title: "Mecha Pilot Neural Sync 100%",
       category: "Mecha",
+      recommendedModel: "flux-anime",
       icon: "🤖",
-      template: "1girl, elite mecha pilot, {short sporty purple hair|sleek blonde bob}, wearing {skintight neural plugsuit with glowing interface nodes}, seated inside {the holographic panoramic cockpit of a giant combat mecha}, {neon tactical HUD displays reflecting in eyes|heads-up radar holographic graphs floating in air}, deep space battlefield visible outside viewport, high tension, neon accents, Gainax / Trigger mecha anime aesthetic"
+      template: "1girl, solo, elite mecha pilot, {short lavender hair with headset clips|long fiery red ponytail}, wearing {form-fitting white and cyan neural plugsuit with glowing telemetry nodes}, seated inside {the panoramic holographic cockpit of an orbital combat mecha}, {translucent orange HUD targeting reticles reflecting in her eyes|floating holographic diagnostic screens surrounding her}, orbital earth horizon and starfield visible through cockpit glass, dramatic neon rim lighting, Gainax / Studio Trigger mecha aesthetic"
+    },
+    {
+      id: "scale-figurine-3d",
+      title: "1/7 Scale Collectible Anime Figure",
+      category: "3D & Figure",
+      recommendedModel: "flux-3d",
+      icon: "🏆",
+      template: "1girl, solo, collectible 1/7 scale painted PVC anime figure of a {celestial dragon swordswoman|magical idol singer|cyberpunk Valkyrie}, {translucent gradient hair tips with pearl finish}, dynamic pose atop a {sculpted crystal diorama display base with translucent water splashes|ruined marble pillar base with LED flame effects}, studio macro product photography, subsurface scattering on skin, smooth satin paint finish, soft dual rim lighting, shallow depth of field, Good Smile Company Alter masterpiece"
     },
     {
       id: "cozy-cafe",
-      title: "Cozy Rainy Day Cafe",
+      title: "KyoAni Rainy Window Bookshop Cafe",
       category: "Slice of Life",
+      recommendedModel: "flux-anime",
       icon: "☕",
-      template: "1girl, cute cafe barista, {warm honey brown hair in loose messy bun|soft dark bob}, {sweet gentle smile}, wearing {knitted oversized turtleneck sweater and brown apron}, holding {a ceramic mug of steaming latte with foam art}, sitting by {a rain-streaked cafe window overlooking a peaceful European cobblestone street}, indoor warm lighting, fairy lights bokeh, cozy melancholic atmosphere, Kyoto Animation slice of life artstyle"
+      template: "1girl, solo, gentle bookshop barista, {warm honey-brown hair in loose low bun with stray locks|soft chestnut bob cut}, {warm comforting smile, looking at viewer}, wearing {oversized cream cable-knit turtleneck sweater and dark cafe apron}, holding {a ceramic mug of steaming matcha latte with leaf foam art}, seated beside {a rain-streaked vintage window overlooking an autumn cobblestone street}, warm tungsten fairy lights bokeh, soft bloom lighting, Kyoto Animation slice-of-life masterpiece"
     }
   ],
 
   /**
-   * Generates a completely randomized, high quality anime prompt
+   * Real-time Prompt Coach & Pillar Analyzer
+   * Evaluates a user's prompt against the 7 core pillars of anime prompt engineering
+   * and checks for model-specific trigger identifiers.
+   */
+  analyzePrompt(rawPrompt, modelKey = 'flux-anime') {
+    const text = (rawPrompt || '').trim();
+    const lower = text.toLowerCase();
+    const profile = this.modelProfiles[modelKey] || this.modelProfiles['flux-anime'];
+
+    const pillarDefs = [
+      {
+        id: 'subject',
+        label: 'Subject & Count',
+        icon: '👤',
+        regex: /\b(1girl|1boy|2girls|2boys|solo|girl|boy|woman|man|heroine|warrior|samurai|ronin|magical girl|miko|maid|elf|witch|mage|sorceress|knight|pilot|princess|vampire|kitsune|catgirl|kemonomimi|idol|student|barista|chibi|character|couple|protagonist)\b|\[(subject)\]/i,
+        suggestions: ['1girl, solo', '1boy, solo', 'magical girl', 'cyberpunk samurai', 'miko shrine maiden', 'elf archmage']
+      },
+      {
+        id: 'appearance',
+        label: 'Hair, Eyes & Expression',
+        icon: '👁️',
+        regex: /\b(hair|twintails|ponytail|braid|bob|hime cut|bangs|ahoge|drills|eyes|heterochromia|pupils|eyelashes|smile|grin|smirk|pout|blush|wink|stoic|tsundere|kuudere|expression|gaze|crying|tears)\b|\[(hair|haircolor|hairstyle|eyes|expression)\]/i,
+        suggestions: ['silver hair, long twintails', 'glowing sapphire eyes', 'heterochromia', 'gentle smile, blush', 'blunt bangs, sidelocks']
+      },
+      {
+        id: 'outfit',
+        label: 'Attire, Fabrics & Props',
+        icon: '👘',
+        regex: /\b(uniform|serafuku|kimono|yukata|miko|dress|gown|lolita|armor|plugsuit|bodysuit|techwear|jacket|coat|hoodie|sweater|turtleneck|robe|cloak|cape|apron|skirt|thighhighs|ribbon|lace|katana|sword|staff|wand|parasol|glasses|visor|wings|halo|horns|ears)\b|\[(outfit|attire|accessory)\]/i,
+        suggestions: ['serafuku sailor uniform', 'ornate gothic lolita dress', 'cyberpunk techwear jacket', 'ceremonial miko kimono', 'glowing katana']
+      },
+      {
+        id: 'poseCamera',
+        label: 'Pose, Angle & Framing',
+        icon: '🎥',
+        regex: /\b(pose|stance|standing|sitting|seated|leaping|floating|reaching|holding|wielding|looking at viewer|looking back|looking up|head tilt|portrait|close-up|upper body|cowboy shot|full body|wide shot|low angle|high angle|from below|from above|dutch angle|foreshortening|pov|over-the-shoulder|profile|depth of field|bokeh)\b|\[(pose|camera|angle)\]/i,
+        suggestions: ['cowboy shot, looking at viewer', 'dramatic low angle (from below)', 'dutch angle, dynamic pose', 'shallow depth of field, bokeh', 'foreshortening, reaching out']
+      },
+      {
+        id: 'setting',
+        label: 'Environment & Scenery',
+        icon: '⛩️',
+        regex: /\b(shrine|torii|temple|alley|tokyo|city|skyline|rooftop|island|ruins|train|station|classroom|cafe|library|observatory|forest|meadow|garden|cathedral|castle|throne|beach|ocean|sea|mountain|sky|clouds|moon|starry|galaxy|street|window|room|background)\b|\[(scenery|setting)\]/i,
+        suggestions: ['cherry blossom Shinto shrine', 'rain-slicked Neo-Tokyo neon alley', 'twilight rooftop overlooking city', 'floating sky island ruins', 'starlit astral observatory']
+      },
+      {
+        id: 'lightingVfx',
+        label: 'Lighting, Atmosphere & VFX',
+        icon: '✨',
+        regex: /\b(lighting|backlighting|rim light|god rays|volumetric|tyndall|sunlight|golden hour|twilight|sunset|moonlight|neon|bioluminescent|chiaroscuro|shadows|bloom|glow|sparkles|petals|sakura|embers|sparks|lightning|runes|magic circle|rain|reflections|snow|aurora|lens flare|chromatic aberration|ray tracing|subsurface scattering)\b|\[(lighting|vfx)\]/i,
+        suggestions: ['cinematic backlighting, rim light', 'volumetric god rays, tyndall effect', 'chromatic aberration, bloom', 'drifting sakura petals, bokeh', 'neon cyan and magenta glow']
+      },
+      {
+        id: 'modelTriggers',
+        label: `${profile.shortName} Triggers`,
+        icon: '⚡',
+        regex: modelKey === 'pony-xl'
+          ? /\b(score_9|score_8_up|source_anime)\b/i
+          : (modelKey === 'illustrious-xl' || modelKey === 'animagine-xl')
+            ? /\b(masterpiece|best quality|very aesthetic|absurdres|newest|year 2024|year 2025)\b/i
+            : modelKey === 'flux-3d'
+              ? /\b(3d anime|cel-shaded 3d|pvc|scale figure|subsurface scattering|octane render|unreal engine)\b/i
+              : /\b(masterpiece|best quality|key visual|official art|lineart|cel shad|studio|pixiv|highres|absurdres|8k|4k)\b|\[(quality|studio)\]/i,
+        suggestions: profile.triggerWords.slice(0, 6)
+      }
+    ];
+
+    const pillars = pillarDefs.map(p => {
+      const match = text.match(p.regex);
+      return {
+        id: p.id,
+        label: p.label,
+        icon: p.icon,
+        present: Boolean(match),
+        matchedWord: match ? match[0] : null,
+        suggestions: p.suggestions
+      };
+    });
+
+    const presentCount = pillars.filter(p => p.present).length;
+    const score = text.length === 0 ? 0 : Math.min(100, Math.round((presentCount / pillars.length) * 100));
+
+    let level = 'Needs Detail';
+    if (score >= 85) level = 'Studio Masterpiece';
+    else if (score >= 70) level = 'Strong Prompt';
+    else if (score >= 45) level = 'Balanced Draft';
+
+    // Identify model-specific trigger words not yet in prompt
+    const missingModelTriggers = profile.triggerWords.filter(
+      trig => !lower.includes(trig.toLowerCase())
+    );
+
+    // Model-specific diagnostic warnings / tips
+    const warnings = [];
+    if (modelKey === 'pony-xl' && !lower.includes('score_9')) {
+      warnings.push('Pony V6 XL works best when prefixed with "score_9, score_8_up, score_7_up, source_anime".');
+    }
+    if ((modelKey === 'illustrious-xl' || modelKey === 'animagine-xl') && !lower.includes('1girl') && !lower.includes('1boy') && !lower.includes('[subject]')) {
+      warnings.push(`${profile.shortName} relies on Booru subject count tags like "1girl, solo" or "1boy, solo".`);
+    }
+    if ((modelKey === 'flux-anime' || modelKey === 'flux') && /\(\([^)]+\)\)/.test(text)) {
+      warnings.push('FLUX uses a T5 natural language encoder that ignores ((double parentheses)) — use descriptive adjectives instead.');
+    }
+    if (modelKey === 'turbo' && text.split(/\s+/).length > 65) {
+      warnings.push('SDXL Turbo prioritizes the first ~60 words. Consider keeping the prompt concise and front-loaded.');
+    }
+
+    return {
+      score,
+      level,
+      presentCount,
+      totalPillars: pillars.length,
+      pillars,
+      missingModelTriggers,
+      warnings,
+      profile
+    };
+  },
+
+  /**
+   * Optimizes and enriches a prompt specifically for the chosen model architecture
+   * without duplicating existing tags.
+   */
+  optimizePromptForModel(rawPrompt, modelKey = 'flux-anime') {
+    const profile = this.modelProfiles[modelKey] || this.modelProfiles['flux-anime'];
+    let text = (rawPrompt || '').trim();
+    if (!text) {
+      text = this.generateRandomPrompt(modelKey);
+    }
+
+    const lower = text.toLowerCase();
+    const analysis = this.analyzePrompt(text, modelKey);
+
+    // 1. Ensure subject count identifier for Booru/Pony models
+    if ((modelKey === 'illustrious-xl' || modelKey === 'animagine-xl' || modelKey === 'pony-xl') &&
+        !lower.includes('1girl') && !lower.includes('1boy') && !lower.includes('2girls') && !lower.includes('[subject]')) {
+      text = `1girl, solo, ${text}`;
+    }
+
+    // 2. Apply model-specific prefix identifiers if missing
+    if (modelKey === 'pony-xl' && !lower.includes('score_9')) {
+      text = `score_9, score_8_up, score_7_up, score_6_up, source_anime, rating_safe, ${text}`;
+    } else if (modelKey === 'illustrious-xl' && !lower.includes('very aesthetic')) {
+      text = `masterpiece, best quality, amazing quality, very aesthetic, absurdres, newest, year 2024, ${text}`;
+    }
+
+    // 3. Add missing high-impact pillars if prompt is sparse
+    const updatedLower = text.toLowerCase();
+    const additions = [];
+
+    if (!analysis.pillars.find(p => p.id === 'poseCamera')?.present) {
+      additions.push('cowboy shot, dynamic angle, looking at viewer, depth of field');
+    }
+    if (!analysis.pillars.find(p => p.id === 'lightingVfx')?.present) {
+      additions.push('cinematic backlighting, volumetric lighting, soft bloom');
+    }
+
+    // 4. Add model-specific suffix identifiers if not already present
+    if (modelKey === 'animagine-xl' && !updatedLower.includes('very aesthetic')) {
+      additions.push('masterpiece, best quality, very aesthetic, newest, safe');
+    } else if (modelKey === 'flux-anime' && !updatedLower.includes('key visual')) {
+      additions.push('anime key visual, official art, clean crisp lineart, vibrant cel shading, high production value');
+    } else if (modelKey === 'flux-3d' && !updatedLower.includes('3d anime')) {
+      additions.push('stylized 3D anime render, subsurface scattering, global illumination, studio rim lighting, octane render');
+    } else if (modelKey === 'flux' && !updatedLower.includes('cinematic lighting')) {
+      additions.push('masterpiece illustration, ultra-detailed, cinematic lighting, sharp focus');
+    }
+
+    if (additions.length > 0) {
+      text = `${text.replace(/,\s*$/, '')}, ${additions.join(', ')}`;
+    }
+
+    return text;
+  },
+
+  /**
+   * Generates a completely randomized, model-tuned anime prompt
    * using the internal dictionary and Perchance combinatorial logic.
    */
-  generateRandomPrompt() {
+  generateRandomPrompt(modelKey = 'flux-anime') {
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
     const subject = pick(this.dictionary.subjects);
@@ -1031,20 +1755,33 @@ const PerchanceEngine = {
     const hairStyle = pick(this.dictionary.hairStyles);
     const eyeStyle = pick(this.dictionary.eyeStyles);
     const expression = pick(this.dictionary.expressions);
+    const pose = pick(this.dictionary.poses);
     const attire = pick(this.dictionary.attire);
-    const accessory = Math.random() > 0.3 ? `, ${pick(this.dictionary.accessories)}` : "";
+    const accessory = Math.random() > 0.25 ? `, ${pick(this.dictionary.accessories)}` : "";
     const scenery = pick(this.dictionary.scenery);
     const lighting = pick(this.dictionary.lighting);
+    const vfx = pick(this.dictionary.vfx);
     const camera = pick(this.dictionary.cameraAndComposition);
 
-    return `${subject}, ${hairColor} ${hairStyle}, ${eyeStyle}, ${expression}, wearing ${attire}${accessory}, ${scenery}, ${lighting}, ${camera}`;
+    let core = `${subject}, ${hairColor} ${hairStyle}, ${eyeStyle}, ${expression}, ${pose}, wearing ${attire}${accessory}, ${scenery}, ${lighting}, ${vfx}, ${camera}`;
+
+    if (modelKey === 'pony-xl') {
+      return `score_9, score_8_up, score_7_up, source_anime, rating_safe, ${core}`;
+    } else if (modelKey === 'illustrious-xl') {
+      return `masterpiece, best quality, amazing quality, very aesthetic, absurdres, newest, year 2024, ${core}, anime coloring`;
+    } else if (modelKey === 'animagine-xl') {
+      return `${core}, masterpiece, best quality, very aesthetic, newest, safe`;
+    } else if (modelKey === 'flux-3d') {
+      return `${core}, stylized 3D anime render, subsurface scattering, global illumination, octane render`;
+    }
+    return `${core}, anime key visual, official art, masterpiece`;
   },
 
   /**
    * Generates a Perchance-syntax template with inline curly braces
    * that the user can explore or edit.
    */
-  generateRandomTemplate() {
+  generateRandomTemplate(modelKey = 'flux-anime') {
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     const pickTwo = arr => {
       const a = pick(arr);
@@ -1057,70 +1794,210 @@ const PerchanceEngine = {
     const hairStyleSet = pickTwo(this.dictionary.hairStyles);
     const eyeSet = pickTwo(this.dictionary.eyeStyles);
     const expressionSet = pickTwo(this.dictionary.expressions);
+    const poseSet = pickTwo(this.dictionary.poses);
     const attireSet = pickTwo(this.dictionary.attire);
     const scenerySet = pickTwo(this.dictionary.scenery);
     const lightingSet = pickTwo(this.dictionary.lighting);
 
-    return `1girl, ${hairSet} ${hairStyleSet}, ${eyeSet}, ${expressionSet}, wearing ${attireSet}, ${scenerySet}, ${lightingSet}, masterpiece anime visual`;
+    const prefix = modelKey === 'pony-xl'
+      ? 'score_9, score_8_up, source_anime, 1girl, solo'
+      : modelKey === 'illustrious-xl'
+        ? 'masterpiece, best quality, very aesthetic, newest, 1girl, solo'
+        : '1girl, solo';
+
+    return `${prefix}, ${hairSet} ${hairStyleSet}, ${eyeSet}, ${expressionSet}, ${poseSet}, wearing ${attireSet}, ${scenerySet}, ${lightingSet}, anime key visual, masterpiece`;
   },
 
   /**
-   * Interactive Tag Library for the Tag Builder
+   * Comprehensive Interactive Tag & Model Identifier Lexicon (350+ tokens across 13 categories)
    */
   getTagCategories() {
     return [
       {
-        name: "Character",
+        id: "model-triggers",
+        name: "⚡ Model Quality, Era & Score Identifiers",
+        description: "Core conditioning tokens recognized by FLUX, Illustrious XL, Animagine XL, and Pony V6",
         tags: [
-          "1girl", "1boy", "magical girl", "cyberpunk samurai", "shrine maiden",
-          "elf sorceress", "academy student", "mecha pilot", "gothic lolita",
-          "chibi mascot", "kemonomimi catgirl", "kitsune fox girl", "demon princess",
-          "angelic knight", "barista", "steampunk engineer"
+          "masterpiece", "best quality", "amazing quality", "great quality", "very aesthetic",
+          "absurdres", "highres", "ultra-detailed", "intricate details", "anime key visual",
+          "official art", "official style", "anime coloring", "clean crisp lineart",
+          "cel shading", "newest", "year 2025", "year 2024", "recent", "mid", "early", "old",
+          "1990s (style)", "1980s (style)", "retro artstyle", "anime screencap",
+          "light novel illustration", "visual novel CG", "game CG", "promotional art",
+          "trending on Pixiv", "score_9", "score_8_up", "score_7_up", "score_6_up",
+          "source_anime", "rating_safe"
         ]
       },
       {
-        name: "Hair & Face",
+        id: "subject-count",
+        name: "👤 Subject Count & Character Archetypes",
+        description: "Booru subject count identifiers and classic anime character classes",
         tags: [
-          "silver hair", "sakura pink hair", "raven black hair", "blonde hair",
-          "cyan hair", "twin tails", "flowing long hair", "hime cut", "short bob",
-          "ponytail", "blue eyes", "crimson red eyes", "golden amber eyes",
-          "heterochromia", "star pupils", "gentle smile", "smug smirk",
-          "tsundere pout", "blushing", "winking", "stoic expression"
+          "1girl", "solo", "1boy", "2girls", "1girl 1boy", "multiple girls", "solo focus",
+          "chibi", "super deformed", "magical girl", "miko (shrine maiden)", "cyberpunk netrunner",
+          "ronin swordswoman", "kunoichi ninja", "valkyrie knight", "kuudere elf archmage",
+          "tsundere student", "mecha pilot", "gothic lolita noble", "vampire princess",
+          "kitsune fox spirit", "kemonomimi catgirl", "dragonborn empress", "onmyoji exorcist",
+          "alchemist witch", "steampunk engineer", "idol singer", "cozy cafe barista",
+          "angelic paladin", "demon queen"
         ]
       },
       {
-        name: "Outfit",
+        id: "camera-angles",
+        name: "🎥 Camera Angles, Framing & Lenses",
+        description: "Canonical Danbooru & cinematic camera identifiers to control shot composition",
         tags: [
-          "school sailor uniform", "miko kimono", "gothic lolita dress",
-          "cyberpunk techwear", "pilot plugsuit", "fantasy battle armor",
-          "oversized hoodie", "sorceress robe", "summer sundress",
-          "steampunk coat", "maid outfit", "kimono with obi"
+          "portrait", "close-up", "extreme close-up", "upper body", "cowboy shot", "full body",
+          "wide shot", "establishing shot", "from below", "low angle", "worm's-eye view",
+          "from above", "high angle", "bird's-eye view", "dutch angle", "tilted frame",
+          "from side", "profile", "from behind", "over-the-shoulder", "pov", "foreshortening",
+          "fisheye lens", "panoramic", "85mm f/1.4 lens", "35mm cinematic lens",
+          "shallow depth of field", "bokeh", "blurry foreground", "blurry background",
+          "sharp focus", "motion blur", "vignette", "rule of thirds"
         ]
       },
       {
-        name: "Scenery & Setting",
+        id: "hair-styles",
+        name: "💇‍♀️ Haircuts, Bangs & Hair Physics",
+        description: "Precise Booru hair taxonomy and color gradient identifiers",
         tags: [
-          "cherry blossom shrine", "Neo-Tokyo cyberpunk alley", "floating sky island",
-          "sunset train platform", "enchanted forest", "rooftop garden at dusk",
-          "rainy city street", "celestial observatory", "snowy mountain torii",
-          "tatami tea room", "ancient overgrown ruins", "cozy bookshop cafe"
+          "silver hair", "white hair", "platinum blonde hair", "golden blonde hair",
+          "sakura pink hair", "pastel pink hair", "crimson red hair", "aqua cyan hair",
+          "cobalt blue hair", "midnight black hair", "lavender hair", "amethyst violet hair",
+          "emerald green hair", "Chestnut brown hair", "multicolored hair", "gradient hair",
+          "inner color hair", "streaked hair", "split-color hair", "translucent hair tips",
+          "twintails", "low twintails", "ponytail", "high ponytail", "side ponytail",
+          "braid", "twin braids", "crown braid", "hime cut", "bob cut", "wolf cut",
+          "pixie cut", "drill hair", "twin drills", "floating hair", "windblown hair",
+          "very long hair", "wavy hair", "messy hair", "blunt bangs", "swept bangs",
+          "parted bangs", "crossed bangs", "hair over one eye", "sidelocks", "hair intakes", "ahoge"
         ]
       },
       {
-        name: "Lighting & Effects",
+        id: "eyes-expressions",
+        name: "👁️ Eyes, Pupils & Micro-Expressions",
+        description: "Eye colors, specialized pupil shapes, gaze direction, and facial emotions",
         tags: [
-          "cinematic rim lighting", "golden hour sunset", "vibrant neon glow",
-          "volumetric god rays", "ethereal starlight bokeh", "glowing magic runes",
-          "drifting cherry blossom petals", "rain reflections", "floating embers",
-          "aurora borealis", "sparkling lens flare", "soft studio lighting"
+          "sapphire blue eyes", "crimson red eyes", "golden amber eyes", "emerald green eyes",
+          "amethyst purple eyes", "aqua eyes", "rose pink eyes", "heterochromia",
+          "glowing eyes", "sparkling eyes", "luminous glassy eyes", "star-shaped pupils",
+          "heart-shaped pupils", "slit pupils", "ringed eyes", "detailed iris",
+          "long eyelashes", "colored eyelashes", "looking at viewer", "looking back",
+          "looking up", "looking away", "looking to the side", "half-closed eyes (jitome)",
+          "gentle smile", "confident grin", "smug smirk", "tsundere pout", "blush",
+          "full-face blush", "embarrassed", "playful wink", "one eye closed", "parted lips",
+          "open mouth", "stoic expression", "determined gaze", "melancholic gaze",
+          "tearing up", "crying", "surprised", "yandere gaze", "head tilt"
         ]
       },
       {
-        name: "Composition",
+        id: "poses-actions",
+        name: "🤸 Dynamic Poses, Gestures & Actions",
+        description: "Action stances, hand gestures, and character interaction identifiers",
         tags: [
-          "portrait close-up", "medium shot", "wide cinematic shot",
-          "dynamic battle pose", "dramatic low angle", "looking at viewer",
-          "profile view", "wind blown hair", "depth of field"
+          "dynamic action pose", "combat stance", "mid-air leap", "floating in air",
+          "reaching towards viewer", "outstretched hand", "hand on hip", "arms crossed",
+          "peace sign (v sign)", "salute", "adjusting glasses", "holding weapon",
+          "unsheathing sword", "casting spell", "praying hands", "holding umbrella",
+          "holding teacup", "reading book", "sitting on ledge", "leaning forward",
+          "contrapposto", "arching back", "walking in rain", "running", "dancing"
+        ]
+      },
+      {
+        id: "outfits-fabrics",
+        name: "👘 Outfits, Costumes & Fabric Materials",
+        description: "Traditional, modern, sci-fi, and fantasy garments plus shader material tags",
+        tags: [
+          "serafuku (sailor uniform)", "blazer school uniform", "miko kimono", "furisode kimono",
+          "summer yukata", "hakama", "gothic lolita dress", "sweet lolita dress",
+          "victorian maid apron", "butler suit", "cyberpunk techwear jacket", "tactical harness",
+          "neural pilot plugsuit", "ornate valkyrie armor", "filigree plate armor",
+          "dark fantasy cloak", "celestial sorceress robe", "oversized hoodie",
+          "off-shoulder sweater", "cable-knit turtleneck", "white summer sundress",
+          "frilled dress", "evening gown", "wedding dress", "steampunk corset",
+          "pleated skirt", "thighhighs", "zettai ryouiki", "black pantyhose", "fingerless gloves",
+          "lace trim", "velvet ribbons", "silk fabric", "translucent fabric", "iridescent fabric",
+          "wet clothes", "gold embroidery", "detached sleeves"
+        ]
+      },
+      {
+        id: "weapons-props",
+        name: "⚔️ Weapons, Magic Props & Accessories",
+        description: "Iconic anime weapons, headgear, wings, and ornamental details",
+        tags: [
+          "katana", "glowing rune sword", "plasma blade", "greatsword", "ornate scythe",
+          "crystal magic staff", "star wand", "floating grimoire", "floating magic circle",
+          "bow and energy arrow", "dual cyberpunk pistols", "cybernetic arm",
+          "mechanical wings", "feathered angel wings", "bat demon wings", "translucent fairy wings",
+          "glowing halo", "oni horns", "dragon horns", "fox ears", "nine fox tails",
+          "cat ears (nekomimi)", "pointed elf ears", "holographic visor", "goggles on head",
+          "headphones", "round glasses", "eyepatch", "lace parasol", "paper lantern",
+          "folding fan (sensu)", "kanzashi floral hairpin", "silk hair ribbon",
+          "black choker", "witch hat", "crown", "tiara"
+        ]
+      },
+      {
+        id: "lighting-vfx",
+        name: "🌟 Lighting Physics, Color & Atmospheric VFX",
+        description: "Studio compositing, light transport, particles, and camera optical effects",
+        tags: [
+          "cinematic lighting", "backlighting", "rim lighting", "volumetric lighting",
+          "god rays (crepuscular rays)", "tyndall effect", "chiaroscuro", "dramatic shadows",
+          "dappled sunlight", "golden hour sunset", "blue hour twilight", "crimson moonlight",
+          "cyberpunk neon lighting", "bioluminescence", "soft studio bloom", "anamorphic lens flare",
+          "chromatic aberration", "subsurface scattering", "raytraced reflections",
+          "caustics", "iridescent highlights", "drifting cherry blossom petals",
+          "falling autumn leaves", "floating fire embers", "sparks", "crackling lightning aura",
+          "glowing magic runes", "spirit wisps", "glowing butterflies", "rain droplets",
+          "water puddle reflections", "snowflakes", "aurora borealis", "starlight bokeh"
+        ]
+      },
+      {
+        id: "environments",
+        name: "⛩️ Environments, Architecture & Worldbuilding",
+        description: "Detailed anime background settings and skyscapes",
+        tags: [
+          "Shinto shrine courtyard", "vermilion torii gates", "cherry blossom forest",
+          "bamboo forest", "Neo-Tokyo cyberpunk alley", "holographic city skyline",
+          "school rooftop at sunset", "coastal train station platform", "train interior",
+          "sunlit classroom", "cozy botanical bookshop cafe", "ancient grand library",
+          "celestial astral observatory", "floating sky island", "overgrown marble ruins",
+          "bioluminescent crystal cavern", "underwater Atlantis ruins", "gothic cathedral",
+          "stained glass windows", "baroque throne room", "snowy mountain hot spring (onsen)",
+          "traditional tatami tea room", "post-apocalyptic overgrown metropolis",
+          "sea of clouds", "towering cumulus clouds", "starry Milky Way sky",
+          "split comet in twilight sky", "colossal full moon"
+        ]
+      },
+      {
+        id: "studio-aesthetics",
+        name: "🎨 Anime Studios, Directors & Art Mediums",
+        description: "Recognized studio visual signatures, mediums, and rendering styles",
+        tags: [
+          "Ufotable style", "Kyoto Animation (KyoAni) style", "Makoto Shinkai style",
+          "CoMix Wave Films aesthetic", "Studio Ghibli style", "Hayao Miyazaki style",
+          "Studio Trigger style", "Hiroyuki Imaishi style", "MAPPA style", "CloverWorks style",
+          "Shaft / Monogatari style", "Arc System Works cel-shaded 3D",
+          "Honkai Star Rail 3D shader style", "1/7 scale PVC anime figure",
+          "Good Smile Company aesthetic", "watercolor (medium)", "gouache background",
+          "impasto oil painting", "monochrome", "greyscale", "manga screentones",
+          "G-pen ink lineart", "die-cut vinyl sticker", "pixel art anime"
+        ]
+      },
+      {
+        id: "negative-identifiers",
+        name: "🚫 Negative Prompt Identifiers (Click to Exclude)",
+        description: "Click any token here to add it directly to your Negative Prompt box",
+        isNegative: true,
+        tags: [
+          "worst quality", "low quality", "lowres", "bad anatomy", "bad hands",
+          "mutated hands", "extra fingers", "missing fingers", "fewer digits", "extra digits",
+          "extra limbs", "missing limbs", "bad proportions", "anatomical nonsense",
+          "deformed", "disfigured", "ugly", "blurry", "jpeg artifacts", "watermark",
+          "text", "signature", "username", "logo", "artist name", "cropped", "out of frame",
+          "old", "early", "oldest", "score_4", "score_5", "score_6", "source_furry",
+          "source_pony", "source_cartoon", "3d", "photorealistic", "cgi", "plastic skin",
+          "flat colors", "oversaturated", "simple background", "bad feet", "cross-eyed"
         ]
       }
     ];
@@ -1740,12 +2617,13 @@ const Viewer = {
  * Bychance - Image Generation Service
  * 
  * Supports:
+ * - Model-aware prompt conditioning (FLUX.1 Anime, Illustrious XL, Animagine XL, Pony V6 XL, FLUX.1 Dev, FLUX 3D, SDXL Turbo)
  * - Pollinations.ai FLUX & Turbo models (Free, zero-key, high-res)
  * - Automatic host failover (image.pollinations.ai & gen.pollinations.ai)
- * - Hugging Face Inference API
- * - Custom WebUI / OpenAI-compatible image endpoints
+ * - Hugging Face Inference API with model-specific repository mapping & guidance_scale
+ * - Custom WebUI / A1111 / OpenAI-compatible image endpoints
  * - Optimized aspect ratio dimension mapping (max-edge 1024 to prevent GPU timeouts)
- * - Quality boosting & negative prompt enrichment
+ * - Deduplicated quality boosting & model-calibrated negative prompt enrichment
  * - Batch generation (1, 2, 4 images)
  */
 
@@ -1754,7 +2632,7 @@ const ImageGenerator = {
   // Configurable settings
   settings: {
     provider: 'pollinations', // 'pollinations' | 'huggingface' | 'custom'
-    defaultModel: 'flux',
+    defaultModel: 'flux-anime',
     pollinationsKey: '',
     hfToken: '',
     hfModel: 'cagliostrolab/animagine-xl-3.1',
@@ -1835,14 +2713,37 @@ const ImageGenerator = {
   },
 
   /**
-   * Prepare the final prompt by:
-   * 1. Resolving Perchance template syntax {a|b|c}
-   * 2. Appending style preset tokens if selected
-   * 3. Appending master anime quality boosters if enabled
+   * Deduplicate comma-separated prompt/negative tokens while preserving order
    */
-  preparePrompt(rawPrompt, styleKey = '', enableBoosters = true) {
-    // 1. Resolve Perchance curly brackets
+  _dedupeTokens(tokenStr) {
+    if (!tokenStr) return '';
+    const seen = new Set();
+    const result = [];
+    for (const part of tokenStr.split(',')) {
+      const trimmed = part.trim();
+      if (!trimmed) continue;
+      const key = trimmed.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        result.push(trimmed);
+      }
+    }
+    return result.join(', ');
+  },
+
+  /**
+   * Prepare the final prompt by:
+   * 1. Resolving Perchance template syntax {a|b|c}, weights, and [wildcards]
+   * 2. Applying model-specific prefix/suffix identifiers if Quality Booster is enabled
+   * 3. Appending style preset tokens if selected
+   * 4. Building a deduplicated model + style negative prompt
+   */
+  preparePrompt(rawPrompt, styleKey = '', enableBoosters = true, modelKey = 'flux-anime') {
+    const profile = PerchanceEngine.modelProfiles[modelKey] || PerchanceEngine.modelProfiles['flux-anime'];
+
+    // 1. Resolve Perchance curly brackets & [wildcards]
     let evaluated = PerchanceEngine.evaluate(rawPrompt);
+    const evalLower = evaluated.toLowerCase();
 
     // 2. Apply style preset
     let styleSuffix = '';
@@ -1851,24 +2752,50 @@ const ImageGenerator = {
 
     if (styleKey && PerchanceEngine.stylePresets[styleKey]) {
       const preset = PerchanceEngine.stylePresets[styleKey];
-      styleSuffix = preset.promptSuffix;
-      styleNegative = preset.negativePrompt;
-      styleModel = preset.recommendedModel || 'flux';
+      styleSuffix = preset.promptSuffix || '';
+      styleNegative = preset.negativePrompt || '';
+      styleModel = preset.recommendedModel || modelKey;
     }
 
-    // 3. Apply Quality Booster if enabled
-    let boosterTokens = '';
-    if (enableBoosters) {
-      boosterTokens = ', masterpiece, best quality, ultra-detailed anime artstyle, vibrant colors, sharp focus';
+    // 3. Apply Model-Specific Quality & Conditioning Boosters if enabled
+    let prefixTokens = '';
+    let suffixTokens = '';
+
+    if (enableBoosters && profile) {
+      if (profile.qualityPrefix) {
+        // Only prepend prefix tokens that are not already in the prompt
+        const missingPrefix = profile.qualityPrefix
+          .split(',')
+          .map(s => s.trim())
+          .filter(s => s && !evalLower.includes(s.toLowerCase()));
+        if (missingPrefix.length > 0) {
+          prefixTokens = missingPrefix.join(', ') + ', ';
+        }
+      }
+
+      if (profile.qualitySuffix) {
+        const missingSuffix = profile.qualitySuffix
+          .split(',')
+          .map(s => s.trim())
+          .filter(s => s && !evalLower.includes(s.toLowerCase()));
+        if (missingSuffix.length > 0) {
+          suffixTokens = ', ' + missingSuffix.join(', ');
+        }
+      }
     }
 
-    const fullPrompt = `${evaluated}${styleSuffix}${boosterTokens}`.trim();
+    const rawFullPrompt = `${prefixTokens}${evaluated}${styleSuffix}${suffixTokens}`.trim();
+    const fullPrompt = this._dedupeTokens(rawFullPrompt);
+
+    const modelNegative = profile ? profile.defaultNegative : '';
+    const mergedNegative = this._dedupeTokens([styleNegative, modelNegative].filter(Boolean).join(', '));
 
     return {
       evaluatedPrompt: evaluated,
       fullPrompt: fullPrompt,
-      styleNegative: styleNegative,
-      recommendedModel: styleModel
+      styleNegative: mergedNegative,
+      recommendedModel: styleModel || modelKey,
+      modelProfile: profile
     };
   },
 
@@ -1881,8 +2808,8 @@ const ImageGenerator = {
     style = '',
     aspectRatio = '2:3',
     seed = null,
-    model = 'flux',
-    guidanceScale = 7.5,
+    model = 'flux-anime',
+    guidanceScale = 6.0,
     enableBoosters = true,
     batchIndex = 0
   }) {
@@ -1893,34 +2820,60 @@ const ImageGenerator = {
     const width = ratioConfig.width;
     const height = ratioConfig.height;
 
-    // Resolve prompt & style modifiers
-    const prepared = this.preparePrompt(prompt, style, enableBoosters);
+    const effectiveModelKey = PerchanceEngine.modelProfiles[model] ? model : 'flux-anime';
+    const profile = PerchanceEngine.modelProfiles[effectiveModelKey];
+
+    // Resolve prompt & model-aware style modifiers
+    const prepared = this.preparePrompt(prompt, style, enableBoosters, effectiveModelKey);
     const finalPrompt = prepared.fullPrompt;
 
-    // Combine user negative prompt with style negative prompt
-    const combinedNegative = [negativePrompt, prepared.styleNegative]
-      .filter(s => s && s.trim().length > 0)
-      .join(', ');
+    // Combine user negative prompt with model + style negative prompt
+    const combinedNegative = this._dedupeTokens(
+      [negativePrompt, prepared.styleNegative]
+        .filter(s => s && s.trim().length > 0)
+        .join(', ')
+    );
 
     // Determine seed (random if not specified)
     const effectiveSeed = (seed !== null && seed !== undefined && seed !== '')
       ? Number(seed) + batchIndex
       : Math.floor(Math.random() * 2147483647);
 
-    // Pick model (user selection overrides style recommended)
-    const effectiveModel = (model && model === 'turbo') ? 'turbo' : (prepared.recommendedModel || 'flux');
+    const pollinationsBackendModel = profile ? profile.pollinationsModel : 'flux';
 
     let imageUrl = '';
     let imageBlob = null;
 
     if (this.settings.provider === 'pollinations') {
-      imageUrl = await this._generatePollinationsWithFailover(finalPrompt, width, height, effectiveSeed, effectiveModel, combinedNegative);
+      imageUrl = await this._generatePollinationsWithFailover(
+        finalPrompt,
+        width,
+        height,
+        effectiveSeed,
+        pollinationsBackendModel,
+        combinedNegative
+      );
     } else if (this.settings.provider === 'huggingface') {
-      const result = await this._generateHuggingFace(finalPrompt, combinedNegative, width, height, effectiveSeed);
+      const result = await this._generateHuggingFace(
+        finalPrompt,
+        combinedNegative,
+        width,
+        height,
+        effectiveSeed,
+        guidanceScale,
+        profile
+      );
       imageUrl = result.url;
       imageBlob = result.blob;
     } else if (this.settings.provider === 'custom') {
-      const result = await this._generateCustom(finalPrompt, combinedNegative, width, height, effectiveSeed);
+      const result = await this._generateCustom(
+        finalPrompt,
+        combinedNegative,
+        width,
+        height,
+        effectiveSeed,
+        guidanceScale
+      );
       imageUrl = result.url;
       imageBlob = result.blob;
     }
@@ -1952,7 +2905,8 @@ const ImageGenerator = {
       fullPrompt: finalPrompt,
       negativePrompt: combinedNegative,
       style: style,
-      model: effectiveModel,
+      model: effectiveModelKey,
+      modelName: profile ? profile.shortName : effectiveModelKey,
       aspectRatio: aspectRatio,
       width: width,
       height: height,
@@ -1988,8 +2942,8 @@ const ImageGenerator = {
     style = '',
     aspectRatio = '2:3',
     seed = null,
-    model = 'flux',
-    guidanceScale = 7.5,
+    model = 'flux-anime',
+    guidanceScale = 6.0,
     enableBoosters = true,
     batchCount = 1,
     onProgress = null
@@ -2098,7 +3052,7 @@ const ImageGenerator = {
       ? `https://gen.pollinations.ai/image/${encodedPrompt}`
       : `https://image.pollinations.ai/prompt/${encodedPrompt}`;
 
-    let url = `${baseUrl}?width=${width}&height=${height}&seed=${seed}&model=${validModel}&nologo=true`;
+    let url = `${baseUrl}?width=${width}&height=${height}&seed=${seed}&model=${validModel}&nologo=true&enhance=false`;
 
     if (this.settings.pollinationsKey) {
       url += `&key=${encodeURIComponent(this.settings.pollinationsKey)}`;
@@ -2117,12 +3071,13 @@ const ImageGenerator = {
   /**
    * Hugging Face Inference API generator
    */
-  async _generateHuggingFace(prompt, negativePrompt, width, height, seed) {
+  async _generateHuggingFace(prompt, negativePrompt, width, height, seed, guidanceScale = 6.5, profile = null) {
     if (!this.settings.hfToken) {
       throw new Error('Hugging Face User Access Token is required. Please set it in Settings.');
     }
 
-    const modelName = (this.settings.hfModel || 'cagliostrolab/animagine-xl-3.1').trim();
+    const defaultRepo = (profile && profile.hfRepo) ? profile.hfRepo : 'cagliostrolab/animagine-xl-3.1';
+    const modelName = (this.settings.hfModel || defaultRepo).trim();
     if (!/^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/.test(modelName)) {
       throw new Error('Invalid Hugging Face model repository identifier.');
     }
@@ -2140,6 +3095,7 @@ const ImageGenerator = {
           negative_prompt: negativePrompt,
           width: Math.min(width, 1024),
           height: Math.min(height, 1024),
+          guidance_scale: Number(guidanceScale) || 6.5,
           seed: seed
         }
       })
@@ -2157,7 +3113,7 @@ const ImageGenerator = {
   /**
    * Custom Endpoint (WebUI / A1111 / OpenAI compatible)
    */
-  async _generateCustom(prompt, negativePrompt, width, height, seed) {
+  async _generateCustom(prompt, negativePrompt, width, height, seed, guidanceScale = 6.5) {
     if (!this.settings.customEndpoint) {
       throw new Error('Custom Endpoint URL is required. Please configure it in Settings.');
     }
@@ -2185,8 +3141,8 @@ const ImageGenerator = {
       width: width,
       height: height,
       seed: seed,
-      steps: 25,
-      cfg_scale: 7.0
+      steps: 28,
+      cfg_scale: Number(guidanceScale) || 6.5
     } : {
       prompt: prompt,
       size: `${width}x${height}`,
@@ -2251,6 +3207,8 @@ class App {
     this.galleryItems = [];
     this.currentFilter = 'all'; // 'all' | 'favorites'
     this.searchQuery = '';
+    this.activeTagCategory = 'all';
+    this.tagSearchQuery = '';
   }
 
   escapeHtml(str) {
@@ -2263,6 +3221,11 @@ class App {
       .replace(/'/g, '&#39;');
   }
 
+  getActiveModelKey() {
+    const modelSelect = document.getElementById('model-select');
+    return (modelSelect && modelSelect.value) ? modelSelect.value : 'flux-anime';
+  }
+
   async init() {
     console.log('Initializing Bychance application...');
     ImageGenerator.init();
@@ -2273,7 +3236,10 @@ class App {
     this.renderStylePresets();
     this.renderTemplateLibrary();
     this.renderTagBuilder();
+    this.renderModelGuideModal();
     this.bindEvents();
+    this.updateSyntaxPreview();
+    this.updatePromptCoach();
     await this.loadGallery();
 
     // Default random seed
@@ -2300,15 +3266,55 @@ class App {
       }
     });
 
+    // Optimize Prompt for Active Model Button
+    const btnOptimize = document.getElementById('btn-optimize-prompt');
+    if (btnOptimize) {
+      btnOptimize.addEventListener('click', () => {
+        const promptInput = document.getElementById('prompt-input');
+        const modelKey = this.getActiveModelKey();
+        const profile = PerchanceEngine.modelProfiles[modelKey] || PerchanceEngine.modelProfiles['flux-anime'];
+        if (promptInput) {
+          promptInput.value = PerchanceEngine.optimizePromptForModel(promptInput.value, modelKey);
+          this.updateSyntaxPreview();
+          this.updatePromptCoach();
+          this.showToast(`Optimized prompt with ${profile.shortName} identifiers! ⚡`);
+        }
+      });
+    }
+
+    // Auto-Tune Model Setup (CFG + Negative + Triggers)
+    const btnApplyDefaults = document.getElementById('btn-apply-model-defaults');
+    if (btnApplyDefaults) {
+      btnApplyDefaults.addEventListener('click', () => {
+        this.applyModelBestPractices(this.getActiveModelKey(), true);
+      });
+    }
+
+    // Fill Recommended Negative Prompt for Active Model
+    const btnFillNegative = document.getElementById('btn-fill-model-negative');
+    if (btnFillNegative) {
+      btnFillNegative.addEventListener('click', () => {
+        const modelKey = this.getActiveModelKey();
+        const profile = PerchanceEngine.modelProfiles[modelKey] || PerchanceEngine.modelProfiles['flux-anime'];
+        const negInput = document.getElementById('negative-input');
+        if (negInput && profile) {
+          negInput.value = profile.defaultNegative;
+          this.showToast(`Loaded ${profile.shortName} negative identifiers!`);
+        }
+      });
+    }
+
     // Random Prompt Button (Dice)
     const btnRandom = document.getElementById('btn-random-prompt');
     if (btnRandom) {
       btnRandom.addEventListener('click', () => {
         const promptInput = document.getElementById('prompt-input');
+        const modelKey = this.getActiveModelKey();
         if (promptInput) {
-          promptInput.value = PerchanceEngine.generateRandomPrompt();
+          promptInput.value = PerchanceEngine.generateRandomPrompt(modelKey);
           this.updateSyntaxPreview();
-          this.showToast('Rolled a new random anime scenario! 🎲');
+          this.updatePromptCoach();
+          this.showToast('Rolled a new model-tuned anime scenario! 🎲');
         }
       });
     }
@@ -2318,11 +3324,51 @@ class App {
     if (btnRandomTemplate) {
       btnRandomTemplate.addEventListener('click', () => {
         const promptInput = document.getElementById('prompt-input');
+        const modelKey = this.getActiveModelKey();
         if (promptInput) {
-          promptInput.value = PerchanceEngine.generateRandomTemplate();
+          promptInput.value = PerchanceEngine.generateRandomTemplate(modelKey);
           this.updateSyntaxPreview();
-          this.showToast('Created random Perchance template with {options}! ✨');
+          this.updatePromptCoach();
+          this.showToast('Created Perchance syntax template with {options}! ✨');
         }
+      });
+    }
+
+    // Wildcard Quick-Insert Buttons
+    document.querySelectorAll('.wildcard-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const token = btn.getAttribute('data-wildcard');
+        if (token) {
+          this.appendTokenToPrompt(token);
+          this.showToast(`Inserted dynamic wildcard ${token} 🎲`);
+        }
+      });
+    });
+
+    // Re-roll Syntax Preview Button
+    const btnRerollPreview = document.getElementById('btn-reroll-preview');
+    if (btnRerollPreview) {
+      btnRerollPreview.addEventListener('click', () => {
+        this.updateSyntaxPreview();
+      });
+    }
+
+    // Model Select change -> update coach & guidance recommendation
+    const modelSelect = document.getElementById('model-select');
+    if (modelSelect) {
+      modelSelect.addEventListener('change', () => {
+        const modelKey = this.getActiveModelKey();
+        const profile = PerchanceEngine.modelProfiles[modelKey];
+        if (profile) {
+          const guidanceSlider = document.getElementById('guidance-slider');
+          const guidanceVal = document.getElementById('guidance-val');
+          if (guidanceSlider && guidanceVal) {
+            guidanceSlider.value = profile.recommendedGuidance;
+            guidanceVal.textContent = Number(profile.recommendedGuidance).toFixed(1);
+          }
+          this.showToast(`Switched to ${profile.shortName} (Recommended CFG: ${profile.recommendedGuidance})`);
+        }
+        this.updatePromptCoach();
       });
     }
 
@@ -2352,11 +3398,12 @@ class App {
       });
     }
 
-    // Live Syntax Preview on prompt typing
+    // Live Syntax Preview & Coach on prompt typing
     const promptInput = document.getElementById('prompt-input');
     if (promptInput) {
       promptInput.addEventListener('input', () => {
         this.updateSyntaxPreview();
+        this.updatePromptCoach();
       });
     }
 
@@ -2430,6 +3477,15 @@ class App {
       });
     }
 
+    // Tag / Identifier Lexicon Search Filter
+    const tagSearchInput = document.getElementById('tag-search-input');
+    if (tagSearchInput) {
+      tagSearchInput.addEventListener('input', (e) => {
+        this.tagSearchQuery = e.target.value.trim().toLowerCase();
+        this.renderTagBuilder();
+      });
+    }
+
     // Clear History Button
     const btnClearHistory = document.getElementById('btn-clear-history');
     if (btnClearHistory) {
@@ -2452,12 +3508,19 @@ class App {
 
     // Modal Close Buttons
     document.querySelectorAll('[data-close-modal]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         const targetModalId = btn.getAttribute('data-close-modal');
         const modal = document.getElementById(targetModalId);
         if (modal) modal.classList.add('hidden');
       });
     });
+
+    // Model & Prompt Guide Modal toggle
+    const btnOpenGuide = document.getElementById('btn-open-guide');
+    const guideModal = document.getElementById('guide-modal');
+    if (btnOpenGuide && guideModal) {
+      btnOpenGuide.addEventListener('click', () => guideModal.classList.remove('hidden'));
+    }
 
     // Tag Builder Modal toggle
     const btnOpenTags = document.getElementById('btn-open-tags');
@@ -2540,6 +3603,87 @@ class App {
   }
 
   /**
+   * Append a token cleanly to the prompt input without duplicate commas
+   */
+  appendTokenToPrompt(token) {
+    const promptInput = document.getElementById('prompt-input');
+    if (!promptInput || !token) return;
+
+    const current = promptInput.value.trim();
+    if (!current) {
+      promptInput.value = token;
+    } else if (current.toLowerCase().includes(token.toLowerCase())) {
+      this.showToast(`"${token}" is already in your prompt`);
+      return;
+    } else {
+      const cleaned = current.replace(/,\s*$/, '');
+      promptInput.value = `${cleaned}, ${token}`;
+    }
+
+    this.updateSyntaxPreview();
+    this.updatePromptCoach();
+  }
+
+  /**
+   * Append a negative identifier to the negative prompt input and reveal the drawer
+   */
+  appendTokenToNegative(token) {
+    const negInput = document.getElementById('negative-input');
+    const negContainer = document.getElementById('negative-prompt-container');
+    const toggleBtn = document.getElementById('toggle-negative-btn');
+    if (!negInput || !token) return;
+
+    if (negContainer && negContainer.classList.contains('hidden')) {
+      negContainer.classList.remove('hidden');
+      if (toggleBtn) toggleBtn.textContent = 'Hide Negative Prompt ▲';
+    }
+
+    const current = negInput.value.trim();
+    if (!current) {
+      negInput.value = token;
+    } else if (!current.toLowerCase().includes(token.toLowerCase())) {
+      negInput.value = `${current.replace(/,\s*$/, '')}, ${token}`;
+    }
+  }
+
+  /**
+   * Apply model's recommended CFG, negative prompt, aspect ratio, and trigger optimization
+   */
+  applyModelBestPractices(modelKey, optimizePromptText = true) {
+    const profile = PerchanceEngine.modelProfiles[modelKey] || PerchanceEngine.modelProfiles['flux-anime'];
+    if (!profile) return;
+
+    const modelSelect = document.getElementById('model-select');
+    if (modelSelect && modelSelect.value !== modelKey) {
+      modelSelect.value = modelKey;
+    }
+
+    // Set recommended guidance scale
+    const guidanceSlider = document.getElementById('guidance-slider');
+    const guidanceVal = document.getElementById('guidance-val');
+    if (guidanceSlider && guidanceVal) {
+      guidanceSlider.value = profile.recommendedGuidance;
+      guidanceVal.textContent = Number(profile.recommendedGuidance).toFixed(1);
+    }
+
+    // Set recommended negative prompt
+    const negInput = document.getElementById('negative-input');
+    if (negInput) {
+      negInput.value = profile.defaultNegative;
+    }
+
+    // Optimize prompt text if requested
+    const promptInput = document.getElementById('prompt-input');
+    if (optimizePromptText && promptInput) {
+      promptInput.value = PerchanceEngine.optimizePromptForModel(promptInput.value, modelKey);
+    }
+
+    this.updateSyntaxPreview();
+    this.updatePromptCoach();
+    this.showToast(`Applied ${profile.shortName} best practices (CFG ${profile.recommendedGuidance} + Negative + Triggers)! ⚡`);
+  }
+
+  /**
    * Update Perchance Syntax Preview pill under prompt box
    */
   updateSyntaxPreview() {
@@ -2549,12 +3693,135 @@ class App {
     if (!promptInput || !previewContainer || !previewText) return;
 
     const val = promptInput.value;
-    if (val.includes('{') && val.includes('}')) {
+    const hasCurly = val.includes('{') && val.includes('}');
+    const hasWildcard = /\[(subject|hair|haircolor|hairstyle|eyes|expression|pose|outfit|attire|accessory|scenery|setting|lighting|vfx|camera|angle|studio|quality)\]/i.test(val);
+
+    if (hasCurly || hasWildcard) {
       const resolved = PerchanceEngine.evaluate(val);
       previewText.textContent = resolved;
       previewContainer.classList.remove('hidden');
     } else {
       previewContainer.classList.add('hidden');
+    }
+  }
+
+  /**
+   * Update the Real-Time Prompt Coach & Model Identifier Advisor panel
+   */
+  updatePromptCoach() {
+    const promptInput = document.getElementById('prompt-input');
+    const scoreBar = document.getElementById('coach-score-bar');
+    const scoreBadge = document.getElementById('coach-score-badge');
+    const modelBadge = document.getElementById('coach-model-badge');
+    const pillarsGrid = document.getElementById('coach-pillars-grid');
+    const recsRow = document.getElementById('coach-recommendations-row');
+    const warningsRow = document.getElementById('coach-warnings-row');
+
+    if (!promptInput || !pillarsGrid || !recsRow) return;
+
+    const modelKey = this.getActiveModelKey();
+    const analysis = PerchanceEngine.analyzePrompt(promptInput.value, modelKey);
+    const profile = analysis.profile;
+
+    if (scoreBar) {
+      scoreBar.style.width = `${analysis.score}%`;
+    }
+
+    if (scoreBadge) {
+      scoreBadge.textContent = `${analysis.level} (${analysis.presentCount}/${analysis.totalPillars})`;
+      if (analysis.score >= 80) {
+        scoreBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+      } else if (analysis.score >= 50) {
+        scoreBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30';
+      } else {
+        scoreBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30';
+      }
+    }
+
+    if (modelBadge && profile) {
+      modelBadge.textContent = `${profile.shortName} • Optimal CFG ${profile.recommendedGuidance}`;
+    }
+
+    // Render 7 Pillar status chips
+    pillarsGrid.innerHTML = analysis.pillars.map(p => {
+      if (p.present) {
+        return `
+          <span class="px-2 py-0.5 rounded-lg text-[11px] font-medium bg-emerald-950/50 text-emerald-300 border border-emerald-500/30 flex items-center gap-1" title="Detected: ${this.escapeHtml(p.matchedWord)}">
+            <span>✓</span>
+            <span>${this.escapeHtml(p.label)}</span>
+          </span>
+        `;
+      } else {
+        const firstSug = p.suggestions[0] || '';
+        return `
+          <button type="button" data-suggest="${this.escapeHtml(firstSug)}" class="coach-pillar-add-btn px-2 py-0.5 rounded-lg text-[11px] font-medium bg-zinc-900 hover:bg-indigo-950/60 text-zinc-400 hover:text-indigo-200 border border-zinc-800 border-dashed hover:border-indigo-500/40 flex items-center gap-1 transition-all" title="Missing ${this.escapeHtml(p.label)} — Click to add '${this.escapeHtml(firstSug)}'">
+            <span>+</span>
+            <span>${this.escapeHtml(p.label)}</span>
+          </button>
+        `;
+      }
+    }).join('');
+
+    pillarsGrid.querySelectorAll('.coach-pillar-add-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sug = btn.getAttribute('data-suggest');
+        if (sug) {
+          this.appendTokenToPrompt(sug);
+          this.showToast(`Added ${sug} to strengthen prompt!`);
+        }
+      });
+    });
+
+    // Collect recommended identifiers to display (missing model triggers + missing pillar suggestions)
+    const missingPillars = analysis.pillars.filter(p => !p.present);
+    const quickChips = [];
+
+    // First include up to 4 missing model-specific trigger words
+    analysis.missingModelTriggers.slice(0, 4).forEach(trig => {
+      quickChips.push({ token: trig, type: 'model' });
+    });
+
+    // Then include suggestions from any missing pillars
+    missingPillars.forEach(mp => {
+      mp.suggestions.slice(0, 2).forEach(s => {
+        if (!quickChips.some(c => c.token.toLowerCase() === s.toLowerCase())) {
+          quickChips.push({ token: s, type: 'pillar' });
+        }
+      });
+    });
+
+    if (quickChips.length > 0) {
+      recsRow.innerHTML = `
+        <span class="text-zinc-500 font-medium mr-1">Recommended Identifiers:</span>
+        ${quickChips.slice(0, 8).map(c => `
+          <button type="button" data-token="${this.escapeHtml(c.token)}" class="coach-token-btn px-2 py-0.5 rounded-md text-[11px] ${c.type === 'model' ? 'bg-indigo-950/50 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-600 hover:text-white' : 'bg-zinc-900 text-zinc-300 border border-zinc-800 hover:bg-zinc-800 hover:text-white'} transition-all">
+            + ${this.escapeHtml(c.token)}
+          </button>
+        `).join('')}
+      `;
+
+      recsRow.querySelectorAll('.coach-token-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tok = btn.getAttribute('data-token');
+          if (tok) {
+            this.appendTokenToPrompt(tok);
+            this.showToast(`Added identifier: ${tok}`);
+          }
+        });
+      });
+      recsRow.classList.remove('hidden');
+    } else {
+      recsRow.innerHTML = `<span class="text-emerald-400">✨ All core ${this.escapeHtml(profile.shortName)} trigger identifiers and prompt pillars are active!</span>`;
+    }
+
+    // Warnings
+    if (warningsRow) {
+      if (analysis.warnings.length > 0) {
+        warningsRow.innerHTML = analysis.warnings.map(w => `<div>💡 ${this.escapeHtml(w)}</div>`).join('');
+        warningsRow.classList.remove('hidden');
+      } else {
+        warningsRow.classList.add('hidden');
+      }
     }
   }
 
@@ -2601,8 +3868,9 @@ class App {
       const btn = document.createElement('button');
       btn.className = 'style-preset-btn px-3 py-1.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:border-zinc-700 hover:text-white transition-all flex items-center gap-1.5 whitespace-nowrap';
       btn.setAttribute('data-style', key);
-      btn.title = preset.description;
-      btn.innerHTML = `<span>🎨</span><span>${preset.name}</span>`;
+      const triggersInfo = preset.triggerIdentifiers ? ` [Triggers: ${preset.triggerIdentifiers.join(', ')}]` : '';
+      btn.title = `${preset.description}${triggersInfo}`;
+      btn.innerHTML = `<span>🎨</span><span>${this.escapeHtml(preset.name)}</span>`;
       container.appendChild(btn);
     });
 
@@ -2615,6 +3883,18 @@ class App {
         });
         btn.classList.add('active', 'border-indigo-500', 'bg-indigo-500/20', 'text-indigo-300');
         btn.classList.remove('border-zinc-800', 'bg-zinc-900/60', 'text-zinc-300');
+
+        const styleKey = btn.getAttribute('data-style');
+        if (styleKey && PerchanceEngine.stylePresets[styleKey]) {
+          const preset = PerchanceEngine.stylePresets[styleKey];
+          if (preset.recommendedModel && PerchanceEngine.modelProfiles[preset.recommendedModel]) {
+            const modelSelect = document.getElementById('model-select');
+            if (modelSelect && modelSelect.value !== preset.recommendedModel) {
+              modelSelect.value = preset.recommendedModel;
+              this.updatePromptCoach();
+            }
+          }
+        }
       });
     });
   }
@@ -2628,22 +3908,36 @@ class App {
 
     list.innerHTML = '';
     PerchanceEngine.templates.forEach(tpl => {
+      const recModel = tpl.recommendedModel && PerchanceEngine.modelProfiles[tpl.recommendedModel]
+        ? PerchanceEngine.modelProfiles[tpl.recommendedModel].shortName
+        : 'FLUX.1 Anime';
+
       const card = document.createElement('div');
       card.className = 'p-4 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:border-indigo-500/50 hover:bg-zinc-900 transition-all cursor-pointer group flex flex-col justify-between';
       card.innerHTML = `
         <div>
           <div class="flex items-center justify-between mb-2">
             <span class="text-xl">${tpl.icon}</span>
-            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400">${tpl.category}</span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/20">${this.escapeHtml(recModel)}</span>
+              <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400">${this.escapeHtml(tpl.category)}</span>
+            </div>
           </div>
-          <h4 class="font-medium text-sm text-zinc-200 group-hover:text-indigo-400 transition-colors mb-1.5">${tpl.title}</h4>
-          <p class="text-xs text-zinc-400 line-clamp-3 font-mono leading-relaxed bg-zinc-950/50 p-2 rounded-lg border border-zinc-800/50">${tpl.template}</p>
+          <h4 class="font-medium text-sm text-zinc-200 group-hover:text-indigo-400 transition-colors mb-1.5">${this.escapeHtml(tpl.title)}</h4>
+          <p class="text-xs text-zinc-400 line-clamp-3 font-mono leading-relaxed bg-zinc-950/50 p-2 rounded-lg border border-zinc-800/50">${this.escapeHtml(tpl.template)}</p>
         </div>
         <div class="mt-3 flex items-center justify-between pt-2 border-t border-zinc-800/50">
-          <span class="text-xs text-indigo-400 font-medium">Use Template →</span>
-          <button class="roll-btn text-xs px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300" title="Evaluate immediately">🎲 Roll One</button>
+          <span class="text-xs text-indigo-400 font-medium">Use Template Formula →</span>
+          <button class="roll-btn text-xs px-2.5 py-1 rounded bg-zinc-800 hover:bg-indigo-600 text-zinc-300 hover:text-white transition-colors" title="Evaluate immediately into a resolved prompt">🎲 Roll Single</button>
         </div>
       `;
+
+      const applyTplModel = () => {
+        if (tpl.recommendedModel && PerchanceEngine.modelProfiles[tpl.recommendedModel]) {
+          const modelSelect = document.getElementById('model-select');
+          if (modelSelect) modelSelect.value = tpl.recommendedModel;
+        }
+      };
 
       // Use raw template
       card.addEventListener('click', (e) => {
@@ -2651,9 +3945,11 @@ class App {
         const promptInput = document.getElementById('prompt-input');
         if (promptInput) {
           promptInput.value = tpl.template;
+          applyTplModel();
           this.updateSyntaxPreview();
+          this.updatePromptCoach();
           document.getElementById('templates-modal').classList.add('hidden');
-          this.showToast(`Loaded ${tpl.title} template!`);
+          this.showToast(`Loaded "${tpl.title}" template!`);
         }
       });
 
@@ -2665,9 +3961,11 @@ class App {
           const promptInput = document.getElementById('prompt-input');
           if (promptInput) {
             promptInput.value = PerchanceEngine.evaluate(tpl.template);
+            applyTplModel();
             this.updateSyntaxPreview();
+            this.updatePromptCoach();
             document.getElementById('templates-modal').classList.add('hidden');
-            this.showToast(`Evaluated ${tpl.title} prompt!`);
+            this.showToast(`Evaluated "${tpl.title}" prompt!`);
           }
         });
       }
@@ -2677,24 +3975,67 @@ class App {
   }
 
   /**
-   * Render Tag Builder Modal
+   * Render Interactive Identifier Lexicon & Tag Builder Modal with Search & Category Tabs
    */
   renderTagBuilder() {
     const container = document.getElementById('tags-container');
+    const tabsContainer = document.getElementById('tag-category-tabs');
     if (!container) return;
 
-    container.innerHTML = '';
     const categories = PerchanceEngine.getTagCategories();
 
+    // Render Category Tabs
+    if (tabsContainer) {
+      const allActive = this.activeTagCategory === 'all';
+      let tabsHtml = `
+        <button type="button" data-cat-id="all" class="tag-cat-tab px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${allActive ? 'bg-indigo-600 text-white' : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'}">
+          All Categories (${categories.reduce((acc, c) => acc + c.tags.length, 0)})
+        </button>
+      `;
+
+      categories.forEach(cat => {
+        const isActive = this.activeTagCategory === cat.id;
+        tabsHtml += `
+          <button type="button" data-cat-id="${this.escapeHtml(cat.id)}" class="tag-cat-tab px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${isActive ? 'bg-indigo-600 text-white' : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'}">
+            ${this.escapeHtml(cat.name)}
+          </button>
+        `;
+      });
+
+      tabsContainer.innerHTML = tabsHtml;
+      tabsContainer.querySelectorAll('.tag-cat-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          this.activeTagCategory = tab.getAttribute('data-cat-id') || 'all';
+          this.renderTagBuilder();
+        });
+      });
+    }
+
+    container.innerHTML = '';
+    const query = this.tagSearchQuery;
+
     categories.forEach(cat => {
+      if (this.activeTagCategory !== 'all' && this.activeTagCategory !== cat.id) return;
+
+      const filteredTags = query
+        ? cat.tags.filter(t => t.toLowerCase().includes(query) || cat.name.toLowerCase().includes(query))
+        : cat.tags;
+
+      if (filteredTags.length === 0) return;
+
       const section = document.createElement('div');
-      section.className = 'mb-4';
+      section.className = 'p-3.5 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 space-y-2.5';
+      const isNegative = Boolean(cat.isNegative);
+
       section.innerHTML = `
-        <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">${cat.name}</h4>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <h4 class="text-xs font-bold uppercase tracking-wider ${isNegative ? 'text-rose-400' : 'text-indigo-300'}">${this.escapeHtml(cat.name)}</h4>
+          <span class="text-[11px] text-zinc-500">${this.escapeHtml(cat.description || '')}</span>
+        </div>
         <div class="flex flex-wrap gap-1.5">
-          ${cat.tags.map(tag => `
-            <button class="tag-pill px-2.5 py-1 rounded-lg text-xs bg-zinc-800/80 hover:bg-indigo-600 hover:text-white text-zinc-300 transition-colors border border-zinc-700/50" data-tag="${tag}">
-              + ${tag}
+          ${filteredTags.map(tag => `
+            <button type="button" class="tag-pill px-2.5 py-1 rounded-lg text-xs ${isNegative ? 'bg-rose-950/40 hover:bg-rose-600 text-rose-200 border border-rose-500/30' : 'bg-zinc-800/80 hover:bg-indigo-600 text-zinc-200 border border-zinc-700/50'} hover:text-white transition-colors" data-tag="${this.escapeHtml(tag)}" data-negative="${isNegative}">
+              ${isNegative ? '−' : '+'} ${this.escapeHtml(tag)}
             </button>
           `).join('')}
         </div>
@@ -2703,17 +4044,142 @@ class App {
       section.querySelectorAll('.tag-pill').forEach(btn => {
         btn.addEventListener('click', () => {
           const tag = btn.getAttribute('data-tag');
-          const promptInput = document.getElementById('prompt-input');
-          if (promptInput) {
-            const current = promptInput.value.trim();
-            promptInput.value = current ? `${current}, ${tag}` : tag;
-            this.updateSyntaxPreview();
-            this.showToast(`Added tag: ${tag}`);
+          const isNeg = btn.getAttribute('data-negative') === 'true';
+          if (isNeg) {
+            this.appendTokenToNegative(tag);
+            this.showToast(`Added "${tag}" to Negative Prompt 🚫`);
+          } else {
+            this.appendTokenToPrompt(tag);
+            this.showToast(`Added identifier: ${tag}`);
           }
         });
       });
 
       container.appendChild(section);
+    });
+
+    if (!container.children.length) {
+      container.innerHTML = `<p class="text-center text-zinc-500 py-8 text-xs">No identifiers matched "${this.escapeHtml(query)}".</p>`;
+    }
+  }
+
+  /**
+   * Render Model Intelligence & Prompt Engineering Guide Modal
+   */
+  renderModelGuideModal() {
+    const container = document.getElementById('guide-content');
+    if (!container) return;
+
+    const profiles = Object.values(PerchanceEngine.modelProfiles);
+
+    const modelCardsHtml = profiles.map(p => `
+      <div class="p-4 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-3 flex flex-col justify-between">
+        <div class="space-y-2.5">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <h4 class="text-sm font-bold text-white">${this.escapeHtml(p.name)}</h4>
+              <p class="text-[11px] text-indigo-400 font-medium">${this.escapeHtml(p.encoder)}</p>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 whitespace-nowrap">
+              CFG ${p.recommendedGuidance} (${p.guidanceRange[0]}–${p.guidanceRange[1]})
+            </span>
+          </div>
+
+          <p class="text-xs text-zinc-300 leading-relaxed">${this.escapeHtml(p.description)}</p>
+
+          <div class="p-2.5 rounded-xl bg-zinc-950/80 border border-zinc-800/80 space-y-1">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 block">Recommended Prompt Formula</span>
+            <p class="font-mono text-[11px] text-emerald-300">${this.escapeHtml(p.promptFormula)}</p>
+          </div>
+
+          <div>
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 block mb-1.5">Recognized Model Trigger Identifiers (Click to Insert)</span>
+            <div class="flex flex-wrap gap-1">
+              ${p.triggerWords.map(tw => `
+                <button type="button" data-guide-trigger="${this.escapeHtml(tw)}" class="guide-trigger-btn px-2 py-0.5 rounded-md bg-indigo-950/60 hover:bg-indigo-600 text-indigo-200 hover:text-white border border-indigo-500/30 text-[11px] font-mono transition-colors">
+                  + ${this.escapeHtml(tw)}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-rose-950/20 border border-rose-500/20 space-y-1">
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-rose-300 block">Recommended Negative Identifiers</span>
+            <p class="font-mono text-[11px] text-zinc-400 line-clamp-2">${this.escapeHtml(p.defaultNegative)}</p>
+          </div>
+
+          <ul class="space-y-1 text-[11px] text-zinc-400 list-disc list-inside">
+            ${p.tips.map(t => `<li>${this.escapeHtml(t)}</li>`).join('')}
+          </ul>
+        </div>
+
+        <div class="pt-3 border-t border-zinc-800/80 flex items-center justify-end">
+          <button type="button" data-select-model="${this.escapeHtml(p.id)}" class="guide-select-model-btn w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-all">
+            ⚡ Activate ${this.escapeHtml(p.shortName)} &amp; Auto-Tune Setup
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    container.innerHTML = `
+      <!-- Perchance Syntax & Wildcards Cheat Sheet -->
+      <div class="p-4 rounded-2xl bg-indigo-950/25 border border-indigo-500/30 space-y-3">
+        <h4 class="text-sm font-bold text-white flex items-center gap-2">
+          <span>🎲</span>
+          <span>Perchance Dynamic Syntax &amp; Wildcards Reference</span>
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div class="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800">
+            <span class="text-[11px] font-semibold text-indigo-300 block mb-1">1. Choice Sets</span>
+            <code class="text-xs text-zinc-200 font-mono block mb-1">{silver|pink|aqua} hair</code>
+            <p class="text-[11px] text-zinc-400">Randomly picks one option per image in a batch.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800">
+            <span class="text-[11px] font-semibold text-indigo-300 block mb-1">2. Percentage &amp; Ratio Weights</span>
+            <code class="text-xs text-zinc-200 font-mono block mb-1">{70% common|30% rare}</code>
+            <p class="text-[11px] text-zinc-400">Also supports ratio weights like <code class="text-indigo-300">{3::kimono|1::armor}</code>.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800">
+            <span class="text-[11px] font-semibold text-indigo-300 block mb-1">3. Nested Expressions</span>
+            <code class="text-xs text-zinc-200 font-mono block mb-1">{cute {cat|fox} girl|ronin}</code>
+            <p class="text-[11px] text-zinc-400">Evaluates from the innermost curly braces outward.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800">
+            <span class="text-[11px] font-semibold text-pink-300 block mb-1">4. Built-in [Wildcards]</span>
+            <code class="text-xs text-pink-200 font-mono block mb-1">[subject], [hair], [scenery]</code>
+            <p class="text-[11px] text-zinc-400">Pulls curated phrases from Bychance's anime dictionary.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model Architecture Cards -->
+      <div>
+        <h4 class="text-sm font-bold text-white mb-3">Supported Anime Model Profiles &amp; Conditioning Architectures</h4>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          ${modelCardsHtml}
+        </div>
+      </div>
+    `;
+
+    container.querySelectorAll('.guide-trigger-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const trig = btn.getAttribute('data-guide-trigger');
+        if (trig) {
+          this.appendTokenToPrompt(trig);
+          this.showToast(`Inserted trigger identifier: ${trig}`);
+        }
+      });
+    });
+
+    container.querySelectorAll('.guide-select-model-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mId = btn.getAttribute('data-select-model');
+        if (mId) {
+          this.applyModelBestPractices(mId, true);
+          const modal = document.getElementById('guide-modal');
+          if (modal) modal.classList.add('hidden');
+        }
+      });
     });
   }
 
@@ -2741,11 +4207,10 @@ class App {
 
     // Guidance Scale
     const guidanceSlider = document.getElementById('guidance-slider');
-    const guidanceScale = guidanceSlider ? parseFloat(guidanceSlider.value) : 7.5;
+    const guidanceScale = guidanceSlider ? parseFloat(guidanceSlider.value) : 5.5;
 
     // Model selection
-    const modelSelect = document.getElementById('model-select');
-    const model = modelSelect ? modelSelect.value : 'flux';
+    const model = this.getActiveModelKey();
 
     // Quality Booster Checkbox
     const boosterCheck = document.getElementById('quality-booster-toggle');
@@ -2822,6 +4287,8 @@ class App {
 
     grid.innerHTML = '';
     const ratioInfo = ImageGenerator.aspectRatios[aspectRatio] || ImageGenerator.aspectRatios['2:3'];
+    const profile = PerchanceEngine.modelProfiles[this.getActiveModelKey()];
+    const modelLabel = profile ? profile.shortName : 'FLUX.1 Anime';
 
     // Adjust grid columns based on batch size
     grid.className = count === 1 
@@ -2838,7 +4305,7 @@ class App {
         <div class="absolute inset-0 bg-gradient-to-br from-indigo-950/20 to-zinc-950 animate-pulse flex flex-col items-center justify-center p-4 text-center">
           <div class="w-10 h-10 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3"></div>
           <span class="text-xs font-medium text-zinc-400">Rendering anime artwork #${i + 1}...</span>
-          <span class="text-[10px] text-zinc-500 mt-1">Applying FLUX attention layers</span>
+          <span class="text-[10px] text-zinc-500 mt-1">Conditioning with ${this.escapeHtml(modelLabel)} identifiers</span>
         </div>
       `;
 
@@ -2955,7 +4422,7 @@ class App {
       const safeAlt = this.escapeHtml(item.prompt);
       const safePrompt = this.escapeHtml(item.evaluatedPrompt || item.prompt);
       const safeSeed = this.escapeHtml(item.seed);
-      const safeModel = this.escapeHtml(item.model || 'FLUX');
+      const safeModel = this.escapeHtml(item.modelName || item.model || 'FLUX.1 Anime');
 
       card.innerHTML = `
         <img src="${safeUrl}" alt="${safeAlt}" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
@@ -3030,10 +4497,13 @@ class App {
 
     if (item.model) {
       const modelSelect = document.getElementById('model-select');
-      if (modelSelect) modelSelect.value = item.model;
+      if (modelSelect && PerchanceEngine.modelProfiles[item.model]) {
+        modelSelect.value = item.model;
+      }
     }
 
     this.updateSyntaxPreview();
+    this.updatePromptCoach();
   }
 
   populateSettingsForm() {
