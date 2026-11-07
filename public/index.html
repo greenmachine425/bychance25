@@ -4,13 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bychance — Prompt Optimiser &amp; Splitter</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Crect width='32' height='32' rx='7' fill='%23141413'/%3E%3Crect x='6' y='6' width='9' height='9' rx='2' fill='%23ffffff'/%3E%3Crect x='17' y='6' width='9' height='9' rx='2' fill='%23ffffff' fill-opacity='0.45'/%3E%3Crect x='6' y='17' width='9' height='9' rx='2' fill='%23ffffff' fill-opacity='0.45'/%3E%3Crect x='17' y='17' width='9' height='9' rx='2' fill='%23ffffff'/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
     <header class="topbar">
         <div class="topbar-inner">
             <div class="brand-and-tabs">
-                <h1 class="brand-title">Bychance</h1>
+                <div class="brand-mark">
+                    <svg class="brand-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                        <rect width="32" height="32" rx="7" fill="currentColor" />
+                        <rect x="6" y="6" width="9" height="9" rx="2" fill="var(--bg-surface)" />
+                        <rect x="17" y="6" width="9" height="9" rx="2" fill="var(--bg-surface)" fill-opacity="0.45" />
+                        <rect x="6" y="17" width="9" height="9" rx="2" fill="var(--bg-surface)" fill-opacity="0.45" />
+                        <rect x="17" y="17" width="9" height="9" rx="2" fill="var(--bg-surface)" />
+                    </svg>
+                    <h1 class="brand-title">Bychance</h1>
+                </div>
                 <div class="mode-switcher" role="tablist" aria-label="Tool Mode">
                     <button
                         id="tab-optimiser"
@@ -38,6 +48,13 @@
                 <button id="btn-save-full-preset" class="btn">Save Preset</button>
                 <button id="btn-delete-full-preset" class="btn hidden">Delete</button>
                 <button id="btn-clear-all" class="btn">Clear</button>
+                <button
+                    id="btn-theme-toggle"
+                    class="theme-circle-btn"
+                    type="button"
+                    title="Toggle dark mode"
+                    aria-label="Toggle dark mode"
+                ></button>
             </div>
         </div>
     </header>

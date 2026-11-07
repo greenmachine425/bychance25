@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bychance — Prompt Optimiser &amp; Splitter</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Crect width='32' height='32' rx='7' fill='%23141413'/%3E%3Crect x='6' y='6' width='9' height='9' rx='2' fill='%23ffffff'/%3E%3Crect x='17' y='6' width='9' height='9' rx='2' fill='%23ffffff' fill-opacity='0.45'/%3E%3Crect x='6' y='17' width='9' height='9' rx='2' fill='%23ffffff' fill-opacity='0.45'/%3E%3Crect x='17' y='17' width='9' height='9' rx='2' fill='%23ffffff'/%3E%3C/svg%3E" />
     <style>
 /* Bychance — Minimalist Prompt Optimiser & Section Splitter */
 :root {
@@ -18,10 +19,26 @@
     --line-strong: #c8c8c2;
     --accent-ink: #141413;
     --accent-ink-hover: #2c2c2a;
+    --accent-ink-fg: #ffffff;
     --control-h: 34px;
     --radius: 4px;
     --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+[data-theme="dark"] {
+    --bg-canvas: #000000;
+    --bg-surface: #0d0d0d;
+    --bg-subtle: #161616;
+    --bg-hover: #222222;
+    --text-main: #ffffff;
+    --text-muted: #9a9a9a;
+    --text-faint: #666666;
+    --line-color: #242424;
+    --line-strong: #3d3d3d;
+    --accent-ink: #ffffff;
+    --accent-ink-hover: #e2e2e2;
+    --accent-ink-fg: #000000;
 }
 
 * {
@@ -67,6 +84,19 @@ html, body {
     gap: 16px;
 }
 
+.brand-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-main);
+}
+
+.brand-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
 .brand-title {
     font-size: 15px;
     font-weight: 600;
@@ -104,7 +134,7 @@ html, body {
 
 .mode-tab.active {
     background-color: var(--accent-ink);
-    color: #ffffff;
+    color: var(--accent-ink-fg);
 }
 
 .preset-toolbar {
@@ -112,6 +142,29 @@ html, body {
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
+}
+
+/* Simple Circle Dark Mode Toggle */
+.theme-circle-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line-strong);
+    background-color: var(--accent-ink);
+    cursor: pointer;
+    padding: 0;
+    margin-left: 2px;
+    flex-shrink: 0;
+    transition: transform 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.theme-circle-btn:hover {
+    border-color: var(--text-main);
+    transform: scale(1.08);
+}
+
+.theme-circle-btn:active {
+    transform: scale(0.96);
 }
 
 /* Main Workspace Container */
@@ -263,7 +316,7 @@ html, body {
 .btn-primary {
     background-color: var(--accent-ink);
     border-color: var(--accent-ink);
-    color: #ffffff;
+    color: var(--accent-ink-fg);
 }
 
 .btn-primary:hover {
@@ -389,7 +442,7 @@ html, body {
     bottom: 20px;
     right: 20px;
     background-color: var(--accent-ink);
-    color: #ffffff;
+    color: var(--accent-ink-fg);
     border-radius: var(--radius);
     padding: 8px 14px;
     font-size: 12px;
@@ -417,7 +470,16 @@ html, body {
     <header class="topbar">
         <div class="topbar-inner">
             <div class="brand-and-tabs">
-                <h1 class="brand-title">Bychance</h1>
+                <div class="brand-mark">
+                    <svg class="brand-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                        <rect width="32" height="32" rx="7" fill="currentColor" />
+                        <rect x="6" y="6" width="9" height="9" rx="2" fill="var(--bg-surface)" />
+                        <rect x="17" y="6" width="9" height="9" rx="2" fill="var(--bg-surface)" fill-opacity="0.45" />
+                        <rect x="6" y="17" width="9" height="9" rx="2" fill="var(--bg-surface)" fill-opacity="0.45" />
+                        <rect x="17" y="17" width="9" height="9" rx="2" fill="var(--bg-surface)" />
+                    </svg>
+                    <h1 class="brand-title">Bychance</h1>
+                </div>
                 <div class="mode-switcher" role="tablist" aria-label="Tool Mode">
                     <button
                         id="tab-optimiser"
@@ -445,6 +507,13 @@ html, body {
                 <button id="btn-save-full-preset" class="btn">Save Preset</button>
                 <button id="btn-delete-full-preset" class="btn hidden">Delete</button>
                 <button id="btn-clear-all" class="btn">Clear</button>
+                <button
+                    id="btn-theme-toggle"
+                    class="theme-circle-btn"
+                    type="button"
+                    title="Toggle dark mode"
+                    aria-label="Toggle dark mode"
+                ></button>
             </div>
         </div>
     </header>
@@ -2334,6 +2403,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const upgradeSuggestionsList = document.getElementById("upgrade-suggestions-list");
     const upgradeCountBadge = document.getElementById("upgrade-count-badge");
+    const themeToggleBtn = document.getElementById("btn-theme-toggle");
+    const THEME_STORAGE_KEY = "bychance_theme";
+
+    function applyTheme(theme) {
+        if (theme === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+        } else {
+            document.documentElement.removeAttribute("data-theme");
+        }
+    }
+
+    try {
+        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+        if (savedTheme === "dark") {
+            applyTheme("dark");
+        }
+    } catch (e) {}
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener("click", () => {
+            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+            const nextTheme = isDark ? "light" : "dark";
+            applyTheme(nextTheme);
+            try {
+                localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+            } catch (e) {}
+        });
+    }
 
     let toastTimer = null;
     let masterDirty = false;

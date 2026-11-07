@@ -37,6 +37,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const upgradeSuggestionsList = document.getElementById("upgrade-suggestions-list");
     const upgradeCountBadge = document.getElementById("upgrade-count-badge");
+    const themeToggleBtn = document.getElementById("btn-theme-toggle");
+    const THEME_STORAGE_KEY = "bychance_theme";
+
+    function applyTheme(theme) {
+        if (theme === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+        } else {
+            document.documentElement.removeAttribute("data-theme");
+        }
+    }
+
+    try {
+        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+        if (savedTheme === "dark") {
+            applyTheme("dark");
+        }
+    } catch (e) {}
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener("click", () => {
+            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+            const nextTheme = isDark ? "light" : "dark";
+            applyTheme(nextTheme);
+            try {
+                localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+            } catch (e) {}
+        });
+    }
 
     let toastTimer = null;
     let masterDirty = false;
