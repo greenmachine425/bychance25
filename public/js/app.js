@@ -35,6 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
         style: document.getElementById("preset-select-style")
     };
 
+    const upgradeSuggestionsList = document.getElementById("upgrade-suggestions-list");
+    const upgradeCountBadge = document.getElementById("upgrade-count-badge");
+
     let toastTimer = null;
     let masterDirty = false;
 
@@ -83,6 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (syncMaster) {
             syncSectionsToMaster();
         } else {
+            refreshUpgradeSuggestions();
             PresetManager.saveLastWorkbenchState(getCurrentSections());
         }
     }
@@ -94,6 +98,165 @@ document.addEventListener("DOMContentLoaded", () => {
         masterBox.value = PromptEngine.assembleFullPrompt(current, format);
         masterDirty = false;
         PresetManager.saveLastWorkbenchState(current);
+        refreshUpgradeSuggestions();
+    }
+
+    function getActiveScanText() {
+        if (masterDirty && masterBox.value.trim()) {
+            return masterBox.value;
+        }
+        return [
+            boxes.character.value,
+            boxes.outfit.value,
+            boxes.pose.value,
+            boxes.scene.value,
+            boxes.style.value,
+            masterBox.value
+        ].join(", ");
+    }
+
+    function replaceRegexAcrossBoxes(regex, replacement) {
+        if (masterDirty) {
+            syncMasterToSectionsIfEdited();
+        }
+        let changedInModular = false;
+        PRESET_SECTION_KEYS.forEach((k) => {
+            regex.lastIndex = 0;
+            if (regex.test(boxes[k].value)) {
+                regex.lastIndex = 0;
+                boxes[k].value = PromptEngine.cleanCommaFormatting(boxes[k].value.replace(regex, replacement));
+                changedInModular = true;
+            }
+        });
+
+        if (changedInModular) {
+            syncSectionsToMaster();
+        } else {
+            regex.lastIndex = 0;
+            masterBox.value = PromptEngine.cleanCommaFormatting(masterBox.value.replace(regex, replacement));
+            const parsed = PromptEngine.parseFullPromptToSections(masterBox.value);
+            if (!parsed.negative) {
+                parsed.negative = negativeOptBox.value || boxes.negative.value;
+            }
+            setSections(parsed, true);
+        }
+    }
+
+    function refreshUpgradeSuggestions() {
+        if (!upgradeSuggestionsList || !upgradeCountBadge) return;
+        const scanText = getActiveScanText();
+        const suggestions = PromptEngine.scanForUpgrades(scanText);
+        upgradeCountBadge.textContent = `${suggestions.length}`;
+        upgradeSuggestionsList.innerHTML = "";
+
+        if (suggestions.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "card-hint";
+            empty.style.padding = "2px 0";
+            empty.textContent = "No weak words detected. Type terms like 'Rosalina', 'shiny', 'standing', 'sad', 'nice lighting', 'armor', or 'forest' to see tag replacements.";
+            upgradeSuggestionsList.appendChild(empty);
+            return;
+        }
+
+        suggestions.forEach((item) => {
+            const card = document.createElement("div");
+            card.className = "upgrade-item";
+
+            const header = document.createElement("div");
+            header.className = "upgrade-item-header";
+
+            const wordBadge = document.createElement("span");
+            wordBadge.className = "upgrade-word-badge";
+            wordBadge.textContent = item.type === "character" ? item.label : `Term: ${item.label}`;
+
+            const catBadge = document.createElement("span");
+            catBadge.className = "upgrade-cat-badge";
+            catBadge.textContent = item.category;
+
+            header.appendChild(wordBadge);
+            header.appendChild(catBadge);
+
+            const preview = document.createElement("div");
+            preview.className = "upgrade-target-preview";
+            preview.textContent = item.primary;
+
+            const actions = document.createElement("div");
+            actions.className = "upgrade-actions";
+
+            if (item.type === "character" && item.characterProfile) {
+                const fillAllBtn = document.createElement("button");
+                fillAllBtn.className = "btn btn-sm btn-primary";
+                fillAllBtn.textContent = "Populate All Sections";
+                fillAllBtn.addEventListener("click", () => {
+                    if (masterDirty) syncMasterToSectionsIfEdited();
+                    const prof = item.characterProfile;
+                    boxes.character.value = prof.character;
+                    if (!boxes.outfit.value.trim()) boxes.outfit.value = prof.outfit;
+                    if (!boxes.pose.value.trim() && prof.pose) boxes.pose.value = prof.pose;
+                    if (!boxes.scene.value.trim()) boxes.scene.value = prof.scene;
+                    if (!boxes.style.value.trim()) boxes.style.value = prof.style;
+                    syncSectionsToMaster();
+                    showToast(`Loaded visual traits for ${prof.name}`);
+                });
+
+                const charOnlyBtn = document.createElement("button");
+                charOnlyBtn.className = "btn btn-sm";
+                charOnlyBtn.textContent = "Expand Character Only";
+                charOnlyBtn.addEventListener("click", () => {
+                    if (masterDirty) syncMasterToSectionsIfEdited();
+                    const prof = item.characterProfile;
+                    const reg = new RegExp(`\\b${item.matchedWord}\\b`, "gi");
+                    if (reg.test(boxes.character.value)) {
+                        boxes.character.value = PromptEngine.cleanCommaFormatting(
+                            boxes.character.value.replace(reg, prof.character)
+                        );
+                    } else {
+                        boxes.character.value = prof.character;
+                    }
+                    syncSectionsToMaster();
+                    showToast(`Expanded character traits for ${prof.name}`);
+                });
+
+                actions.appendChild(fillAllBtn);
+                actions.appendChild(charOnlyBtn);
+            } else {
+                const applyPrimaryBtn = document.createElement("button");
+                applyPrimaryBtn.className = "btn btn-sm btn-primary";
+                applyPrimaryBtn.textContent = "Replace with Tags";
+                applyPrimaryBtn.addEventListener("click", () => {
+                    replaceRegexAcrossBoxes(item.regex, item.primary);
+                    showToast(`Upgraded ${item.label}`);
+                });
+
+                const applyPerchanceBtn = document.createElement("button");
+                applyPerchanceBtn.className = "btn btn-sm";
+                applyPerchanceBtn.textContent = "Replace as {a|b}";
+                applyPerchanceBtn.addEventListener("click", () => {
+                    replaceRegexAcrossBoxes(item.regex, item.perchance);
+                    showToast(`Upgraded ${item.label} to {a|b}`);
+                });
+
+                actions.appendChild(applyPrimaryBtn);
+                actions.appendChild(applyPerchanceBtn);
+
+                (item.alternatives || []).forEach((alt, idx) => {
+                    const altBtn = document.createElement("button");
+                    altBtn.className = "btn btn-sm";
+                    altBtn.textContent = `Option ${idx + 2}`;
+                    altBtn.title = alt;
+                    altBtn.addEventListener("click", () => {
+                        replaceRegexAcrossBoxes(item.regex, alt);
+                        showToast(`Replaced ${item.label}`);
+                    });
+                    actions.appendChild(altBtn);
+                });
+            }
+
+            card.appendChild(header);
+            card.appendChild(preview);
+            card.appendChild(actions);
+            upgradeSuggestionsList.appendChild(card);
+        });
     }
 
     function syncMasterToSectionsIfEdited() {
@@ -208,6 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     masterBox.addEventListener("input", () => {
         masterDirty = true;
+        refreshUpgradeSuggestions();
     });
 
     masterBox.addEventListener("keydown", (e) => {

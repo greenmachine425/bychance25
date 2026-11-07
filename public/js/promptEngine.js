@@ -113,7 +113,7 @@ const PromptEngine = (() => {
             perchance: "{bashful expression, soft cheek blush, averted gaze|flustered blush, coy sideways glance}"
         },
         {
-            match: /\b(looking|staring)\b/gi,
+            match: /\b(looking|staring)\b(?!\s+(?:at viewer|back|into|up|down))/gi,
             label: "looking / staring",
             category: "Expression",
             primary: "looking at viewer, direct eye contact, detailed iris catchlights",
@@ -333,7 +333,7 @@ const PromptEngine = (() => {
 
         // Quality & Style Boosters
         {
-            match: /\b(good quality|high quality|detailed|very detailed)\b/gi,
+            match: /(?<!ultra-|hyper-)\b(good quality|high quality|very detailed|detailed)\b(?!\s+(?:iris|eyes|eye|hair|fabric|attire|skin|background|textures|linework|armor|foliage|streetscape))/gi,
             label: "good/high quality / detailed",
             category: "Style",
             primary: "masterpiece, best quality, ultra-detailed, crisp lineart, intricate textures, 8k resolution",
@@ -603,6 +603,30 @@ const PromptEngine = (() => {
         ]
     };
 
+    function isRuleAlreadyApplied(text, rule) {
+        if (!text || !rule) return false;
+        const lower = text.toLowerCase();
+        const candidates = [rule.primary, ...(rule.alternatives || [])];
+        for (const cand of candidates) {
+            if (!cand) continue;
+            const firstClause = cand.split(",")[0].trim().toLowerCase();
+            if (firstClause.length >= 6 && lower.includes(firstClause)) {
+                return true;
+            }
+        }
+        if (rule.perchance) {
+            const inner = rule.perchance.replace(/^\{|\}$/g, "");
+            const opts = inner.split("|");
+            for (const opt of opts) {
+                const firstClause = opt.split(",")[0].trim().toLowerCase();
+                if (firstClause.length >= 6 && lower.includes(firstClause)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     // 4. Scan text for weak words or unexpanded character names
     function scanForUpgrades(text) {
         if (!text || !text.trim()) return [];
@@ -631,9 +655,11 @@ const PromptEngine = (() => {
 
         // Check weak words & phrases
         WORD_UPGRADES.forEach((rule) => {
+            if (seenLabels.has(rule.label)) return;
+            if (isRuleAlreadyApplied(text, rule)) return;
             rule.match.lastIndex = 0;
             const found = rule.match.exec(text);
-            if (found && !seenLabels.has(rule.label)) {
+            if (found) {
                 suggestions.push({
                     type: "word",
                     matchedWord: found[0],
@@ -669,6 +695,7 @@ const PromptEngine = (() => {
 
         // Replace weak words with high-signal model tokens
         WORD_UPGRADES.forEach((rule) => {
+            if (isRuleAlreadyApplied(updated, rule)) return;
             rule.match.lastIndex = 0;
             if (rule.match.test(updated)) {
                 rule.match.lastIndex = 0;

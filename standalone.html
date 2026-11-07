@@ -271,6 +271,70 @@ html, body {
     border-color: var(--accent-ink-hover);
 }
 
+.btn-sm {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+/* Word Upgrade Recommendations */
+.upgrade-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.upgrade-item {
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--line-color);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+}
+
+.upgrade-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.upgrade-word-badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.upgrade-cat-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.upgrade-target-preview {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    word-break: break-word;
+}
+
+.upgrade-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.status-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--line-color);
+    padding: 1px 7px;
+    border-radius: var(--radius);
+}
+
 /* Textareas */
 .prompt-textarea {
     width: 100%;
@@ -416,6 +480,18 @@ html, body {
                     <div class="spacer"></div>
                     <button id="btn-copy-master" class="btn">Copy Prompt</button>
                 </div>
+            </div>
+
+            <!-- Detected Word & Character Upgrade Recommendations -->
+            <div class="editor-card" id="card-upgrade-suggestions">
+                <div class="card-header">
+                    <div class="card-title-group">
+                        <h2 class="card-title">Suggested Word Upgrades</h2>
+                        <span id="upgrade-count-badge" class="status-count">0</span>
+                    </div>
+                    <span class="card-hint">Click to replace weak terms with model tags</span>
+                </div>
+                <div id="upgrade-suggestions-list" class="upgrade-list"></div>
             </div>
 
             <div class="editor-card">
@@ -695,7 +771,7 @@ const PromptEngine = (() => {
             perchance: "{bashful expression, soft cheek blush, averted gaze|flustered blush, coy sideways glance}"
         },
         {
-            match: /\b(looking|staring)\b/gi,
+            match: /\b(looking|staring)\b(?!\s+(?:at viewer|back|into|up|down))/gi,
             label: "looking / staring",
             category: "Expression",
             primary: "looking at viewer, direct eye contact, detailed iris catchlights",
@@ -915,7 +991,7 @@ const PromptEngine = (() => {
 
         // Quality & Style Boosters
         {
-            match: /\b(good quality|high quality|detailed|very detailed)\b/gi,
+            match: /(?<!ultra-|hyper-)\b(good quality|high quality|very detailed|detailed)\b(?!\s+(?:iris|eyes|eye|hair|fabric|attire|skin|background|textures|linework|armor|foliage|streetscape))/gi,
             label: "good/high quality / detailed",
             category: "Style",
             primary: "masterpiece, best quality, ultra-detailed, crisp lineart, intricate textures, 8k resolution",
@@ -1185,6 +1261,30 @@ const PromptEngine = (() => {
         ]
     };
 
+    function isRuleAlreadyApplied(text, rule) {
+        if (!text || !rule) return false;
+        const lower = text.toLowerCase();
+        const candidates = [rule.primary, ...(rule.alternatives || [])];
+        for (const cand of candidates) {
+            if (!cand) continue;
+            const firstClause = cand.split(",")[0].trim().toLowerCase();
+            if (firstClause.length >= 6 && lower.includes(firstClause)) {
+                return true;
+            }
+        }
+        if (rule.perchance) {
+            const inner = rule.perchance.replace(/^\{|\}$/g, "");
+            const opts = inner.split("|");
+            for (const opt of opts) {
+                const firstClause = opt.split(",")[0].trim().toLowerCase();
+                if (firstClause.length >= 6 && lower.includes(firstClause)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     // 4. Scan text for weak words or unexpanded character names
     function scanForUpgrades(text) {
         if (!text || !text.trim()) return [];
@@ -1213,9 +1313,11 @@ const PromptEngine = (() => {
 
         // Check weak words & phrases
         WORD_UPGRADES.forEach((rule) => {
+            if (seenLabels.has(rule.label)) return;
+            if (isRuleAlreadyApplied(text, rule)) return;
             rule.match.lastIndex = 0;
             const found = rule.match.exec(text);
-            if (found && !seenLabels.has(rule.label)) {
+            if (found) {
                 suggestions.push({
                     type: "word",
                     matchedWord: found[0],
@@ -1251,6 +1353,7 @@ const PromptEngine = (() => {
 
         // Replace weak words with high-signal model tokens
         WORD_UPGRADES.forEach((rule) => {
+            if (isRuleAlreadyApplied(updated, rule)) return;
             rule.match.lastIndex = 0;
             if (rule.match.test(updated)) {
                 rule.match.lastIndex = 0;
@@ -2229,6 +2332,9 @@ document.addEventListener("DOMContentLoaded", () => {
         style: document.getElementById("preset-select-style")
     };
 
+    const upgradeSuggestionsList = document.getElementById("upgrade-suggestions-list");
+    const upgradeCountBadge = document.getElementById("upgrade-count-badge");
+
     let toastTimer = null;
     let masterDirty = false;
 
@@ -2277,6 +2383,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (syncMaster) {
             syncSectionsToMaster();
         } else {
+            refreshUpgradeSuggestions();
             PresetManager.saveLastWorkbenchState(getCurrentSections());
         }
     }
@@ -2288,6 +2395,165 @@ document.addEventListener("DOMContentLoaded", () => {
         masterBox.value = PromptEngine.assembleFullPrompt(current, format);
         masterDirty = false;
         PresetManager.saveLastWorkbenchState(current);
+        refreshUpgradeSuggestions();
+    }
+
+    function getActiveScanText() {
+        if (masterDirty && masterBox.value.trim()) {
+            return masterBox.value;
+        }
+        return [
+            boxes.character.value,
+            boxes.outfit.value,
+            boxes.pose.value,
+            boxes.scene.value,
+            boxes.style.value,
+            masterBox.value
+        ].join(", ");
+    }
+
+    function replaceRegexAcrossBoxes(regex, replacement) {
+        if (masterDirty) {
+            syncMasterToSectionsIfEdited();
+        }
+        let changedInModular = false;
+        PRESET_SECTION_KEYS.forEach((k) => {
+            regex.lastIndex = 0;
+            if (regex.test(boxes[k].value)) {
+                regex.lastIndex = 0;
+                boxes[k].value = PromptEngine.cleanCommaFormatting(boxes[k].value.replace(regex, replacement));
+                changedInModular = true;
+            }
+        });
+
+        if (changedInModular) {
+            syncSectionsToMaster();
+        } else {
+            regex.lastIndex = 0;
+            masterBox.value = PromptEngine.cleanCommaFormatting(masterBox.value.replace(regex, replacement));
+            const parsed = PromptEngine.parseFullPromptToSections(masterBox.value);
+            if (!parsed.negative) {
+                parsed.negative = negativeOptBox.value || boxes.negative.value;
+            }
+            setSections(parsed, true);
+        }
+    }
+
+    function refreshUpgradeSuggestions() {
+        if (!upgradeSuggestionsList || !upgradeCountBadge) return;
+        const scanText = getActiveScanText();
+        const suggestions = PromptEngine.scanForUpgrades(scanText);
+        upgradeCountBadge.textContent = `${suggestions.length}`;
+        upgradeSuggestionsList.innerHTML = "";
+
+        if (suggestions.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "card-hint";
+            empty.style.padding = "2px 0";
+            empty.textContent = "No weak words detected. Type terms like 'Rosalina', 'shiny', 'standing', 'sad', 'nice lighting', 'armor', or 'forest' to see tag replacements.";
+            upgradeSuggestionsList.appendChild(empty);
+            return;
+        }
+
+        suggestions.forEach((item) => {
+            const card = document.createElement("div");
+            card.className = "upgrade-item";
+
+            const header = document.createElement("div");
+            header.className = "upgrade-item-header";
+
+            const wordBadge = document.createElement("span");
+            wordBadge.className = "upgrade-word-badge";
+            wordBadge.textContent = item.type === "character" ? item.label : `Term: ${item.label}`;
+
+            const catBadge = document.createElement("span");
+            catBadge.className = "upgrade-cat-badge";
+            catBadge.textContent = item.category;
+
+            header.appendChild(wordBadge);
+            header.appendChild(catBadge);
+
+            const preview = document.createElement("div");
+            preview.className = "upgrade-target-preview";
+            preview.textContent = item.primary;
+
+            const actions = document.createElement("div");
+            actions.className = "upgrade-actions";
+
+            if (item.type === "character" && item.characterProfile) {
+                const fillAllBtn = document.createElement("button");
+                fillAllBtn.className = "btn btn-sm btn-primary";
+                fillAllBtn.textContent = "Populate All Sections";
+                fillAllBtn.addEventListener("click", () => {
+                    if (masterDirty) syncMasterToSectionsIfEdited();
+                    const prof = item.characterProfile;
+                    boxes.character.value = prof.character;
+                    if (!boxes.outfit.value.trim()) boxes.outfit.value = prof.outfit;
+                    if (!boxes.pose.value.trim() && prof.pose) boxes.pose.value = prof.pose;
+                    if (!boxes.scene.value.trim()) boxes.scene.value = prof.scene;
+                    if (!boxes.style.value.trim()) boxes.style.value = prof.style;
+                    syncSectionsToMaster();
+                    showToast(`Loaded visual traits for ${prof.name}`);
+                });
+
+                const charOnlyBtn = document.createElement("button");
+                charOnlyBtn.className = "btn btn-sm";
+                charOnlyBtn.textContent = "Expand Character Only";
+                charOnlyBtn.addEventListener("click", () => {
+                    if (masterDirty) syncMasterToSectionsIfEdited();
+                    const prof = item.characterProfile;
+                    const reg = new RegExp(`\\b${item.matchedWord}\\b`, "gi");
+                    if (reg.test(boxes.character.value)) {
+                        boxes.character.value = PromptEngine.cleanCommaFormatting(
+                            boxes.character.value.replace(reg, prof.character)
+                        );
+                    } else {
+                        boxes.character.value = prof.character;
+                    }
+                    syncSectionsToMaster();
+                    showToast(`Expanded character traits for ${prof.name}`);
+                });
+
+                actions.appendChild(fillAllBtn);
+                actions.appendChild(charOnlyBtn);
+            } else {
+                const applyPrimaryBtn = document.createElement("button");
+                applyPrimaryBtn.className = "btn btn-sm btn-primary";
+                applyPrimaryBtn.textContent = "Replace with Tags";
+                applyPrimaryBtn.addEventListener("click", () => {
+                    replaceRegexAcrossBoxes(item.regex, item.primary);
+                    showToast(`Upgraded ${item.label}`);
+                });
+
+                const applyPerchanceBtn = document.createElement("button");
+                applyPerchanceBtn.className = "btn btn-sm";
+                applyPerchanceBtn.textContent = "Replace as {a|b}";
+                applyPerchanceBtn.addEventListener("click", () => {
+                    replaceRegexAcrossBoxes(item.regex, item.perchance);
+                    showToast(`Upgraded ${item.label} to {a|b}`);
+                });
+
+                actions.appendChild(applyPrimaryBtn);
+                actions.appendChild(applyPerchanceBtn);
+
+                (item.alternatives || []).forEach((alt, idx) => {
+                    const altBtn = document.createElement("button");
+                    altBtn.className = "btn btn-sm";
+                    altBtn.textContent = `Option ${idx + 2}`;
+                    altBtn.title = alt;
+                    altBtn.addEventListener("click", () => {
+                        replaceRegexAcrossBoxes(item.regex, alt);
+                        showToast(`Replaced ${item.label}`);
+                    });
+                    actions.appendChild(altBtn);
+                });
+            }
+
+            card.appendChild(header);
+            card.appendChild(preview);
+            card.appendChild(actions);
+            upgradeSuggestionsList.appendChild(card);
+        });
     }
 
     function syncMasterToSectionsIfEdited() {
@@ -2402,6 +2668,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     masterBox.addEventListener("input", () => {
         masterDirty = true;
+        refreshUpgradeSuggestions();
     });
 
     masterBox.addEventListener("keydown", (e) => {
