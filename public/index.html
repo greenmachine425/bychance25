@@ -3,260 +3,226 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bychance — Perchance Prompting Helper & Modular Workbench</title>
+    <title>Bychance — Perchance Prompt Workbench</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-    <!-- Top Header & Full Preset Toolbar -->
     <header class="topbar">
         <div class="topbar-inner">
             <div class="brand-group">
-                <div class="brand-logo">B</div>
-                <div>
-                    <h1 class="brand-title">
-                        Bychance Prompt Workbench
-                        <span class="brand-badge">Deterministic · Zero AI</span>
-                    </h1>
-                    <p class="brand-subtitle">
-                        Modular Perchance prompt builder, weak-word upgrader &amp; character tag translator
-                    </p>
-                </div>
+                <h1 class="brand-title">Bychance</h1>
+                <p class="brand-subtitle">Perchance Prompting Workbench</p>
             </div>
 
-            <!-- Full Setup Presets Bar -->
             <div class="preset-toolbar">
-                <label for="full-preset-select" class="card-hint" style="font-weight:600;">Full Setup Preset:</label>
-                <select id="full-preset-select" class="select-input" style="min-width:230px;" title="Select a complete Character + Outfit + Scene + Style preset"></select>
-                <button id="btn-load-full-preset" class="btn btn-primary" title="Load selected full preset into all modular boxes">
-                    📂 Load Preset
-                </button>
-                <button id="btn-save-full-preset" class="btn btn-emerald" title="Save all current modular boxes as a custom Full Preset">
-                    💾 Save Full Preset
-                </button>
-                <button id="btn-delete-full-preset" class="btn btn-danger hidden" title="Delete selected custom preset">
-                    🗑️ Delete
-                </button>
-                <button id="btn-export-presets" class="btn" title="Export your custom presets as JSON">
-                    📤 Export
-                </button>
-                <button id="btn-import-presets" class="btn" title="Import custom presets from JSON">
-                    📥 Import
-                </button>
+                <label for="full-preset-select" class="toolbar-label">Preset</label>
+                <select id="full-preset-select" class="select-input" style="min-width:220px;" title="Select a full preset"></select>
+                <button id="btn-load-full-preset" class="btn btn-primary">Load</button>
+                <button id="btn-save-full-preset" class="btn">Save Preset</button>
+                <button id="btn-delete-full-preset" class="btn hidden">Delete</button>
+                <div class="toolbar-divider"></div>
+                <button id="btn-export-presets" class="btn">Export JSON</button>
+                <button id="btn-import-presets" class="btn">Import JSON</button>
                 <input type="file" id="import-presets-input" accept=".json" class="hidden" />
-                <button id="btn-clear-all" class="btn btn-danger" title="Clear all modular prompt windows">
-                    🧹 Clear All
-                </button>
+                <button id="btn-clear-all" class="btn">Clear All</button>
             </div>
         </div>
     </header>
 
-    <!-- Main Workbench Grid -->
     <main class="workbench-container">
-        <!-- LEFT COLUMN: Split Modular Edit Windows -->
+        <!-- Left Column: Split Modular Sections -->
         <section class="column-stack" aria-label="Modular Prompt Sections">
-            <!-- 1. Character & Identity -->
+            <!-- 01. Character -->
             <div class="editor-card" id="card-character">
                 <div class="card-header">
                     <div class="card-title-group">
-                        <h2 class="card-title">👤 1. Character &amp; Subject</h2>
-                        <span class="card-hint">(Identity, hair, eyes, facial traits, species)</span>
+                        <span class="section-index">01</span>
+                        <h2 class="card-title">Character &amp; Subject</h2>
+                        <span class="card-hint">Identity, hair, eyes, facial traits</span>
                     </div>
                     <div class="card-controls">
-                        <select id="preset-select-character" class="select-input" title="Swap only the Character while keeping Outfit & Scene"></select>
-                        <button class="btn btn-xs" data-save-section="character" title="Save current Character box as a reusable Character preset">+ Save</button>
-                        <button class="btn btn-xs btn-danger hidden" id="del-section-character" data-delete-section="character" title="Delete selected custom Character preset">🗑️</button>
-                        <button class="btn btn-xs btn-amber" data-upgrade-section="character" title="Upgrade weak words or expand character names in this box">✨ Upgrade Words</button>
-                        <button class="btn btn-xs" data-expand-box="box-character" title="Toggle tall expanded view">↕️ Expand</button>
+                        <select id="preset-select-character" class="select-input"></select>
+                        <button class="btn" data-save-section="character">Save</button>
+                        <button class="btn hidden" id="del-section-character" data-delete-section="character">Delete</button>
+                        <button class="btn" data-upgrade-section="character">Upgrade Words</button>
+                        <button class="btn" data-expand-box="box-character">Expand</button>
                     </div>
                 </div>
                 <textarea
                     id="box-character"
                     class="prompt-textarea"
-                    placeholder="Type character name (e.g. Rosalina, Zelda, Frieren, 2B) or traits (1girl, solo, silver hair, emerald eyes)..."
+                    placeholder="Character name (e.g. Rosalina, Zelda, Frieren, 2B) or subject traits (1girl, solo, silver hair, emerald eyes)..."
                 ></textarea>
                 <div class="chip-row" id="chips-character"></div>
             </div>
 
-            <!-- 2. Pose, Outfit & Accessories -->
+            <!-- 02. Pose & Outfit -->
             <div class="editor-card" id="card-outfit">
                 <div class="card-header">
                     <div class="card-title-group">
-                        <h2 class="card-title">👗 2. Pose, Outfit &amp; Action</h2>
-                        <span class="card-hint">(Stance, expression, clothing, fabrics, props)</span>
+                        <span class="section-index">02</span>
+                        <h2 class="card-title">Pose, Outfit &amp; Action</h2>
+                        <span class="card-hint">Stance, expression, clothing, props</span>
                     </div>
                     <div class="card-controls">
-                        <select id="preset-select-outfit" class="select-input" title="Swap only the Pose & Outfit while keeping Character & Scene"></select>
-                        <button class="btn btn-xs" data-save-section="outfit" title="Save current Pose/Outfit box as a reusable preset">+ Save</button>
-                        <button class="btn btn-xs btn-danger hidden" id="del-section-outfit" data-delete-section="outfit" title="Delete selected custom Outfit preset">🗑️</button>
-                        <button class="btn btn-xs btn-amber" data-upgrade-section="outfit" title="Upgrade weak pose/clothing words in this box">✨ Upgrade Words</button>
-                        <button class="btn btn-xs" data-expand-box="box-outfit" title="Toggle tall expanded view">↕️ Expand</button>
+                        <select id="preset-select-outfit" class="select-input"></select>
+                        <button class="btn" data-save-section="outfit">Save</button>
+                        <button class="btn hidden" id="del-section-outfit" data-delete-section="outfit">Delete</button>
+                        <button class="btn" data-upgrade-section="outfit">Upgrade Words</button>
+                        <button class="btn" data-expand-box="box-outfit">Expand</button>
                     </div>
                 </div>
                 <textarea
                     id="box-outfit"
                     class="prompt-textarea"
-                    placeholder="Pose, expression, clothing, accessories (e.g. graceful standing pose, ornate turquoise gown, holding star wand)..."
+                    placeholder="Pose, expression, garments, fabrics, accessories..."
                 ></textarea>
                 <div class="chip-row" id="chips-outfit"></div>
             </div>
 
-            <!-- 3. Scene & Environment -->
+            <!-- 03. Scene & Environment -->
             <div class="editor-card" id="card-scene">
                 <div class="card-header">
                     <div class="card-title-group">
-                        <h2 class="card-title">🏞️ 3. Scene &amp; Environment</h2>
-                        <span class="card-hint">(Setting, architecture, weather, time of day, background)</span>
+                        <span class="section-index">03</span>
+                        <h2 class="card-title">Scene &amp; Environment</h2>
+                        <span class="card-hint">Setting, architecture, weather, time of day</span>
                     </div>
                     <div class="card-controls">
-                        <select id="preset-select-scene" class="select-input" title="Swap only the Scene/Background"></select>
-                        <button class="btn btn-xs" data-save-section="scene" title="Save current Scene box as a reusable preset">+ Save</button>
-                        <button class="btn btn-xs btn-danger hidden" id="del-section-scene" data-delete-section="scene" title="Delete selected custom Scene preset">🗑️</button>
-                        <button class="btn btn-xs btn-amber" data-upgrade-section="scene" title="Upgrade weak environment words in this box">✨ Upgrade Words</button>
-                        <button class="btn btn-xs" data-expand-box="box-scene" title="Toggle tall expanded view">↕️ Expand</button>
+                        <select id="preset-select-scene" class="select-input"></select>
+                        <button class="btn" data-save-section="scene">Save</button>
+                        <button class="btn hidden" id="del-section-scene" data-delete-section="scene">Delete</button>
+                        <button class="btn" data-upgrade-section="scene">Upgrade Words</button>
+                        <button class="btn" data-expand-box="box-scene">Expand</button>
                     </div>
                 </div>
                 <textarea
                     id="box-scene"
                     class="prompt-textarea"
-                    placeholder="Background setting, lighting atmosphere, weather (e.g. cosmic starry observatory, Milky Way nebula, floating stardust)..."
+                    placeholder="Background setting, atmosphere, weather..."
                 ></textarea>
                 <div class="chip-row" id="chips-scene"></div>
             </div>
 
-            <!-- 4. Art Style, Camera & Lighting -->
+            <!-- 04. Art Style, Camera & Quality -->
             <div class="editor-card" id="card-style">
                 <div class="card-header">
                     <div class="card-title-group">
-                        <h2 class="card-title">🎨 4. Art Style, Camera &amp; Quality</h2>
-                        <span class="card-hint">(Medium, studio aesthetic, camera angle, lighting, quality tags)</span>
+                        <span class="section-index">04</span>
+                        <h2 class="card-title">Art Style, Camera &amp; Lighting</h2>
+                        <span class="card-hint">Medium, framing, lens, lighting, quality tags</span>
                     </div>
                     <div class="card-controls">
-                        <select id="preset-select-style" class="select-input" title="Swap only the Art Style & Camera setup"></select>
-                        <button class="btn btn-xs" data-save-section="style" title="Save current Art Style box as a reusable preset">+ Save</button>
-                        <button class="btn btn-xs btn-danger hidden" id="del-section-style" data-delete-section="style" title="Delete selected custom Style preset">🗑️</button>
-                        <button class="btn btn-xs btn-amber" data-upgrade-section="style" title="Upgrade weak style/camera/lighting words in this box">✨ Upgrade Words</button>
-                        <button class="btn btn-xs" data-expand-box="box-style" title="Toggle tall expanded view">↕️ Expand</button>
+                        <select id="preset-select-style" class="select-input"></select>
+                        <button class="btn" data-save-section="style">Save</button>
+                        <button class="btn hidden" id="del-section-style" data-delete-section="style">Delete</button>
+                        <button class="btn" data-upgrade-section="style">Upgrade Words</button>
+                        <button class="btn" data-expand-box="box-style">Expand</button>
                     </div>
                 </div>
                 <textarea
                     id="box-style"
                     class="prompt-textarea"
-                    placeholder="Art style, camera angle, lighting, quality tags (e.g. masterpiece, best quality, modern anime key visual, cinematic rim lighting)..."
+                    placeholder="Art style, camera angle, lighting, quality tags..."
                 ></textarea>
                 <div class="chip-row" id="chips-style"></div>
             </div>
 
-            <!-- 5. Negative Prompt -->
+            <!-- 05. Negative Prompt -->
             <div class="editor-card" id="card-negative">
                 <div class="card-header">
                     <div class="card-title-group">
-                        <h2 class="card-title">🚫 5. Negative Prompt / Exclusions</h2>
-                        <span class="card-hint">(Tags to exclude in Perchance negative prompt box)</span>
+                        <span class="section-index">05</span>
+                        <h2 class="card-title">Negative Prompt</h2>
+                        <span class="card-hint">Exclusions</span>
                     </div>
                     <div class="card-controls">
-                        <button class="btn btn-xs" id="btn-reset-negative" title="Restore standard high-signal negative prompt tags">↺ Default Negatives</button>
-                        <button class="btn btn-xs" data-expand-box="box-negative" title="Toggle tall expanded view">↕️ Expand</button>
+                        <button class="btn" id="btn-reset-negative">Reset Defaults</button>
+                        <button class="btn" data-expand-box="box-negative">Expand</button>
                     </div>
                 </div>
                 <textarea
                     id="box-negative"
                     class="prompt-textarea"
-                    style="min-height:66px;"
+                    style="min-height:60px;"
                     placeholder="lowres, worst quality, low quality, bad anatomy, bad hands, blurry, watermark..."
                 ></textarea>
                 <div class="chip-row" id="chips-negative"></div>
             </div>
         </section>
 
-        <!-- RIGHT COLUMN: Unified Copy-Paste Master Window & Word Upgrader -->
-        <aside class="column-stack" aria-label="Full Master Prompt and Word Upgrader">
-            <!-- Master Full Prompt Copy-Paste Window -->
-            <div class="editor-card master-card">
+        <!-- Right Column: Full Prompt Master Window & Word Upgrader -->
+        <aside class="column-stack" aria-label="Full Prompt and Word Upgrader">
+            <!-- Master Copy-Paste Window -->
+            <div class="editor-card">
                 <div class="card-header">
                     <div class="card-title-group">
-                        <h2 class="card-title">📋 Full Prompt Copy-Paste Window</h2>
-                        <span class="card-hint">Live-synced with modular boxes · Paste here &amp; split anytime</span>
+                        <h2 class="card-title">Full Prompt</h2>
+                        <span class="card-hint">Synced with modular sections</span>
                     </div>
                     <div class="card-controls">
-                        <select id="master-format-select" class="select-input" title="Choose how the Full Prompt window formats your output">
-                            <option value="standard">Format: Standard Prompt</option>
-                            <option value="with-negative">Format: Prompt + Negative</option>
-                            <option value="perchance-list">Format: Perchance List Code</option>
+                        <select id="master-format-select" class="select-input">
+                            <option value="standard">Standard Prompt</option>
+                            <option value="with-negative">Prompt + Negative</option>
+                            <option value="perchance-list">Perchance List</option>
                         </select>
-                        <button class="btn btn-xs" data-expand-box="box-master" title="Toggle tall expanded view">↕️ Expand</button>
+                        <button class="btn" data-expand-box="box-master">Expand</button>
                     </div>
                 </div>
 
                 <textarea
                     id="box-master"
                     class="prompt-textarea master-textarea"
-                    placeholder="Your complete assembled prompt appears here automatically. You can also paste any full prompt here and click '↙️ Split into Modular Boxes' below!"
+                    placeholder="Assembled full prompt. Paste any prompt here and click 'Split to Sections' to populate the modular editors."
                 ></textarea>
 
-                <!-- Primary Copy & Action Bar -->
-                <div class="card-controls" style="margin-top:0.7rem; gap:0.45rem;">
-                    <button id="btn-copy-master" class="btn btn-primary" title="Copy the full prompt to clipboard">
-                        📋 Copy Full Prompt
-                    </button>
-                    <button id="btn-copy-negative" class="btn" title="Copy only the Negative Prompt to clipboard">
-                        📋 Copy Negative
-                    </button>
-                    <button id="btn-upgrade-all" class="btn btn-amber" title="Deterministically replace weak words across all sections with model-recognized tags">
-                        ✨ Upgrade All Weak Words
-                    </button>
-                    <button id="btn-upgrade-perchance" class="btn btn-purple" title="Upgrade weak words into Perchance {option1|option2} dynamic choices">
-                        🎲 Upgrade to {a|b} Choices
-                    </button>
-                    <button id="btn-wrap-choice" class="btn" title="Wrap highlighted text in the Full Prompt box into {opt1|opt2} Perchance syntax">
-                        {a|b} Wrap Selection
-                    </button>
-                    <button id="btn-roll-preview" class="btn btn-emerald" title="Test-roll any {a|b|c} Perchance syntax in your prompt to preview a sample output">
-                        🎲 Test Roll {Syntax}
-                    </button>
-                    <button id="btn-split-to-boxes" class="btn" title="Parse the text inside this Full Prompt box into Character, Pose/Outfit, Scene, Style, and Negative boxes">
-                        ↙️ Split into Modular Boxes
-                    </button>
+                <div class="master-toolbar">
+                    <button id="btn-copy-master" class="btn btn-primary">Copy Prompt</button>
+                    <button id="btn-copy-negative" class="btn">Copy Negative</button>
+                    <button id="btn-upgrade-all" class="btn">Upgrade Weak Words</button>
+                    <button id="btn-upgrade-perchance" class="btn">Upgrade to {a|b}</button>
+                    <button id="btn-wrap-choice" class="btn">Wrap Selection {a|b}</button>
+                    <button id="btn-roll-preview" class="btn">Test Roll</button>
+                    <button id="btn-split-to-boxes" class="btn">Split to Sections</button>
                 </div>
 
-                <!-- Perchance {a|b} Test-Roll Preview Output -->
                 <div id="roll-preview-container" class="roll-preview-box hidden">
-                    <div class="card-header" style="margin-bottom:0.2rem;">
-                        <span class="card-title" style="font-size:0.8rem; color:#d8b4fe;">🎲 Sample Perchance Roll Preview</span>
+                    <div class="card-header" style="margin-bottom:4px;">
+                        <span class="card-title" style="font-size:12px;">Sample Roll Output</span>
                         <div class="card-controls">
-                            <button id="btn-reroll" class="btn btn-xs btn-purple">🎲 Re-Roll</button>
-                            <button id="btn-copy-roll" class="btn btn-xs">📋 Copy Roll</button>
-                            <button id="btn-close-roll" class="btn btn-xs">✕</button>
+                            <button id="btn-reroll" class="btn btn-sm">Re-Roll</button>
+                            <button id="btn-copy-roll" class="btn btn-sm">Copy</button>
+                            <button id="btn-close-roll" class="btn btn-sm">Close</button>
                         </div>
                     </div>
                     <p id="roll-preview-output" class="roll-preview-text"></p>
                 </div>
             </div>
 
-            <!-- Live Word & Character Upgrader Panel -->
+            <!-- Detected Word & Character Upgrades -->
             <div class="editor-card">
                 <div class="card-header">
                     <div class="card-title-group">
-                        <h2 class="card-title">🪄 Detected Word &amp; Character Upgrades</h2>
-                        <span id="upgrade-count-badge" class="brand-badge">0 found</span>
+                        <h2 class="card-title">Suggested Word Upgrades</h2>
+                        <span id="upgrade-count-badge" class="status-count">0</span>
                     </div>
-                    <span class="card-hint">Click any suggestion to swap weak words for stronger model tags</span>
+                    <span class="card-hint">Click to replace weak terms with model tags</span>
                 </div>
                 <div id="upgrade-suggestions-list" class="upgrade-list"></div>
             </div>
 
-            <!-- Deterministic Word & Character Dictionary Browser -->
+            <!-- Deterministic Tag & Character Lookup -->
             <div class="editor-card">
                 <div class="card-header">
                     <div class="card-title-group">
-                        <h2 class="card-title">📖 Model Tag &amp; Synonym Lookup</h2>
-                        <span class="card-hint">Search weak words or characters to insert stronger tags</span>
+                        <h2 class="card-title">Tag &amp; Synonym Reference</h2>
                     </div>
                     <input
                         type="search"
                         id="dict-search-input"
                         class="select-input"
                         style="min-width:210px;"
-                        placeholder="Search e.g. Rosalina, shiny, camera, sad..."
+                        placeholder="Filter terms or characters..."
                     />
                 </div>
                 <div id="dict-browser-grid" class="dict-grid"></div>
@@ -264,10 +230,8 @@
         </aside>
     </main>
 
-    <!-- Toast Notification -->
     <div id="toast-banner" class="toast-banner" role="status" aria-live="polite"></div>
 
-    <!-- Scripts -->
     <script src="js/promptEngine.js"></script>
     <script src="js/presetManager.js"></script>
     <script src="js/app.js"></script>

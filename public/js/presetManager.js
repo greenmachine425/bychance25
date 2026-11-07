@@ -1,7 +1,7 @@
 /**
  * Bychance Preset Manager
  * Manages Full Setup Presets and Per-Section Modular Presets (Character, Outfit/Pose, Scene, Art Style)
- * with full localStorage persistence, custom saving, deleting, and JSON import/export.
+ * with localStorage persistence, custom saving, deleting, and JSON import/export.
  */
 
 const PresetManager = (() => {
@@ -11,11 +11,11 @@ const PresetManager = (() => {
 
     const DEFAULT_NEGATIVE = "lowres, worst quality, low quality, bad anatomy, bad hands, extra digits, fewer digits, blurry, watermark, signature, text, jpeg artifacts, deformed, mutated hands";
 
-    // Built-in Full Setup Presets (populates all modular editors accurately)
+    // Built-in Full Setup Presets
     const BUILTIN_FULL_PRESETS = [
         {
             id: "full_rosalina",
-            name: "⭐ Rosalina — Cosmic Observatory",
+            name: "Rosalina — Cosmic Observatory",
             builtin: true,
             sections: {
                 character: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, serene regal expression, fair skin",
@@ -27,7 +27,7 @@ const PresetManager = (() => {
         },
         {
             id: "full_zelda",
-            name: "🗡️ Princess Zelda — Sacred Ruins",
+            name: "Princess Zelda — Sacred Ruins",
             builtin: true,
             sections: {
                 character: "Princess Zelda (Legend of Zelda), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes, noble contemplative expression",
@@ -39,7 +39,7 @@ const PresetManager = (() => {
         },
         {
             id: "full_frieren",
-            name: "🌿 Frieren — Twilight Flower Field",
+            name: "Frieren — Twilight Flower Field",
             builtin: true,
             sections: {
                 character: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in long twin tails, long pointed elf ears, calm emerald green eyes, gentle nostalgic smile",
@@ -51,7 +51,7 @@ const PresetManager = (() => {
         },
         {
             id: "full_2b",
-            name: "⚔️ 2B — Post-Apocalyptic Cathedral",
+            name: "2B — Post-Apocalyptic Cathedral",
             builtin: true,
             sections: {
                 character: "2B (NieR:Automata), YoRHa No.2 Type B, 1girl, solo, short silver-white bob hair, bangs, black combat visor blindfold over eyes, beauty mark under lip, stoic expression",
@@ -63,7 +63,7 @@ const PresetManager = (() => {
         },
         {
             id: "full_samus",
-            name: "🚀 Samus Aran — Starship Bridge",
+            name: "Samus Aran — Starship Bridge",
             builtin: true,
             sections: {
                 character: "Samus Aran (Metroid), 1girl, solo, tall athletic figure, long golden blonde hair in high ponytail, piercing ice-blue eyes, beauty mark under left eye, confident gaze",
@@ -75,7 +75,7 @@ const PresetManager = (() => {
         },
         {
             id: "full_miku",
-            name: "🎵 Hatsune Miku — Holographic Concert",
+            name: "Hatsune Miku — Holographic Concert",
             builtin: true,
             sections: {
                 character: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails, bright turquoise eyes, joyful beaming smile, sparkling eye catchlights",
@@ -87,7 +87,7 @@ const PresetManager = (() => {
         },
         {
             id: "full_perchance_mix",
-            name: "🎲 Dynamic Fantasy Explorer (Perchance {a|b})",
+            name: "Dynamic Fantasy Explorer ({a|b} Syntax)",
             builtin: true,
             sections: {
                 character: "1girl, solo, {silver-white|platinum blonde|midnight black|crimson} hair, {windswept hair|long braided hair|twin tails}, {emerald green|sapphire blue|amber gold} eyes, detailed iris catchlights",
@@ -99,153 +99,153 @@ const PresetManager = (() => {
         }
     ];
 
-    // Built-in Modular Section Presets (mix & match Character, Outfit/Pose, Scene, or Style independently)
+    // Built-in Modular Section Presets
     const BUILTIN_SECTION_PRESETS = {
         character: [
             {
                 id: "char_rosalina",
-                name: "⭐ Rosalina (Super Mario)",
+                name: "Rosalina (Super Mario)",
                 value: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, serene regal expression, fair skin"
             },
             {
                 id: "char_peach",
-                name: "👑 Princess Peach (Super Mario)",
+                name: "Princess Peach (Super Mario)",
                 value: "Princess Peach (Super Mario), 1girl, solo, long wavy golden blonde hair, sapphire blue eyes, sweet royal smile, rosy cheeks"
             },
             {
                 id: "char_zelda",
-                name: "🗡️ Princess Zelda (Legend of Zelda)",
+                name: "Princess Zelda (Legend of Zelda)",
                 value: "Princess Zelda (Legend of Zelda), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes, noble expression"
             },
             {
                 id: "char_frieren",
-                name: "🌿 Frieren (Sousou no Frieren)",
+                name: "Frieren (Sousou no Frieren)",
                 value: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in long twin tails, long pointed elf ears, calm green eyes, gentle nostalgic expression"
             },
             {
                 id: "char_2b",
-                name: "⚔️ 2B (NieR:Automata)",
+                name: "2B (NieR:Automata)",
                 value: "2B (NieR:Automata), YoRHa No.2 Type B, 1girl, solo, short silver-white bob hair, bangs, black combat visor blindfold, beauty mark under lip"
             },
             {
                 id: "char_samus",
-                name: "🚀 Samus Aran (Metroid)",
+                name: "Samus Aran (Metroid)",
                 value: "Samus Aran (Metroid), 1girl, solo, tall athletic figure, long golden blonde hair in high ponytail, piercing ice-blue eyes, beauty mark under left eye"
             },
             {
                 id: "char_miku",
-                name: "🎵 Hatsune Miku (Vocaloid)",
+                name: "Hatsune Miku (Vocaloid)",
                 value: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails, bright turquoise eyes, cheerful energetic smile"
             },
             {
                 id: "char_tifa",
-                name: "🥊 Tifa Lockhart (FFVII)",
+                name: "Tifa Lockhart (FFVII)",
                 value: "Tifa Lockhart (Final Fantasy VII), 1girl, solo, long dark brown hair with dolphin-tail tips, warm wine-red eyes, athletic toned physique, confident smile"
             },
             {
                 id: "char_custom_elf",
-                name: "🧝‍♀️ Ethereal High Elf Archetype",
+                name: "Ethereal High Elf Archetype",
                 value: "1girl, solo, ethereal high elf, waist-length iridescent silver hair, long pointed elf ears, luminous violet eyes, delicate eyelashes, serene expression"
             }
         ],
         outfit: [
             {
                 id: "out_rosalina_gown",
-                name: "⭐ Rosalina's Turquoise Gown & Luma",
+                name: "Rosalina's Turquoise Gown & Luma",
                 value: "graceful floating posture, holding golden star wand, silver tiara crown, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, floating yellow Luma companion"
             },
             {
                 id: "out_cozy_cafe",
-                name: "☕ Cozy Autumn Sweater & Coffee",
+                name: "Cozy Autumn Sweater & Coffee",
                 value: "seated at wooden table, holding warm ceramic coffee mug with both hands, gentle smile, oversized cream cable-knit sweater, plaid pleated skirt, warm scarf"
             },
             {
                 id: "out_cyber_techwear",
-                name: "⚡ Cyberpunk Neon Techwear & Katana",
+                name: "Cyberpunk Neon Techwear & Katana",
                 value: "confident standing pose, looking back over shoulder, sleek matte-black futuristic techwear jacket, glowing cyan neon collar trim, tactical utility straps, fingerless gloves, holographic katana"
             },
             {
                 id: "out_royal_ballgown",
-                name: "👑 Opulent Royal Ballgown",
+                name: "Opulent Royal Ballgown",
                 value: "poised curtsy stance, looking at viewer, ornate midnight-blue silk ballgown, gold filigree embroidery, layered chiffon skirt, diamond tiara, long white opera gloves"
             },
             {
                 id: "out_valkyrie_armor",
-                name: "🛡️ Engraved Silver Valkyrie Armor",
+                name: "Engraved Silver Valkyrie Armor",
                 value: "heroic wind-swept combat stance, holding winged spear, engraved silver filigree plate armor, white feathered cape, gilded pauldrons, battle-ready expression"
             },
             {
                 id: "out_summer_sundress",
-                name: "🌻 Sunlit Summer Sundress & Straw Hat",
+                name: "Sunlit Summer Sundress & Straw Hat",
                 value: "walking along shoreline, holding wide-brimmed straw sunhat against breeze, joyful laugh, flowing white linen sundress with ribbon, barefoot"
             },
             {
                 id: "out_action_spellcaster",
-                name: "✨ Dynamic Arcane Spellcasting Pose",
+                name: "Dynamic Arcane Spellcasting Pose",
                 value: "dynamic airborne action pose, foreshortened hand reaching out, casting glowing arcane magic circle, billowing mage cloak, intense focused gaze"
             }
         ],
         scene: [
             {
                 id: "scn_observatory",
-                name: "🌌 Cosmic Starry Observatory",
+                name: "Cosmic Starry Observatory",
                 value: "Comet Observatory dome terrace, deep cosmic starry night sky, vivid Milky Way nebula, floating stardust particles, luminous crescent moon"
             },
             {
                 id: "scn_neon_rain",
-                name: "🌧️ Rainy Cyberpunk Neon Alley",
+                name: "Rainy Cyberpunk Neon Alley",
                 value: "neon-drenched cyberpunk street at night, wet asphalt mirror reflections, glowing holographic kanji signage, falling rain droplets, steam rising from vents"
             },
             {
                 id: "scn_enchanted_forest",
-                name: "🌲 Sunlit Enchanted Forest Glade",
+                name: "Sunlit Enchanted Forest Glade",
                 value: "ancient mossy forest glade, golden sunbeams filtering through dense canopy, glowing bioluminescent mushrooms, crystal clear stream, floating pollen motes"
             },
             {
                 id: "scn_cozy_cafe",
-                name: "☕ Warm Rainy-Window Cafe Interior",
+                name: "Warm Rainy-Window Cafe Interior",
                 value: "cozy vintage wooden cafe interior, warm amber Edison bulb lighting, raindrops streaking down glass windowpane, blurred city bokeh outside, bookshelves"
             },
             {
                 id: "scn_gothic_palace",
-                name: "🏰 Grand Stained-Glass Cathedral",
+                name: "Grand Stained-Glass Cathedral",
                 value: "grand Gothic cathedral hall, soaring vaulted marble arches, towering stained glass rose windows casting colorful light beams, candelabras"
             },
             {
                 id: "scn_sunset_beach",
-                name: "🌅 Golden Hour Ocean Horizon",
+                name: "Golden Hour Ocean Horizon",
                 value: "scenic tropical ocean shoreline at golden hour sunset, turquoise translucent waves, wet sand reflections, dramatic glowing cumulonimbus clouds"
             }
         ],
         style: [
             {
                 id: "sty_modern_anime",
-                name: "🎨 Modern Anime Key Visual (Shinkai / KyoAni)",
+                name: "Modern Anime Key Visual (Shinkai / KyoAni)",
                 value: "masterpiece, best quality, ultra-detailed modern anime key visual, Makoto Shinkai and Kyoto Animation aesthetic, vibrant cel shading, crisp lineart, cinematic rim lighting, luminous bloom, shallow depth of field"
             },
             {
                 id: "sty_90s_cel",
-                name: "📼 90s Retro Cel Anime Aesthetic",
+                name: "90s Retro Cel Anime Aesthetic",
                 value: "masterpiece, best quality, 1990s retro anime production cel aesthetic, hand-painted gouache background, subtle VHS film grain, classic high-contrast cel shading, nostalgic color palette"
             },
             {
                 id: "sty_ufotable_action",
-                name: "⚡ Ufotable Dynamic Lighting & VFX",
+                name: "Ufotable Dynamic Lighting & VFX",
                 value: "masterpiece, best quality, ufotable style digital anime illustration, dramatic high-contrast lighting, glowing particle effects, dynamic camera angle, crisp metallic highlights, absurdres"
             },
             {
                 id: "sty_painterly_fantasy",
-                name: "🖌️ Painterly Fantasy Concept Art",
+                name: "Painterly Fantasy Concept Art",
                 value: "masterpiece, best quality, digital fantasy concept art illustration, expressive painterly brushwork, rich atmospheric color grading, volumetric god rays, chiaroscuro lighting, intricate textures"
             },
             {
                 id: "sty_watercolor",
-                name: "🌸 Soft Storybook Watercolor",
+                name: "Soft Storybook Watercolor",
                 value: "masterpiece, best quality, delicate watercolor and ink illustration, textured cold-press paper grain, soft pastel washes, gentle diffused daylight, whimsical aesthetic"
             },
             {
                 id: "sty_photoreal",
-                name: "📷 Cinematic 85mm Photorealistic Portrait",
+                name: "Cinematic 85mm Photorealistic Portrait",
                 value: "RAW photo, masterpiece, best quality, photorealistic portrait, 85mm f/1.4 prime lens, creamy bokeh background, natural skin texture, subsurface scattering, Kodak Portra 400 film grading, cinematic key lighting"
             }
         ]
@@ -308,7 +308,7 @@ const PresetManager = (() => {
         const list = getCustomFullPresets();
         const newPreset = {
             id: "custom_full_" + Date.now(),
-            name: `💾 ${name.trim()}`,
+            name: `${name.trim()} (Custom)`,
             builtin: false,
             sections: { ...sections }
         };
@@ -327,7 +327,7 @@ const PresetManager = (() => {
         if (!map[sectionKey]) map[sectionKey] = [];
         const newEntry = {
             id: `custom_${sectionKey}_${Date.now()}`,
-            name: `💾 ${name.trim()}`,
+            name: `${name.trim()} (Custom)`,
             value: value.trim(),
             custom: true
         };

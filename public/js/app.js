@@ -45,14 +45,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (toastTimer) clearTimeout(toastTimer);
         toastTimer = setTimeout(() => {
             banner.classList.remove("visible");
-        }, 2600);
+        }, 2400);
     }
 
-    // Auto-adjust textarea height so content never clips
     function autoFitTextarea(el) {
         if (!el) return;
         el.style.height = "auto";
-        const minH = el.classList.contains("master-textarea") ? 165 : 86;
+        const minH = el.classList.contains("master-textarea") ? 150 : 76;
         el.style.height = Math.max(minH, Math.min(el.scrollHeight + 4, 420)) + "px";
     }
 
@@ -61,7 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
         autoFitTextarea(masterBox);
     }
 
-    // Read current modular sections state
     function getCurrentSections() {
         return {
             character: boxes.character.value,
@@ -72,7 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
-    // Write state into modular boxes and sync master window
     function setSections(sections, syncMaster = true) {
         SECTION_KEYS.forEach((k) => {
             if (typeof sections[k] === "string") {
@@ -88,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Sync Modular Boxes -> Full Master Prompt Window
     function syncModularToMaster() {
         const current = getCurrentSections();
         const format = masterFormatSelect.value || "standard";
@@ -98,7 +94,6 @@ document.addEventListener("DOMContentLoaded", () => {
         autoFitAllTextareas();
     }
 
-    // Populate Full Setup Presets Dropdown
     function renderFullPresetDropdown(selectedId) {
         const all = PresetManager.getAllFullPresets();
         fullPresetSelect.innerHTML = "";
@@ -124,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Populate Per-Section Modular Presets Dropdowns
     function renderSectionPresetDropdowns() {
         ["character", "outfit", "scene", "style"].forEach((sectionKey) => {
             const selectEl = sectionSelects[sectionKey];
@@ -135,10 +129,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const placeholder = document.createElement("option");
             placeholder.value = "";
             const labelMap = {
-                character: "Swap Character Preset...",
-                outfit: "Swap Pose / Outfit Preset...",
-                scene: "Swap Scene Preset...",
-                style: "Swap Art Style Preset..."
+                character: "Select Character Preset...",
+                outfit: "Select Pose / Outfit Preset...",
+                scene: "Select Scene Preset...",
+                style: "Select Style Preset..."
             };
             placeholder.textContent = labelMap[sectionKey];
             selectEl.appendChild(placeholder);
@@ -167,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Render Quick-Add Tag Chips under each modular box
     function renderQuickTagChips() {
         SECTION_KEYS.forEach((sectionKey) => {
             const container = document.getElementById(`chips-${sectionKey}`);
@@ -198,10 +191,9 @@ document.addEventListener("DOMContentLoaded", () => {
             box.value = PromptEngine.cleanCommaFormatting(`${current}, ${tokenStr}`);
         }
         syncModularToMaster();
-        showToast(`Added to ${sectionKey}: ${tokenStr.slice(0, 36)}...`);
+        showToast(`Added to ${sectionKey}`);
     }
 
-    // Scan all boxes for weak words or unexpanded character names and render interactive suggestions
     function refreshUpgradeSuggestions() {
         const combinedText = [
             boxes.character.value,
@@ -212,14 +204,14 @@ document.addEventListener("DOMContentLoaded", () => {
         ].join(", ");
 
         const suggestions = PromptEngine.scanForUpgrades(combinedText);
-        upgradeCountBadge.textContent = `${suggestions.length} upgrade${suggestions.length === 1 ? "" : "s"} available`;
+        upgradeCountBadge.textContent = `${suggestions.length}`;
         upgradeSuggestionsList.innerHTML = "";
 
         if (suggestions.length === 0) {
             const empty = document.createElement("div");
             empty.className = "card-hint";
-            empty.style.padding = "0.5rem 0";
-            empty.textContent = "No weak words detected! Try typing words like 'Rosalina', 'shiny', 'standing', 'sad', 'nice lighting', 'camera below', or 'good quality' to see instant deterministic upgrades.";
+            empty.style.padding = "4px 0";
+            empty.textContent = "No weak words detected. Type terms like 'Rosalina', 'shiny', 'standing', 'sad', 'nice lighting', 'camera below', or 'good quality' to see deterministic tag replacements.";
             upgradeSuggestionsList.appendChild(empty);
             return;
         }
@@ -233,7 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const wordBadge = document.createElement("span");
             wordBadge.className = "upgrade-word-badge";
-            wordBadge.textContent = item.type === "character" ? `🌟 ${item.label}` : `Weak term: ${item.label}`;
+            wordBadge.textContent = item.type === "character" ? item.label : `Term: ${item.label}`;
 
             const catBadge = document.createElement("span");
             catBadge.className = "upgrade-cat-badge";
@@ -244,15 +236,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const preview = document.createElement("div");
             preview.className = "upgrade-target-preview";
-            preview.textContent = `→ ${item.primary}`;
+            preview.textContent = item.primary;
 
             const actions = document.createElement("div");
             actions.className = "upgrade-actions";
 
             if (item.type === "character" && item.characterProfile) {
                 const fillAllBtn = document.createElement("button");
-                fillAllBtn.className = "btn btn-xs btn-primary";
-                fillAllBtn.textContent = "✨ Populate Character + Outfit + Scene Boxes";
+                fillAllBtn.className = "btn btn-sm btn-primary";
+                fillAllBtn.textContent = "Populate All Sections";
                 fillAllBtn.addEventListener("click", () => {
                     const prof = item.characterProfile;
                     boxes.character.value = prof.character;
@@ -260,12 +252,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (!boxes.scene.value.trim()) boxes.scene.value = prof.scene;
                     if (!boxes.style.value.trim()) boxes.style.value = prof.style;
                     syncModularToMaster();
-                    showToast(`Loaded full visual identifiers for ${prof.name}!`);
+                    showToast(`Loaded visual traits for ${prof.name}`);
                 });
 
                 const charOnlyBtn = document.createElement("button");
-                charOnlyBtn.className = "btn btn-xs btn-emerald";
-                charOnlyBtn.textContent = "👤 Expand Character Box Only";
+                charOnlyBtn.className = "btn btn-sm";
+                charOnlyBtn.textContent = "Expand Character Only";
                 charOnlyBtn.addEventListener("click", () => {
                     const prof = item.characterProfile;
                     const reg = new RegExp(`\\b${item.matchedWord}\\b`, "gi");
@@ -277,27 +269,26 @@ document.addEventListener("DOMContentLoaded", () => {
                         boxes.character.value = prof.character;
                     }
                     syncModularToMaster();
-                    showToast(`Expanded ${prof.name} character traits!`);
+                    showToast(`Expanded character traits for ${prof.name}`);
                 });
 
                 actions.appendChild(fillAllBtn);
                 actions.appendChild(charOnlyBtn);
             } else {
-                // Weak word replacement buttons
                 const applyPrimaryBtn = document.createElement("button");
-                applyPrimaryBtn.className = "btn btn-xs btn-amber";
-                applyPrimaryBtn.textContent = "✨ Replace with Model Tags";
+                applyPrimaryBtn.className = "btn btn-sm btn-primary";
+                applyPrimaryBtn.textContent = "Replace with Tags";
                 applyPrimaryBtn.addEventListener("click", () => {
                     replaceRegexAcrossBoxes(item.regex, item.primary);
-                    showToast(`Upgraded ${item.label} → ${item.primary.slice(0, 34)}...`);
+                    showToast(`Upgraded ${item.label}`);
                 });
 
                 const applyPerchanceBtn = document.createElement("button");
-                applyPerchanceBtn.className = "btn btn-xs btn-purple";
-                applyPerchanceBtn.textContent = "🎲 Replace with {a|b} Choice";
+                applyPerchanceBtn.className = "btn btn-sm";
+                applyPerchanceBtn.textContent = "Replace as {a|b}";
                 applyPerchanceBtn.addEventListener("click", () => {
                     replaceRegexAcrossBoxes(item.regex, item.perchance);
-                    showToast(`Upgraded ${item.label} to Perchance {a|b} choices!`);
+                    showToast(`Upgraded ${item.label} to {a|b}`);
                 });
 
                 actions.appendChild(applyPrimaryBtn);
@@ -305,12 +296,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 (item.alternatives || []).forEach((alt, idx) => {
                     const altBtn = document.createElement("button");
-                    altBtn.className = "btn btn-xs";
-                    altBtn.textContent = `Alt ${idx + 1}: ${alt.slice(0, 28)}...`;
+                    altBtn.className = "btn btn-sm";
+                    altBtn.textContent = `Option ${idx + 2}`;
                     altBtn.title = alt;
                     altBtn.addEventListener("click", () => {
                         replaceRegexAcrossBoxes(item.regex, alt);
-                        showToast(`Replaced ${item.label} with Alt ${idx + 1}`);
+                        showToast(`Replaced ${item.label}`);
                     });
                     actions.appendChild(altBtn);
                 });
@@ -344,7 +335,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Render Searchable Dictionary Browser
     function renderDictionaryBrowser(query = "") {
         const q = query.trim().toLowerCase();
         dictBrowserGrid.innerHTML = "";
@@ -370,8 +360,8 @@ document.addEventListener("DOMContentLoaded", () => {
             row.className = "dict-row";
             row.innerHTML = `
                 <div class="upgrade-item-header">
-                    <span class="upgrade-word-badge" style="color:#34d399;">👤 ${prof.name}</span>
-                    <span class="upgrade-cat-badge">Character ID</span>
+                    <span class="upgrade-word-badge">${prof.name}</span>
+                    <span class="upgrade-cat-badge">Character Profile</span>
                 </div>
                 <div class="upgrade-target-preview">${prof.character}</div>
             `;
@@ -379,8 +369,8 @@ document.addEventListener("DOMContentLoaded", () => {
             btnRow.className = "upgrade-actions";
 
             const loadCharBtn = document.createElement("button");
-            loadCharBtn.className = "btn btn-xs btn-emerald";
-            loadCharBtn.textContent = "+ Set Character Box";
+            loadCharBtn.className = "btn btn-sm";
+            loadCharBtn.textContent = "Set Character";
             loadCharBtn.addEventListener("click", () => {
                 boxes.character.value = prof.character;
                 syncModularToMaster();
@@ -388,15 +378,15 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             const loadFullCharBtn = document.createElement("button");
-            loadFullCharBtn.className = "btn btn-xs btn-primary";
-            loadFullCharBtn.textContent = "+ Load Character + Outfit + Scene";
+            loadFullCharBtn.className = "btn btn-sm btn-primary";
+            loadFullCharBtn.textContent = "Load Full Profile";
             loadFullCharBtn.addEventListener("click", () => {
                 boxes.character.value = prof.character;
                 boxes.outfit.value = prof.outfit;
                 boxes.scene.value = prof.scene;
                 boxes.style.value = prof.style;
                 syncModularToMaster();
-                showToast(`Loaded full setup for ${prof.name}`);
+                showToast(`Loaded full profile for ${prof.name}`);
             });
 
             btnRow.appendChild(loadCharBtn);
@@ -421,7 +411,7 @@ document.addEventListener("DOMContentLoaded", () => {
             row.innerHTML = `
                 <div class="upgrade-item-header">
                     <span class="upgrade-word-badge">"${rule.label}"</span>
-                    <span class="upgrade-cat-badge">${rule.category} → ${targetSection}</span>
+                    <span class="upgrade-cat-badge">${rule.category} &rarr; ${targetSection}</span>
                 </div>
                 <div class="upgrade-target-preview">${rule.primary}</div>
             `;
@@ -429,15 +419,15 @@ document.addEventListener("DOMContentLoaded", () => {
             btnRow.className = "upgrade-actions";
 
             const addTagBtn = document.createElement("button");
-            addTagBtn.className = "btn btn-xs btn-amber";
-            addTagBtn.textContent = `+ Add to ${targetSection}`;
+            addTagBtn.className = "btn btn-sm";
+            addTagBtn.textContent = `Add to ${targetSection}`;
             addTagBtn.addEventListener("click", () => {
                 appendTokenToBox(targetSection, rule.primary);
             });
 
             const addChoiceBtn = document.createElement("button");
-            addChoiceBtn.className = "btn btn-xs btn-purple";
-            addChoiceBtn.textContent = `+ Add {a|b} to ${targetSection}`;
+            addChoiceBtn.className = "btn btn-sm";
+            addChoiceBtn.textContent = `Add {a|b} to ${targetSection}`;
             addChoiceBtn.addEventListener("click", () => {
                 appendTokenToBox(targetSection, rule.perchance);
             });
@@ -449,15 +439,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Copy helper with clipboard fallback
     async function copyTextToClipboard(text, label) {
         if (!text || !text.trim()) {
-            showToast(`Nothing to copy in ${label}!`);
+            showToast(`Nothing to copy in ${label}`);
             return;
         }
         try {
             await navigator.clipboard.writeText(text);
-            showToast(`✅ Copied ${label} to clipboard!`);
+            showToast(`Copied ${label}`);
         } catch (err) {
             const temp = document.createElement("textarea");
             temp.value = text;
@@ -465,12 +454,10 @@ document.addEventListener("DOMContentLoaded", () => {
             temp.select();
             document.execCommand("copy");
             document.body.removeChild(temp);
-            showToast(`✅ Copied ${label} to clipboard!`);
+            showToast(`Copied ${label}`);
         }
     }
 
-    // Wire Event Listeners
-    // 1. Modular Box Input -> Live Sync to Master
     SECTION_KEYS.forEach((key) => {
         boxes[key].addEventListener("input", () => {
             autoFitTextarea(boxes[key]);
@@ -478,7 +465,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 2. Master Box Input -> Refresh Upgrade Suggestions & AutoFit
     masterBox.addEventListener("input", () => {
         autoFitTextarea(masterBox);
         refreshUpgradeSuggestions();
@@ -488,14 +474,13 @@ document.addEventListener("DOMContentLoaded", () => {
         syncModularToMaster();
     });
 
-    // 3. Full Setup Preset Load / Save / Delete
     fullPresetSelect.addEventListener("change", () => {
         updateDeleteFullPresetVisibility();
         const all = PresetManager.getAllFullPresets();
         const chosen = all.find((p) => p.id === fullPresetSelect.value);
         if (chosen) {
             setSections(chosen.sections, true);
-            showToast(`Loaded preset: ${chosen.name}`);
+            showToast(`Loaded ${chosen.name}`);
         }
     });
 
@@ -504,16 +489,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const chosen = all.find((p) => p.id === fullPresetSelect.value);
         if (chosen) {
             setSections(chosen.sections, true);
-            showToast(`Loaded preset: ${chosen.name}`);
+            showToast(`Loaded ${chosen.name}`);
         }
     });
 
     document.getElementById("btn-save-full-preset").addEventListener("click", () => {
-        const name = window.prompt("Enter a name for this Full Preset (saves Character + Outfit + Scene + Style + Negative):");
+        const name = window.prompt("Preset name (saves Character, Pose/Outfit, Scene, Style, and Negative):");
         if (!name || !name.trim()) return;
         const created = PresetManager.addCustomFullPreset(name, getCurrentSections());
         renderFullPresetDropdown(created.id);
-        showToast(`💾 Saved custom preset: ${created.name}`);
+        showToast(`Saved preset: ${created.name}`);
     });
 
     deleteFullPresetBtn.addEventListener("click", () => {
@@ -524,11 +509,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (window.confirm(`Delete custom preset "${chosen.name}"?`)) {
             PresetManager.deleteCustomFullPreset(id);
             renderFullPresetDropdown();
-            showToast("Deleted custom preset.");
+            showToast("Deleted custom preset");
         }
     });
 
-    // 4. Per-Section Preset Swap / Save / Delete
     ["character", "outfit", "scene", "style"].forEach((sectionKey) => {
         const selectEl = sectionSelects[sectionKey];
         selectEl.addEventListener("change", () => {
@@ -538,7 +522,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (chosen) {
                 boxes[sectionKey].value = chosen.value;
                 syncModularToMaster();
-                showToast(`Swapped ${sectionKey}: ${chosen.name}`);
+                showToast(`Updated ${sectionKey}: ${chosen.name}`);
             }
         });
     });
@@ -548,16 +532,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const sectionKey = btn.getAttribute("data-save-section");
             const val = boxes[sectionKey].value.trim();
             if (!val) {
-                showToast(`Write something in the ${sectionKey} box first!`);
+                showToast(`Enter text in ${sectionKey} first`);
                 return;
             }
-            const name = window.prompt(`Save current ${sectionKey.toUpperCase()} box as a reusable preset named:`);
+            const name = window.prompt(`Save current ${sectionKey} preset as:`);
             if (!name || !name.trim()) return;
             const created = PresetManager.addCustomSectionPreset(sectionKey, name, val);
             renderSectionPresetDropdowns();
             sectionSelects[sectionKey].value = created.id;
             updateSectionDeleteBtn(sectionKey);
-            showToast(`💾 Saved ${sectionKey} preset: ${created.name}`);
+            showToast(`Saved ${sectionKey} preset: ${created.name}`);
         });
     });
 
@@ -569,11 +553,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!id) return;
             PresetManager.deleteCustomSectionPreset(sectionKey, id);
             renderSectionPresetDropdowns();
-            showToast(`Deleted custom ${sectionKey} preset.`);
+            showToast(`Deleted custom ${sectionKey} preset`);
         });
     });
 
-    // 5. Per-Section Upgrade Words Button
     document.querySelectorAll("[data-upgrade-section]").forEach((btn) => {
         btn.addEventListener("click", () => {
             const sectionKey = btn.getAttribute("data-upgrade-section");
@@ -581,14 +564,13 @@ document.addEventListener("DOMContentLoaded", () => {
             boxes[sectionKey].value = res.text;
             syncModularToMaster();
             if (res.count > 0) {
-                showToast(`✨ Upgraded ${res.count} term(s) in ${sectionKey}!`);
+                showToast(`Upgraded ${res.count} term(s) in ${sectionKey}`);
             } else {
-                showToast(`No weak terms found in ${sectionKey} box.`);
+                showToast(`No weak terms found in ${sectionKey}`);
             }
         });
     });
 
-    // 6. Expand / Collapse Box Height Buttons (Zero Clipping)
     document.querySelectorAll("[data-expand-box]").forEach((btn) => {
         btn.addEventListener("click", () => {
             const targetId = btn.getAttribute("data-expand-box");
@@ -596,12 +578,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!el) return;
             el.classList.toggle("expanded-box");
             const isExpanded = el.classList.contains("expanded-box");
-            btn.textContent = isExpanded ? "🔽 Shrink" : "↕️ Expand";
+            btn.textContent = isExpanded ? "Collapse" : "Expand";
             autoFitTextarea(el);
         });
     });
 
-    // 7. Master Window Actions
     document.getElementById("btn-copy-master").addEventListener("click", () => {
         copyTextToClipboard(masterBox.value, "Full Prompt");
     });
@@ -619,9 +600,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         syncModularToMaster();
         if (total > 0) {
-            showToast(`✨ Deterministically upgraded ${total} weak word(s) across your prompt!`);
+            showToast(`Upgraded ${total} weak word(s)`);
         } else {
-            showToast("All words are already high-signal! Check the Lookup panel to add more tags.");
+            showToast("No weak words detected");
         }
     });
 
@@ -634,9 +615,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         syncModularToMaster();
         if (total > 0) {
-            showToast(`🎲 Upgraded ${total} term(s) into Perchance {a|b} dynamic choice sets!`);
+            showToast(`Upgraded ${total} term(s) to {a|b} choices`);
         } else {
-            showToast("No weak words detected to convert into {a|b} sets.");
+            showToast("No weak words detected");
         }
     });
 
@@ -645,20 +626,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const end = masterBox.selectionEnd;
         const full = masterBox.value;
         if (start === end) {
-            showToast("Highlight comma-separated words inside the Full Prompt box first to wrap them in {a|b}!");
+            showToast("Select text inside Full Prompt first");
             return;
         }
         const selected = full.slice(start, end).trim();
         const parts = selected.split(",").map((s) => s.trim()).filter(Boolean);
-        const wrapped = parts.length > 1 ? `{${parts.join("|")}}` : `{${selected}|alternative}`;
+        const wrapped = parts.length > 1 ? `{${parts.join("|")}}` : `{${selected}|variant}`;
         masterBox.value = full.slice(0, start) + wrapped + full.slice(end);
-        showToast(`Wrapped selection as Perchance choice: ${wrapped}`);
+        showToast(`Wrapped selection: ${wrapped}`);
     });
 
     function runRollPreview() {
         const template = masterBox.value.trim();
         if (!template) {
-            showToast("Prompt is empty!");
+            showToast("Prompt is empty");
             return;
         }
         const rolled = PromptEngine.evaluatePerchanceSyntax(template);
@@ -668,24 +649,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("btn-roll-preview").addEventListener("click", () => {
         runRollPreview();
-        showToast("🎲 Rolled sample output from your Perchance {a|b} choices!");
+        showToast("Rolled sample prompt");
     });
 
     document.getElementById("btn-reroll").addEventListener("click", runRollPreview);
 
     document.getElementById("btn-copy-roll").addEventListener("click", () => {
-        copyTextToClipboard(rollPreviewOutput.textContent, "Rolled Sample Prompt");
+        copyTextToClipboard(rollPreviewOutput.textContent, "Sample Roll");
     });
 
     document.getElementById("btn-close-roll").addEventListener("click", () => {
         rollPreviewContainer.classList.add("hidden");
     });
 
-    // Split Full Pasted Prompt into Modular Boxes
     document.getElementById("btn-split-to-boxes").addEventListener("click", () => {
         const raw = masterBox.value.trim();
         if (!raw) {
-            showToast("Paste or type a prompt in the Full Prompt box first!");
+            showToast("Paste or enter a prompt in Full Prompt first");
             return;
         }
         const split = PromptEngine.parseFullPromptToSections(raw);
@@ -693,17 +673,15 @@ document.addEventListener("DOMContentLoaded", () => {
             split.negative = boxes.negative.value;
         }
         setSections(split, true);
-        showToast("↙️ Split full prompt into Character, Pose/Outfit, Scene, and Style boxes!");
+        showToast("Split full prompt into modular sections");
     });
 
-    // Reset Default Negatives
     document.getElementById("btn-reset-negative").addEventListener("click", () => {
         boxes.negative.value = PresetManager.DEFAULT_NEGATIVE;
         syncModularToMaster();
-        showToast("Restored default high-signal Negative Prompt tags.");
+        showToast("Restored default negative prompt");
     });
 
-    // Clear All
     document.getElementById("btn-clear-all").addEventListener("click", () => {
         setSections(
             {
@@ -715,10 +693,9 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             true
         );
-        showToast("🧹 Cleared all positive prompt sections.");
+        showToast("Cleared all sections");
     });
 
-    // Export / Import Custom Presets JSON
     document.getElementById("btn-export-presets").addEventListener("click", () => {
         const json = PresetManager.exportAllCustomPresetsJSON();
         const blob = new Blob([json], { type: "application/json" });
@@ -730,7 +707,7 @@ document.addEventListener("DOMContentLoaded", () => {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast("📤 Exported custom presets as bychance-presets.json");
+        showToast("Exported bychance-presets.json");
     });
 
     const importInput = document.getElementById("import-presets-input");
@@ -747,27 +724,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 PresetManager.importCustomPresetsJSON(String(reader.result));
                 renderFullPresetDropdown();
                 renderSectionPresetDropdowns();
-                showToast("📥 Imported custom presets!");
+                showToast("Imported custom presets");
             } catch (err) {
-                showToast("❌ Invalid preset JSON file.");
+                showToast("Invalid preset JSON file");
             }
         };
         reader.readAsText(file);
         importInput.value = "";
     });
 
-    // Dictionary Search
     dictSearchInput.addEventListener("input", () => {
         renderDictionaryBrowser(dictSearchInput.value);
     });
 
-    // Initialize Workbench
+    // Initialize
     renderFullPresetDropdown();
     renderSectionPresetDropdowns();
     renderQuickTagChips();
     renderDictionaryBrowser("");
 
-    // Load last saved state or default to Rosalina — Cosmic Observatory so user sees accurate traits immediately
     const lastState = PresetManager.loadLastWorkbenchState();
     if (lastState && (lastState.character || lastState.outfit || lastState.scene || lastState.style)) {
         setSections(lastState, true);

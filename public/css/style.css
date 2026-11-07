@@ -1,20 +1,20 @@
-/* Bychance — Clean, Unclipped Perchance Prompting Workbench Stylesheet */
+/* Bychance — Utilitarian Minimalist Workbench Stylesheet */
 :root {
-    --bg-main: #0d1117;
-    --bg-panel: #161b22;
-    --bg-input: #090d12;
-    --bg-elevated: #1f2631;
-    --border-color: #30363d;
-    --border-focus: #6366f1;
-    --text-primary: #f0f6fc;
-    --text-secondary: #8b949e;
-    --text-muted: #6e7681;
-    --accent-indigo: #6366f1;
-    --accent-indigo-hover: #4f46e5;
-    --accent-emerald: #10b981;
-    --accent-amber: #f59e0b;
-    --accent-purple: #a855f7;
-    --accent-rose: #f43f5e;
+    --bg-canvas: #f4f4f1;
+    --bg-surface: #ffffff;
+    --bg-subtle: #f9f9f7;
+    --bg-hover: #ededeb;
+    --text-main: #141413;
+    --text-muted: #666660;
+    --text-faint: #94948e;
+    --line-color: #e2e2dd;
+    --line-strong: #c8c8c2;
+    --accent-ink: #141413;
+    --accent-ink-hover: #2c2c2a;
+    --control-h: 32px;
+    --radius: 4px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
 * {
@@ -24,129 +24,106 @@
 html, body {
     margin: 0;
     padding: 0;
-    background-color: var(--bg-main);
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+    background-color: var(--bg-canvas);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    font-size: 13px;
     line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
     min-height: 100vh;
-    overflow-x: hidden;
-    overflow-y: auto;
 }
 
-/* Top Bar */
+/* Header Bar */
 .topbar {
-    background-color: var(--bg-panel);
-    border-bottom: 1px solid var(--border-color);
-    padding: 0.85rem 1.25rem;
+    background-color: var(--bg-surface);
+    border-bottom: 1px solid var(--line-color);
+    padding: 12px 24px;
     position: sticky;
     top: 0;
-    z-index: 40;
+    z-index: 30;
 }
 
 .topbar-inner {
-    max-width: 1520px;
+    max-width: 1480px;
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 0.85rem;
+    gap: 16px;
 }
 
 .brand-group {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.brand-logo {
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 0.6rem;
-    background: linear-gradient(135deg, #6366f1, #a855f7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 1.1rem;
-    color: #fff;
-    flex-shrink: 0;
+    align-items: baseline;
+    gap: 12px;
 }
 
 .brand-title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    margin: 0;
-    letter-spacing: -0.02em;
-}
-
-.brand-badge {
-    font-size: 0.7rem;
+    font-size: 15px;
     font-weight: 600;
-    padding: 0.15rem 0.5rem;
-    border-radius: 999px;
-    background: rgba(16, 185, 129, 0.15);
-    color: #34d399;
-    border: 1px solid rgba(16, 185, 129, 0.35);
-    margin-left: 0.4rem;
-    vertical-align: middle;
+    letter-spacing: -0.01em;
+    margin: 0;
+    color: var(--text-main);
 }
 
 .brand-subtitle {
-    font-size: 0.78rem;
-    color: var(--text-secondary);
+    font-size: 12px;
+    color: var(--text-muted);
     margin: 0;
 }
 
-/* Full Preset Bar in Header */
 .preset-toolbar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
 }
 
-/* Main Two-Column Workbench Layout (Zero overflow clipping) */
+.toolbar-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-right: 4px;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 18px;
+    background-color: var(--line-color);
+    margin: 0 4px;
+}
+
+/* Main Workbench Grid */
 .workbench-container {
-    max-width: 1520px;
+    max-width: 1480px;
     margin: 0 auto;
-    padding: 1.25rem;
+    padding: 24px;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.25rem;
+    gap: 24px;
     align-items: start;
 }
 
-@media (min-width: 1080px) {
+@media (min-width: 1040px) {
     .workbench-container {
-        grid-template-columns: 1.15fr 0.85fr;
+        grid-template-columns: 1.1fr 0.9fr;
     }
 }
 
 .column-stack {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 16px;
     min-width: 0;
 }
 
-/* Editor Cards - NEVER overflow:hidden so expanded boxes and menus never clip */
+/* Section Panels */
 .editor-card {
-    background-color: var(--bg-panel);
-    border: 1px solid var(--border-color);
-    border-radius: 0.75rem;
-    padding: 1rem 1.1rem;
-    overflow: visible;
-    transition: border-color 0.15s ease;
-}
-
-.editor-card:focus-within {
-    border-color: var(--border-focus);
-}
-
-.editor-card.master-card {
-    border-color: rgba(99, 102, 241, 0.55);
-    background: linear-gradient(180deg, rgba(99, 102, 241, 0.06) 0%, var(--bg-panel) 100%);
+    background-color: var(--bg-surface);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
@@ -154,296 +131,295 @@ html, body {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem;
-    margin-bottom: 0.65rem;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
 .card-title-group {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.section-index {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    font-weight: 500;
 }
 
 .card-title {
-    font-size: 0.95rem;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 600;
     margin: 0;
-    color: var(--text-primary);
+    color: var(--text-main);
 }
 
 .card-hint {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
+    font-size: 12px;
+    color: var(--text-muted);
 }
 
 .card-controls {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.4rem;
+    gap: 6px;
 }
 
-/* Inputs, Selects & Buttons */
+/* Uniform Form Controls: All selects, inputs, and buttons share exact height & spacing */
 .select-input {
-    background-color: var(--bg-input);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 0.45rem;
-    padding: 0.35rem 0.6rem;
-    font-size: 0.8rem;
-    max-width: 240px;
+    height: var(--control-h);
+    background-color: var(--bg-subtle);
+    color: var(--text-main);
+    border: 1px solid var(--line-color);
+    border-radius: var(--radius);
+    padding: 0 10px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: 30px;
     cursor: pointer;
+    transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.select-input:hover {
+    border-color: var(--line-strong);
 }
 
 .select-input:focus {
     outline: none;
-    border-color: var(--border-focus);
+    border-color: var(--accent-ink);
+    background-color: var(--bg-surface);
 }
 
-.prompt-textarea {
-    width: 100%;
-    min-height: 86px;
-    background-color: var(--bg-input);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 0.55rem;
-    padding: 0.7rem 0.85rem;
-    font-family: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 0.86rem;
-    line-height: 1.55;
-    resize: vertical;
-    overflow-y: auto;
-    display: block;
-}
-
-.prompt-textarea:focus {
-    outline: none;
-    border-color: var(--border-focus);
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-}
-
-.prompt-textarea.master-textarea {
-    min-height: 165px;
-    font-size: 0.9rem;
-}
-
-.prompt-textarea.expanded-box {
-    min-height: 280px !important;
-}
-
-/* Buttons */
 .btn {
+    height: var(--control-h);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.35rem;
-    padding: 0.38rem 0.7rem;
-    border-radius: 0.45rem;
-    font-size: 0.78rem;
-    font-weight: 600;
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-elevated);
-    color: var(--text-primary);
+    padding: 0 12px;
+    border-radius: var(--radius);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--line-color);
+    background-color: var(--bg-subtle);
+    color: var(--text-main);
     cursor: pointer;
-    transition: all 0.15s ease;
     white-space: nowrap;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 
 .btn:hover {
-    background-color: #2b3442;
-    border-color: #485260;
+    background-color: var(--bg-hover);
+    border-color: var(--line-strong);
+}
+
+.btn:active {
+    transform: translateY(0.5px);
 }
 
 .btn-primary {
-    background-color: var(--accent-indigo);
-    border-color: var(--accent-indigo);
+    background-color: var(--accent-ink);
+    border-color: var(--accent-ink);
     color: #ffffff;
 }
 
 .btn-primary:hover {
-    background-color: var(--accent-indigo-hover);
-    border-color: var(--accent-indigo-hover);
+    background-color: var(--accent-ink-hover);
+    border-color: var(--accent-ink-hover);
 }
 
-.btn-emerald {
-    background-color: rgba(16, 185, 129, 0.16);
-    border-color: rgba(16, 185, 129, 0.4);
-    color: #34d399;
+.btn-sm {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
 }
 
-.btn-emerald:hover {
-    background-color: rgba(16, 185, 129, 0.28);
+/* Textareas — Clean, Unclipped, Auto-Growing */
+.prompt-textarea {
+    width: 100%;
+    min-height: 76px;
+    background-color: var(--bg-subtle);
+    color: var(--text-main);
+    border: 1px solid var(--line-color);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.55;
+    resize: vertical;
+    overflow-y: auto;
+    display: block;
+    transition: border-color 0.12s ease, background-color 0.12s ease;
 }
 
-.btn-amber {
-    background-color: rgba(245, 158, 11, 0.16);
-    border-color: rgba(245, 158, 11, 0.4);
-    color: #fbbf24;
+.prompt-textarea::placeholder {
+    color: var(--text-faint);
 }
 
-.btn-amber:hover {
-    background-color: rgba(245, 158, 11, 0.28);
+.prompt-textarea:focus {
+    outline: none;
+    background-color: var(--bg-surface);
+    border-color: var(--accent-ink);
 }
 
-.btn-purple {
-    background-color: rgba(168, 85, 247, 0.16);
-    border-color: rgba(168, 85, 247, 0.4);
-    color: #c084fc;
+.prompt-textarea.master-textarea {
+    min-height: 150px;
+    background-color: var(--bg-surface);
 }
 
-.btn-purple:hover {
-    background-color: rgba(168, 85, 247, 0.28);
-}
-
-.btn-danger {
-    background-color: rgba(244, 63, 94, 0.14);
-    border-color: rgba(244, 63, 94, 0.35);
-    color: #fb7185;
-}
-
-.btn-danger:hover {
-    background-color: rgba(244, 63, 94, 0.25);
-}
-
-.btn-xs {
-    padding: 0.22rem 0.5rem;
-    font-size: 0.72rem;
+.prompt-textarea.expanded-box {
+    min-height: 260px !important;
 }
 
 /* Quick Tag Chips */
 .chip-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
-    margin-top: 0.55rem;
+    gap: 6px;
+    margin-top: 8px;
 }
 
 .tag-chip {
-    background-color: var(--bg-input);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    border-radius: 999px;
-    padding: 0.2rem 0.55rem;
-    font-size: 0.72rem;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    background-color: transparent;
+    border: 1px solid var(--line-color);
+    color: var(--text-muted);
+    border-radius: var(--radius);
+    padding: 0 8px;
+    font-family: var(--font-sans);
+    font-size: 11.5px;
     cursor: pointer;
     transition: all 0.12s ease;
 }
 
 .tag-chip:hover {
-    color: var(--text-primary);
-    border-color: var(--accent-indigo);
-    background-color: rgba(99, 102, 241, 0.12);
+    color: var(--text-main);
+    border-color: var(--line-strong);
+    background-color: var(--bg-subtle);
 }
 
-/* Word Upgrade Suggestion Cards */
+/* Master Action Bar */
+.master-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line-color);
+}
+
+/* Roll Preview Box */
+.roll-preview-box {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: var(--radius);
+    background-color: var(--bg-subtle);
+    border-left: 2px solid var(--accent-ink);
+}
+
+.roll-preview-text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-main);
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 6px 0 0 0;
+}
+
+/* Word Upgrade List & Lookup Table */
 .upgrade-list {
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
-    margin-top: 0.5rem;
+    gap: 8px;
 }
 
 .upgrade-item {
-    background-color: var(--bg-input);
-    border: 1px solid var(--border-color);
-    border-left: 3px solid var(--accent-amber);
-    border-radius: 0.5rem;
-    padding: 0.65rem 0.8rem;
+    background-color: var(--bg-subtle);
+    border-radius: var(--radius);
+    padding: 10px 12px;
 }
 
 .upgrade-item-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem;
-    margin-bottom: 0.35rem;
+    gap: 8px;
+    margin-bottom: 4px;
 }
 
 .upgrade-word-badge {
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: #fbbf24;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-main);
 }
 
 .upgrade-cat-badge {
-    font-size: 0.68rem;
-    padding: 0.1rem 0.45rem;
-    border-radius: 0.3rem;
-    background-color: var(--bg-elevated);
-    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
 }
 
 .upgrade-target-preview {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.76rem;
-    color: #a5b4fc;
-    margin-bottom: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
     word-break: break-word;
 }
 
 .upgrade-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
+    gap: 6px;
 }
 
-/* Roll Preview Box */
-.roll-preview-box {
-    margin-top: 0.75rem;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    background-color: rgba(168, 85, 247, 0.08);
-    border: 1px solid rgba(168, 85, 247, 0.35);
-}
-
-.roll-preview-text {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.82rem;
-    color: #e9d5ff;
-    white-space: pre-wrap;
-    word-break: break-word;
-    margin: 0.35rem 0 0 0;
-}
-
-/* Dictionary Reference Grid */
+/* Dictionary Reference List */
 .dict-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-    max-height: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 340px;
     overflow-y: auto;
-    padding-right: 0.25rem;
-    margin-top: 0.6rem;
+    padding-right: 4px;
 }
 
 .dict-row {
-    background-color: var(--bg-input);
-    border: 1px solid var(--border-color);
-    border-radius: 0.45rem;
-    padding: 0.55rem 0.7rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    background-color: var(--bg-subtle);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+}
+
+.status-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background-color: var(--bg-subtle);
+    padding: 2px 8px;
+    border-radius: var(--radius);
 }
 
 /* Toast Notification */
 .toast-banner {
     position: fixed;
-    bottom: 1.25rem;
-    right: 1.25rem;
-    background-color: #1e293b;
-    color: #f8fafc;
-    border: 1px solid var(--accent-indigo);
-    border-radius: 0.55rem;
-    padding: 0.65rem 1rem;
-    font-size: 0.82rem;
-    font-weight: 600;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--accent-ink);
+    color: #ffffff;
+    border-radius: var(--radius);
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     z-index: 100;
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(6px);
     pointer-events: none;
-    transition: all 0.2s ease;
+    transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .toast-banner.visible {
