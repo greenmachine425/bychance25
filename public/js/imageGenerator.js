@@ -2,15 +2,12 @@
  * Bychance - Image Generation Service
  * 
  * Supports:
+ * - Single-request binary fetch pipeline (eliminates duplicate requests that trigger IP cooldowns)
+ * - Automatic Pollinations free-tier cooldown detection with live second-by-second countdown & auto-retry
+ * - Real-time phase & status callbacks (onStatus) for live UI telemetry
  * - Built-in Window Server & Security Engine integration (rate limiting, Safe-Mode guardrail, magic-byte verification)
  * - Model-aware prompt conditioning (FLUX.1 Anime, Illustrious XL, Animagine XL, Pony V6 XL, FLUX.1 Dev, FLUX 3D, SDXL Turbo)
- * - Pollinations.ai FLUX & Turbo models (Free, zero-key, high-res)
- * - Automatic host failover (image.pollinations.ai & gen.pollinations.ai)
- * - Hugging Face Inference API with model-specific repository mapping & guidance_scale
- * - Custom WebUI / A1111 / OpenAI-compatible image endpoints
- * - Optimized aspect ratio dimension mapping (max-edge 1024 to prevent GPU timeouts)
- * - Deduplicated quality boosting & model-calibrated negative prompt enrichment
- * - Batch generation (1, 2, 4 images)
+ * - Hugging Face Inference API & Custom WebUI / A1111 / OpenAI-compatible image endpoints
  */
 
 import { PerchanceEngine } from './perchanceEngine.js';
@@ -47,7 +44,6 @@ export const ImageGenerator = {
       const saved = localStorage.getItem('bychance_settings');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Migrate any legacy keys out of persistent localStorage into sessionStorage
         const hadLegacyKeys = Boolean(parsed.pollinationsKey || parsed.hfToken || parsed.customApiKey);
         this.settings = {
           ...this.settings,
@@ -193,7 +189,7 @@ export const ImageGenerator = {
   },
 
   /**
-   * Generate a single image with automatic retries, failover, and security verification
+   * Generate a single image with live phase telemetry, automatic cooldown wait, and magic-byte verification
    */
   async generateSingle({
     prompt,
@@ -204,9 +200,17 @@ export const ImageGenerator = {
     model = 'flux-anime',
     guidanceScale = 6.0,
     enableBoosters = true,
-    batchIndex = 0
+    batchIndex = 0,
+    onStatus = null
   }) {
     const startTime = performance.now();
+    const emitStatus = (phase, message, extra = {}) => {
+      if (typeof onStatus === 'function') {
+        onStatus({ index: batchIndex, phase, message, ...extra });
+      }
+    };
+
+    emitStatus('conditioning', 'Phase 1/4: Evaluating Perchance syntax & model conditioning...');
 
     // Enforce Safe-Mode Prompt Guardrail on raw input first
     EmbeddedServer.enforcePromptSafety(prompt, negativePrompt);
@@ -240,22 +244,32 @@ export const ImageGenerator = {
       : Math.floor(Math.random() * 2147483647);
 
     const pollinationsBackendModel = profile ? profile.pollinationsModel : 'flux';
+    const modelShortName = profile ? profile.shortName : effectiveModelKey;
+
+    emitStatus(
+      'sampling',
+      `Phase 2/4: Rendering ${width}×${height} anime illustration on ${modelShortName}...`,
+      { evaluatedPrompt: prepared.evaluatedPrompt, seed: effectiveSeed, modelName: modelShortName }
+    );
 
     let imageUrl = '';
     let imageBlob = null;
 
     EmbeddedServer.requestCount++;
-    EmbeddedServer._log('GENERATE', `Rendering [${profile ? profile.shortName : effectiveModelKey}] ${width}x${height} (Seed: ${effectiveSeed})`);
+    EmbeddedServer._log('GENERATE', `Rendering [${modelShortName}] ${width}x${height} (Seed: ${effectiveSeed})`);
 
     if (this.settings.provider === 'pollinations') {
-      imageUrl = await this._generatePollinationsWithFailover(
+      const result = await this._generatePollinationsSinglePass(
         finalPrompt,
         width,
         height,
         effectiveSeed,
         pollinationsBackendModel,
-        combinedNegative
+        combinedNegative,
+        emitStatus
       );
+      imageUrl = result.url;
+      imageBlob = result.blob;
     } else if (this.settings.provider === 'huggingface') {
       const result = await this._generateHuggingFace(
         finalPrompt,
@@ -281,22 +295,7 @@ export const ImageGenerator = {
       imageBlob = result.blob;
     }
 
-    // Attempt to convert to validated binary Blob for local IndexedDB caching
-    if (!imageBlob && imageUrl) {
-      try {
-        const fetchRes = await fetch(imageUrl, {
-          mode: 'cors',
-          referrerPolicy: 'no-referrer',
-          credentials: 'omit'
-        });
-        if (fetchRes.ok) {
-          const rawBlob = await fetchRes.blob();
-          imageBlob = await EmbeddedServer.validateImageBlob(rawBlob);
-        }
-      } catch (err) {
-        // Direct browser <img> rendering will still work if CORS restricts Blob reading
-      }
-    }
+    emitStatus('verifying', 'Phase 4/4: Verifying binary magic bytes & saving to gallery...');
 
     // Never persist API key query parameters in the saved record URL
     const sanitizedUrl = this._redactUrlSecrets(imageUrl);
@@ -314,7 +313,7 @@ export const ImageGenerator = {
       negativePrompt: combinedNegative,
       style: style,
       model: effectiveModelKey,
-      modelName: profile ? profile.shortName : effectiveModelKey,
+      modelName: modelShortName,
       aspectRatio: aspectRatio,
       width: width,
       height: height,
@@ -343,6 +342,7 @@ export const ImageGenerator = {
 
   /**
    * Generate a batch of images (1, 2, or 4) with rate-limit verification
+   * Executes sequentially on anonymous Pollinations to prevent simultaneous IP rate-limit collisions.
    */
   async generateBatch({
     prompt,
@@ -354,15 +354,45 @@ export const ImageGenerator = {
     guidanceScale = 6.0,
     enableBoosters = true,
     batchCount = 1,
-    onProgress = null
+    onProgress = null,
+    onStatus = null
   }) {
     const count = Math.min(Math.max(parseInt(batchCount, 10) || 1, 1), 4);
 
     // Check built-in window server rate limiter before firing batch
     EmbeddedServer.checkRateLimit(count);
 
-    const promises = [];
+    const isAnonymousPollinations =
+      this.settings.provider === 'pollinations' && !this.settings.pollinationsKey;
 
+    if (isAnonymousPollinations && count > 1) {
+      // Run sequentially so requests don't collide on the anonymous IP limiter
+      const results = [];
+      for (let i = 0; i < count; i++) {
+        try {
+          const res = await this.generateSingle({
+            prompt,
+            negativePrompt,
+            style,
+            aspectRatio,
+            seed,
+            model,
+            guidanceScale,
+            enableBoosters,
+            batchIndex: i,
+            onStatus
+          });
+          if (onProgress) onProgress({ index: i, count, result: res, success: true });
+          results.push({ status: 'fulfilled', value: res });
+        } catch (err) {
+          if (onProgress) onProgress({ index: i, count, error: err, success: false });
+          results.push({ status: 'rejected', reason: err });
+        }
+      }
+      return results;
+    }
+
+    const promises = [];
     for (let i = 0; i < count; i++) {
       const p = this.generateSingle({
         prompt,
@@ -373,7 +403,8 @@ export const ImageGenerator = {
         model,
         guidanceScale,
         enableBoosters,
-        batchIndex: i
+        batchIndex: i,
+        onStatus
       }).then(result => {
         if (onProgress) onProgress({ index: i, count, result, success: true });
         return result;
@@ -415,39 +446,99 @@ export const ImageGenerator = {
   },
 
   /**
-   * Generates using Pollinations with automatic host failover & fallback models
+   * Sleep helper with live 1-second countdown status updates
    */
-  async _generatePollinationsWithFailover(prompt, width, height, seed, model, negativePrompt) {
-    // 1. Primary Attempt: image.pollinations.ai
+  async _waitWithCountdown(seconds, emitStatus, reasonPrefix) {
+    const total = Math.min(Math.max(Math.ceil(seconds), 1), 46);
+    for (let remaining = total; remaining > 0; remaining--) {
+      emitStatus(
+        'cooldown',
+        `⏳ ${reasonPrefix} — Auto-resuming generation in ${remaining}s (or add a free Pollinations key in ⚙️ Settings for instant parallel renders)...`,
+        { cooldownRemaining: remaining, cooldownTotal: total }
+      );
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  },
+
+  /**
+   * Single-pass Pollinations fetch:
+   * - Fetches the image ONCE via fetch() to avoid double-requesting the same URL
+   * - If HTTP 402/429 (anonymous 45s IP rate limit) is returned, reads the exact "Retry after Ns"
+   *   from the JSON body, displays a live countdown in the UI, and automatically completes!
+   */
+  async _generatePollinationsSinglePass(prompt, width, height, seed, model, negativePrompt, emitStatus) {
     const primaryUrl = this._buildPollinationsUrl(prompt, width, height, seed, model, negativePrompt, false);
-    try {
-      await this._preloadImage(primaryUrl, 30000);
-      return primaryUrl;
-    } catch (err1) {
-      console.warn('Pollinations primary endpoint failed or timed out:', err1);
-    }
 
-    // 2. Fallback Attempt: gen.pollinations.ai
-    const fallbackUrl = this._buildPollinationsUrl(prompt, width, height, seed, model, negativePrompt, true);
-    try {
-      await this._preloadImage(fallbackUrl, 25000);
-      return fallbackUrl;
-    } catch (err2) {
-      console.warn('Pollinations secondary endpoint failed:', err2);
-    }
-
-    // 3. Fallback Model: turbo model (fastest inference, takes ~2 seconds)
-    if (model !== 'turbo') {
-      const turboUrl = this._buildPollinationsUrl(prompt, width, height, seed, 'turbo', negativePrompt, false);
+    for (let attempt = 1; attempt <= 2; attempt++) {
       try {
-        await this._preloadImage(turboUrl, 20000);
-        return turboUrl;
-      } catch (err3) {
-        console.warn('Pollinations turbo fallback failed:', err3);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 35000);
+
+        const response = await fetch(primaryUrl, {
+          method: 'GET',
+          mode: 'cors',
+          referrerPolicy: 'no-referrer',
+          credentials: 'omit',
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          emitStatus('downloading', 'Phase 3/4: Receiving high-resolution anime artwork...');
+          const rawBlob = await response.blob();
+          const validBlob = await EmbeddedServer.validateImageBlob(rawBlob);
+          return { url: primaryUrl, blob: validBlob };
+        }
+
+        // Check for anonymous free-tier rate limit (HTTP 402 or 429)
+        if ((response.status === 402 || response.status === 429) && attempt === 1) {
+          let waitSec = 22;
+          try {
+            const errJson = await response.json();
+            const msg = (errJson && errJson.error && errJson.error.message) ? errJson.error.message : '';
+            const match = msg.match(/Retry after\s+(\d+)\s*s/i);
+            if (match) {
+              waitSec = parseInt(match[1], 10) + 2;
+            }
+          } catch {
+            waitSec = 22;
+          }
+
+          EmbeddedServer._log('INFO', `Pollinations anonymous IP cooldown active; waiting ${waitSec}s to auto-resume`);
+          await this._waitWithCountdown(
+            waitSec,
+            emitStatus,
+            'Free GPU queue cooldown (1 image / 45s without key)'
+          );
+          emitStatus('sampling', 'Phase 2/4: Cooldown finished! Rendering anime illustration now...');
+          continue;
+        }
+      } catch (fetchErr) {
+        console.warn('Direct CORS fetch attempt warning:', fetchErr);
       }
     }
 
-    throw new Error('Image generation provider failed or timed out. If using Pollinations, add a free key in Settings (⚙️), or configure Hugging Face / a local WebUI endpoint.');
+    // Fallback to Image element preload if CORS restricted direct fetch
+    try {
+      emitStatus('sampling', 'Phase 2/4: Loading artwork via direct image stream...');
+      await this._preloadImage(primaryUrl, 30000);
+      return { url: primaryUrl, blob: null };
+    } catch (imgErr) {
+      console.warn('Primary image preload failed:', imgErr);
+    }
+
+    // Final Fallback: gen.pollinations.ai (if user provided a key)
+    if (this.settings.pollinationsKey) {
+      const fallbackUrl = this._buildPollinationsUrl(prompt, width, height, seed, model, negativePrompt, true);
+      try {
+        await this._preloadImage(fallbackUrl, 25000);
+        return { url: fallbackUrl, blob: null };
+      } catch (err2) {
+        console.warn('Secondary Pollinations host failed:', err2);
+      }
+    }
+
+    throw new Error('Free GPU queue is busy (limit: 1 image per 45s without a key). Wait ~20 seconds and click Generate again, or add a free key from enter.pollinations.ai in Settings (⚙️).');
   },
 
   /**

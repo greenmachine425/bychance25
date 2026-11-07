@@ -335,15 +335,45 @@
           </button>
         </div>
 
-        <!-- Animated Progress bar -->
-        <div id="generation-progress-bar" class="hidden w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden">
-          <div class="bg-gradient-to-r from-indigo-500 via-pink-500 to-cyan-400 h-full w-full animate-pulse"></div>
+        <!-- Live Generation Telemetry HUD (Visible during & immediately after generation) -->
+        <div id="generation-telemetry-hud" class="hidden rounded-2xl bg-indigo-950/40 border border-indigo-500/40 p-4 space-y-2.5 shadow-lg shadow-indigo-950/30 transition-all">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span id="telemetry-spinner" class="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin shrink-0"></span>
+              <span id="telemetry-phase-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shrink-0">GENERATING</span>
+              <span id="telemetry-status-text" class="text-xs font-medium text-zinc-100 truncate">Phase 1/4: Evaluating Perchance syntax &amp; model conditioning...</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span id="telemetry-elapsed" class="font-mono text-xs font-bold text-indigo-300 bg-zinc-950/80 px-2.5 py-1 rounded-lg border border-zinc-800">0.0s</span>
+            </div>
+          </div>
+
+          <!-- Animated Progress Bar -->
+          <div id="generation-progress-bar" class="w-full bg-zinc-900 rounded-full h-2 overflow-hidden border border-zinc-800">
+            <div id="telemetry-progress-fill" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-full transition-all duration-300 animate-pulse" style="width: 20%"></div>
+          </div>
+
+          <!-- Evaluated Prompt Being Rendered -->
+          <div class="flex items-center justify-between gap-2 text-[11px] text-zinc-400 pt-0.5">
+            <div class="truncate">
+              <span class="font-semibold text-zinc-300">Active Prompt:</span>
+              <span id="telemetry-active-prompt" class="italic text-indigo-200/90 ml-1"></span>
+            </div>
+            <span class="text-[10px] text-zinc-500 whitespace-nowrap">Auto-saving to Gallery ↓</span>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- Real-time Live Preview Stage -->
-    <section id="live-stage" class="space-y-4">
+    <section id="live-stage" class="space-y-3 scroll-mt-20">
+      <div id="live-stage-header" class="hidden flex items-center justify-between border-b border-zinc-800/80 pb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-ping" id="live-stage-dot"></span>
+          <h3 class="text-sm font-bold text-white" id="live-stage-title">Live Generation Stage</h3>
+        </div>
+        <span id="live-stage-subtitle" class="text-xs text-zinc-400">Rendering high-resolution anime artwork...</span>
+      </div>
       <div id="live-preview-grid">
         <!-- Live generation cards appear here -->
       </div>

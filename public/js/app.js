@@ -1169,7 +1169,7 @@ class App {
   }
 
   /**
-   * Handle the primary Generate action
+   * Handle the primary Generate action with live stopwatch & telemetry HUD
    */
   async handleGenerate() {
     if (this.isGenerating) return;
@@ -1180,15 +1180,31 @@ class App {
       return;
     }
 
+    const profile = PerchanceEngine.modelProfiles[params.model] || PerchanceEngine.modelProfiles['flux-anime'];
     this.isGenerating = true;
-    this.updateGeneratingUI(true);
+    this._genStartMs = performance.now();
+    this.updateGeneratingUI(true, false);
 
     // Setup preview area with placeholder skeleton cards
     this.setupBatchPreviewGrid(params.batchCount, params.aspectRatio);
 
+    // Immediately show toast & smoothly scroll telemetry / live stage into view
+    this.showToast(`🚀 Generating ${params.batchCount} anime image${params.batchCount > 1 ? 's' : ''} with ${profile.shortName}...`);
+    const hud = document.getElementById('generation-telemetry-hud');
+    if (hud) {
+      setTimeout(() => {
+        hud.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 60);
+    }
+
+    let successCount = 0;
+
     try {
       const results = await ImageGenerator.generateBatch({
         ...params,
+        onStatus: (statusInfo) => {
+          this.handleGenerationStatus(statusInfo);
+        },
         onProgress: (progress) => {
           this.handleImageItemProgress(progress);
         }
@@ -1197,12 +1213,19 @@ class App {
       // Save successful generations into storage and refresh gallery
       for (const res of results) {
         if (res.status === 'fulfilled' && res.value) {
+          successCount++;
           await Storage.saveImage(res.value);
         }
       }
 
       await this.loadGallery();
-      this.showToast('Generated image(s) successfully! ✨');
+
+      if (successCount > 0) {
+        this.showToast(`✨ Generated ${successCount} anime masterpiece${successCount > 1 ? 's' : ''}!`);
+      } else {
+        const firstReason = results.find(r => r.status === 'rejected')?.reason;
+        this.showToast(`⚠️ ${firstReason ? firstReason.message : 'Generation timed out'}`);
+      }
 
       // Randomize seed if unlocked
       if (!this.isSeedLocked) {
@@ -1213,7 +1236,54 @@ class App {
       this.showToast(`Generation failed: ${err.message || 'Network error'}`);
     } finally {
       this.isGenerating = false;
-      this.updateGeneratingUI(false);
+      this.updateGeneratingUI(false, successCount > 0);
+    }
+  }
+
+  /**
+   * Update live telemetry HUD and card status text during generation phases
+   */
+  handleGenerationStatus({ index = 0, phase, message, evaluatedPrompt, cooldownRemaining, cooldownTotal }) {
+    const statusText = document.getElementById('telemetry-status-text');
+    const phaseBadge = document.getElementById('telemetry-phase-badge');
+    const progressFill = document.getElementById('telemetry-progress-fill');
+    const activePromptEl = document.getElementById('telemetry-active-prompt');
+
+    if (statusText && message) {
+      statusText.textContent = message;
+    }
+    if (evaluatedPrompt && activePromptEl) {
+      activePromptEl.textContent = evaluatedPrompt;
+    }
+
+    if (phaseBadge && progressFill) {
+      if (phase === 'conditioning') {
+        phaseBadge.textContent = 'STEP 1/4 • SYNTAX';
+        phaseBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shrink-0';
+        progressFill.style.width = '20%';
+      } else if (phase === 'cooldown') {
+        phaseBadge.textContent = `⏳ QUEUE WAIT (${cooldownRemaining || ''}s)`;
+        phaseBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0';
+        const pct = cooldownTotal ? Math.round(((cooldownTotal - (cooldownRemaining || 0)) / cooldownTotal) * 60) + 15 : 40;
+        progressFill.style.width = `${pct}%`;
+      } else if (phase === 'sampling') {
+        phaseBadge.textContent = 'STEP 2/4 • RENDERING GPU';
+        phaseBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30 shrink-0';
+        progressFill.style.width = '65%';
+      } else if (phase === 'downloading') {
+        phaseBadge.textContent = 'STEP 3/4 • RECEIVING';
+        phaseBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shrink-0';
+        progressFill.style.width = '88%';
+      } else if (phase === 'verifying') {
+        phaseBadge.textContent = 'STEP 4/4 • VERIFYING';
+        phaseBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0';
+        progressFill.style.width = '96%';
+      }
+    }
+
+    const cardStatus = document.getElementById(`card-status-${index}`);
+    if (cardStatus && message) {
+      cardStatus.textContent = message;
     }
   }
 
@@ -1222,7 +1292,16 @@ class App {
    */
   setupBatchPreviewGrid(count, aspectRatio) {
     const grid = document.getElementById('live-preview-grid');
+    const stageHeader = document.getElementById('live-stage-header');
+    const stageTitle = document.getElementById('live-stage-title');
+    const stageSubtitle = document.getElementById('live-stage-subtitle');
+    const stageDot = document.getElementById('live-stage-dot');
     if (!grid) return;
+
+    if (stageHeader) stageHeader.classList.remove('hidden');
+    if (stageTitle) stageTitle.textContent = 'Live Generation Stage (Rendering...)';
+    if (stageSubtitle) stageSubtitle.textContent = 'Streaming from AI inference engine...';
+    if (stageDot) stageDot.className = 'w-2.5 h-2.5 rounded-full bg-indigo-400 animate-ping';
 
     grid.innerHTML = '';
     const ratioInfo = ImageGenerator.aspectRatios[aspectRatio] || ImageGenerator.aspectRatios['2:3'];
@@ -1237,14 +1316,23 @@ class App {
     for (let i = 0; i < count; i++) {
       const card = document.createElement('div');
       card.id = `preview-card-${i}`;
-      card.className = 'relative rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-900 flex flex-col items-center justify-center shadow-xl group';
+      card.className = 'relative rounded-2xl overflow-hidden border-2 border-indigo-500/40 bg-zinc-900 flex flex-col items-center justify-center shadow-2xl shadow-indigo-950/40 group cursor-wait';
       card.style.aspectRatio = ratioInfo.cssRatio;
 
       card.innerHTML = `
-        <div class="absolute inset-0 bg-gradient-to-br from-indigo-950/20 to-zinc-950 animate-pulse flex flex-col items-center justify-center p-4 text-center">
-          <div class="w-10 h-10 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-          <span class="text-xs font-medium text-zinc-400">Rendering anime artwork #${i + 1}...</span>
-          <span class="text-[10px] text-zinc-500 mt-1">Conditioning with ${this.escapeHtml(modelLabel)} identifiers</span>
+        <div class="absolute inset-0 bg-gradient-to-br from-indigo-950/40 via-zinc-950 to-purple-950/30 animate-pulse flex flex-col items-center justify-center p-5 text-center">
+          <div class="relative mb-4">
+            <div class="w-14 h-14 border-4 border-indigo-500/30 rounded-full"></div>
+            <div class="w-14 h-14 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin absolute inset-0"></div>
+            <span class="absolute inset-0 flex items-center justify-center text-xs font-mono font-bold text-indigo-300" id="card-timer-${i}">0.0s</span>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-2">
+            Rendering Artwork #${i + 1} • ${this.escapeHtml(modelLabel)}
+          </span>
+          <span id="card-status-${i}" class="text-xs font-medium text-zinc-200 max-w-xs leading-relaxed">
+            Phase 1/4: Conditioning prompt &amp; connecting to GPU...
+          </span>
+          <span class="text-[10px] text-zinc-500 mt-2">Typical render time: 4–12 seconds</span>
         </div>
       `;
 
@@ -1268,6 +1356,9 @@ class App {
 
       card.innerHTML = `
         <img src="${safeUrl}" alt="${safeAlt}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <div class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-emerald-950/85 border border-emerald-500/40 text-emerald-300 text-[10px] font-semibold backdrop-blur">
+          ✓ Rendered in ${safeDuration}s
+        </div>
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3 pointer-events-none">
           <p class="text-xs text-white line-clamp-2 font-medium">${safePrompt}</p>
           <div class="flex items-center justify-between text-[10px] text-zinc-300 mt-1">
@@ -1280,44 +1371,106 @@ class App {
         </button>
       `;
 
-      card.classList.remove('cursor-wait');
-      card.classList.add('cursor-pointer');
+      card.classList.remove('cursor-wait', 'border-indigo-500/40');
+      card.classList.add('cursor-pointer', 'border-emerald-500/50');
       card.addEventListener('click', () => {
         Viewer.open(result, this.galleryItems);
       });
     } else {
       const safeErr = this.escapeHtml(error ? error.message : 'Timeout');
+      card.classList.remove('cursor-wait');
       card.innerHTML = `
-        <div class="p-4 text-center">
-          <span class="text-2xl mb-2 block">⚠️</span>
-          <p class="text-xs text-rose-400 font-medium">Generation Failed</p>
-          <p class="text-[10px] text-zinc-500 mt-1 line-clamp-2">${safeErr}</p>
+        <div class="p-5 text-center space-y-2">
+          <span class="text-3xl block">⚠️</span>
+          <p class="text-xs text-rose-400 font-bold">Generation Paused / Busy</p>
+          <p class="text-[11px] text-zinc-300 leading-relaxed max-w-xs mx-auto">${safeErr}</p>
         </div>
       `;
     }
   }
 
   /**
-   * Update UI generation state (button loading spinner, progress bar)
+   * Update UI generation state (button loading spinner, live stopwatch, telemetry HUD)
    */
-  updateGeneratingUI(loading) {
+  updateGeneratingUI(loading, succeeded = false) {
     const btn = document.getElementById('btn-generate');
-    const progressBar = document.getElementById('generation-progress-bar');
-    if (btn) {
-      if (loading) {
+    const hud = document.getElementById('generation-telemetry-hud');
+    const elapsedEl = document.getElementById('telemetry-elapsed');
+    const spinner = document.getElementById('telemetry-spinner');
+    const phaseBadge = document.getElementById('telemetry-phase-badge');
+    const statusText = document.getElementById('telemetry-status-text');
+    const progressFill = document.getElementById('telemetry-progress-fill');
+    const activePromptEl = document.getElementById('telemetry-active-prompt');
+    const stageTitle = document.getElementById('live-stage-title');
+    const stageSubtitle = document.getElementById('live-stage-subtitle');
+    const stageDot = document.getElementById('live-stage-dot');
+
+    if (this._telemetryTimer) {
+      clearInterval(this._telemetryTimer);
+      this._telemetryTimer = null;
+    }
+
+    if (loading) {
+      const promptInput = document.getElementById('prompt-input');
+      if (activePromptEl && promptInput) {
+        activePromptEl.textContent = PerchanceEngine.evaluate(promptInput.value);
+      }
+      if (hud) hud.classList.remove('hidden');
+      if (spinner) spinner.classList.remove('hidden');
+      if (progressFill) progressFill.style.width = '18%';
+
+      // Start 100ms live stopwatch
+      this._telemetryTimer = setInterval(() => {
+        const sec = ((performance.now() - (this._genStartMs || performance.now())) / 1000).toFixed(1);
+        if (elapsedEl) elapsedEl.textContent = `${sec}s`;
+        if (btn) {
+          btn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>Generating Anime Artwork... (${sec}s)</span>
+          `;
+        }
+        document.querySelectorAll('[id^="card-timer-"]').forEach(el => {
+          el.textContent = `${sec}s`;
+        });
+      }, 100);
+
+      if (btn) {
         btn.disabled = true;
-        btn.innerHTML = `
-          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Generating Anime Art...
-        `;
-        if (progressBar) progressBar.classList.remove('hidden');
-      } else {
+      }
+    } else {
+      if (btn) {
         btn.disabled = false;
-        btn.innerHTML = `<span>Generate Anime</span><span class="text-xs opacity-75 font-normal ml-1">(Ctrl+↵)</span>`;
-        if (progressBar) progressBar.classList.add('hidden');
+        btn.innerHTML = `<span>Generate Anime</span><span class="text-xs opacity-80 font-normal ml-1 hidden sm:inline">(Ctrl+↵)</span>`;
+      }
+      if (spinner) spinner.classList.add('hidden');
+
+      const totalSec = ((performance.now() - (this._genStartMs || performance.now())) / 1000).toFixed(1);
+      if (elapsedEl) elapsedEl.textContent = `${totalSec}s`;
+
+      if (succeeded) {
+        if (phaseBadge) {
+          phaseBadge.textContent = '✓ COMPLETE (100%)';
+          phaseBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0';
+        }
+        if (statusText) {
+          statusText.textContent = `Finished rendering in ${totalSec}s! Saved to your Artwork Gallery below.`;
+        }
+        if (progressFill) {
+          progressFill.style.width = '100%';
+          progressFill.classList.remove('animate-pulse');
+        }
+        if (stageTitle) stageTitle.textContent = 'Latest Generated Anime Artwork';
+        if (stageSubtitle) stageSubtitle.textContent = `Rendered in ${totalSec}s • Click artwork to open Fullscreen Zoom & Inspector`;
+        if (stageDot) stageDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+      } else {
+        if (phaseBadge) {
+          phaseBadge.textContent = '⚠️ PAUSED';
+          phaseBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/40 shrink-0';
+        }
+        if (stageDot) stageDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
       }
     }
   }
