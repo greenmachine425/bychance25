@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bychance — Perchance Prompt Workbench</title>
+    <title>Bychance — Prompt Optimiser &amp; Splitter</title>
     <style>
-/* Bychance — Utilitarian Minimalist Workbench Stylesheet */
+/* Bychance — Minimalist Prompt Optimiser & Section Splitter */
 :root {
     --bg-canvas: #f4f4f1;
     --bg-surface: #ffffff;
@@ -18,7 +18,7 @@
     --line-strong: #c8c8c2;
     --accent-ink: #141413;
     --accent-ink-hover: #2c2c2a;
-    --control-h: 32px;
+    --control-h: 34px;
     --radius: 4px;
     --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
@@ -40,7 +40,7 @@ html, body {
     min-height: 100vh;
 }
 
-/* Header Bar */
+/* Header & Mode Switcher */
 .topbar {
     background-color: var(--bg-surface);
     border-bottom: 1px solid var(--line-color);
@@ -51,7 +51,7 @@ html, body {
 }
 
 .topbar-inner {
-    max-width: 1480px;
+    max-width: 1080px;
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
@@ -60,10 +60,11 @@ html, body {
     gap: 16px;
 }
 
-.brand-group {
+.brand-and-tabs {
     display: flex;
-    align-items: baseline;
-    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
 }
 
 .brand-title {
@@ -74,10 +75,36 @@ html, body {
     color: var(--text-main);
 }
 
-.brand-subtitle {
-    font-size: 12px;
+.mode-switcher {
+    display: inline-flex;
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--line-color);
+    border-radius: var(--radius);
+    padding: 2px;
+    gap: 2px;
+}
+
+.mode-tab {
+    height: 30px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 3px;
+    background: transparent;
     color: var(--text-muted);
-    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.mode-tab:hover {
+    color: var(--text-main);
+}
+
+.mode-tab.active {
+    background-color: var(--accent-ink);
+    color: #ffffff;
 }
 
 .preset-toolbar {
@@ -87,50 +114,58 @@ html, body {
     gap: 8px;
 }
 
-.toolbar-label {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-muted);
-    margin-right: 4px;
-}
-
-.toolbar-divider {
-    width: 1px;
-    height: 18px;
-    background-color: var(--line-color);
-    margin: 0 4px;
-}
-
-/* Main Workbench Grid */
-.workbench-container {
-    max-width: 1480px;
+/* Main Workspace Container */
+.main-shell {
+    max-width: 1080px;
     margin: 0 auto;
     padding: 24px;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
-    align-items: start;
 }
 
-@media (min-width: 1040px) {
-    .workbench-container {
-        grid-template-columns: 1.1fr 0.9fr;
-    }
-}
-
-.column-stack {
+.tool-view {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    min-width: 0;
+}
+
+/* Splitter Top Bar & Grid */
+.splitter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--line-color);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+}
+
+.splitter-bar-left,
+.splitter-bar-right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.splitter-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+@media (min-width: 820px) {
+    .splitter-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 /* Section Panels */
 .editor-card {
     background-color: var(--bg-surface);
+    border: 1px solid var(--line-color);
     border-radius: var(--radius);
     padding: 16px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
@@ -156,7 +191,7 @@ html, body {
 }
 
 .card-title {
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 600;
     margin: 0;
     color: var(--text-main);
@@ -174,7 +209,7 @@ html, body {
     gap: 6px;
 }
 
-/* Uniform Form Controls: All selects, inputs, and buttons share exact height & spacing */
+/* Uniform Form Controls */
 .select-input {
     height: var(--control-h);
     background-color: var(--bg-subtle);
@@ -184,9 +219,8 @@ html, body {
     padding: 0 10px;
     font-family: var(--font-sans);
     font-size: 12px;
-    line-height: 30px;
     cursor: pointer;
-    transition: border-color 0.12s ease, background-color 0.12s ease;
+    max-width: 220px;
 }
 
 .select-input:hover {
@@ -204,10 +238,10 @@ html, body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 12px;
+    padding: 0 14px;
     border-radius: var(--radius);
     font-family: var(--font-sans);
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 500;
     border: 1px solid var(--line-color);
     background-color: var(--bg-subtle);
@@ -237,28 +271,20 @@ html, body {
     border-color: var(--accent-ink-hover);
 }
 
-.btn-sm {
-    height: 28px;
-    padding: 0 10px;
-    font-size: 12px;
-}
-
-/* Textareas — Clean, Unclipped, Auto-Growing */
+/* Textareas */
 .prompt-textarea {
     width: 100%;
-    min-height: 76px;
+    min-height: 92px;
     background-color: var(--bg-subtle);
     color: var(--text-main);
     border: 1px solid var(--line-color);
     border-radius: var(--radius);
     padding: 10px 12px;
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 13px;
     line-height: 1.55;
     resize: vertical;
-    overflow-y: auto;
     display: block;
-    transition: border-color 0.12s ease, background-color 0.12s ease;
 }
 
 .prompt-textarea::placeholder {
@@ -272,142 +298,25 @@ html, body {
 }
 
 .prompt-textarea.master-textarea {
-    min-height: 150px;
+    min-height: 170px;
     background-color: var(--bg-surface);
 }
 
-.prompt-textarea.expanded-box {
-    min-height: 260px !important;
+.prompt-textarea.negative-textarea {
+    min-height: 68px;
 }
 
-/* Quick Tag Chips */
-.chip-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 8px;
-}
-
-.tag-chip {
-    height: 24px;
-    display: inline-flex;
-    align-items: center;
-    background-color: transparent;
-    border: 1px solid var(--line-color);
-    color: var(--text-muted);
-    border-radius: var(--radius);
-    padding: 0 8px;
-    font-family: var(--font-sans);
-    font-size: 11.5px;
-    cursor: pointer;
-    transition: all 0.12s ease;
-}
-
-.tag-chip:hover {
-    color: var(--text-main);
-    border-color: var(--line-strong);
-    background-color: var(--bg-subtle);
-}
-
-/* Master Action Bar */
-.master-toolbar {
+/* Action Bar */
+.action-bar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--line-color);
-}
-
-/* Roll Preview Box */
-.roll-preview-box {
+    gap: 8px;
     margin-top: 12px;
-    padding: 12px;
-    border-radius: var(--radius);
-    background-color: var(--bg-subtle);
-    border-left: 2px solid var(--accent-ink);
 }
 
-.roll-preview-text {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--text-main);
-    white-space: pre-wrap;
-    word-break: break-word;
-    margin: 6px 0 0 0;
-}
-
-/* Word Upgrade List & Lookup Table */
-.upgrade-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.upgrade-item {
-    background-color: var(--bg-subtle);
-    border-radius: var(--radius);
-    padding: 10px 12px;
-}
-
-.upgrade-item-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-
-.upgrade-word-badge {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-main);
-}
-
-.upgrade-cat-badge {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-muted);
-}
-
-.upgrade-target-preview {
-    font-family: var(--font-mono);
-    font-size: 11.5px;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    word-break: break-word;
-}
-
-.upgrade-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-/* Dictionary Reference List */
-.dict-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-height: 340px;
-    overflow-y: auto;
-    padding-right: 4px;
-}
-
-.dict-row {
-    background-color: var(--bg-subtle);
-    border-radius: var(--radius);
-    padding: 10px 12px;
-}
-
-.status-count {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-muted);
-    background-color: var(--bg-subtle);
-    padding: 2px 8px;
-    border-radius: var(--radius);
+.spacer {
+    flex: 1;
 }
 
 /* Toast Notification */
@@ -443,208 +352,229 @@ html, body {
 <body>
     <header class="topbar">
         <div class="topbar-inner">
-            <div class="brand-group">
+            <div class="brand-and-tabs">
                 <h1 class="brand-title">Bychance</h1>
-                <p class="brand-subtitle">Perchance Prompting Workbench</p>
+                <div class="mode-switcher" role="tablist" aria-label="Tool Mode">
+                    <button
+                        id="tab-optimiser"
+                        class="mode-tab active"
+                        role="tab"
+                        aria-selected="true"
+                        aria-controls="view-optimiser"
+                    >
+                        Prompt Optimiser
+                    </button>
+                    <button
+                        id="tab-splitter"
+                        class="mode-tab"
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="view-splitter"
+                    >
+                        Section Splitter
+                    </button>
+                </div>
             </div>
 
             <div class="preset-toolbar">
-                <label for="full-preset-select" class="toolbar-label">Preset</label>
-                <select id="full-preset-select" class="select-input" style="min-width:220px;" title="Select a full preset"></select>
-                <button id="btn-load-full-preset" class="btn btn-primary">Load</button>
+                <select id="full-preset-select" class="select-input" title="Load a preset"></select>
                 <button id="btn-save-full-preset" class="btn">Save Preset</button>
                 <button id="btn-delete-full-preset" class="btn hidden">Delete</button>
-                <div class="toolbar-divider"></div>
-                <button id="btn-export-presets" class="btn">Export JSON</button>
-                <button id="btn-import-presets" class="btn">Import JSON</button>
-                <input type="file" id="import-presets-input" accept=".json" class="hidden" />
-                <button id="btn-clear-all" class="btn">Clear All</button>
+                <button id="btn-clear-all" class="btn">Clear</button>
             </div>
         </div>
     </header>
 
-    <main class="workbench-container">
-        <!-- Left Column: Split Modular Sections -->
-        <section class="column-stack" aria-label="Modular Prompt Sections">
-            <!-- 01. Character -->
-            <div class="editor-card" id="card-character">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <span class="section-index">01</span>
-                        <h2 class="card-title">Character &amp; Subject</h2>
-                        <span class="card-hint">Identity, hair, eyes, facial traits</span>
-                    </div>
-                    <div class="card-controls">
-                        <select id="preset-select-character" class="select-input"></select>
-                        <button class="btn" data-save-section="character">Save</button>
-                        <button class="btn hidden" id="del-section-character" data-delete-section="character">Delete</button>
-                        <button class="btn" data-upgrade-section="character">Upgrade Words</button>
-                        <button class="btn" data-expand-box="box-character">Expand</button>
-                    </div>
-                </div>
-                <textarea
-                    id="box-character"
-                    class="prompt-textarea"
-                    placeholder="Character name (e.g. Rosalina, Zelda, Frieren, 2B) or subject traits (1girl, solo, silver hair, emerald eyes)..."
-                ></textarea>
-                <div class="chip-row" id="chips-character"></div>
-            </div>
-
-            <!-- 02. Pose & Outfit -->
-            <div class="editor-card" id="card-outfit">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <span class="section-index">02</span>
-                        <h2 class="card-title">Pose, Outfit &amp; Action</h2>
-                        <span class="card-hint">Stance, expression, clothing, props</span>
-                    </div>
-                    <div class="card-controls">
-                        <select id="preset-select-outfit" class="select-input"></select>
-                        <button class="btn" data-save-section="outfit">Save</button>
-                        <button class="btn hidden" id="del-section-outfit" data-delete-section="outfit">Delete</button>
-                        <button class="btn" data-upgrade-section="outfit">Upgrade Words</button>
-                        <button class="btn" data-expand-box="box-outfit">Expand</button>
-                    </div>
-                </div>
-                <textarea
-                    id="box-outfit"
-                    class="prompt-textarea"
-                    placeholder="Pose, expression, garments, fabrics, accessories..."
-                ></textarea>
-                <div class="chip-row" id="chips-outfit"></div>
-            </div>
-
-            <!-- 03. Scene & Environment -->
-            <div class="editor-card" id="card-scene">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <span class="section-index">03</span>
-                        <h2 class="card-title">Scene &amp; Environment</h2>
-                        <span class="card-hint">Setting, architecture, weather, time of day</span>
-                    </div>
-                    <div class="card-controls">
-                        <select id="preset-select-scene" class="select-input"></select>
-                        <button class="btn" data-save-section="scene">Save</button>
-                        <button class="btn hidden" id="del-section-scene" data-delete-section="scene">Delete</button>
-                        <button class="btn" data-upgrade-section="scene">Upgrade Words</button>
-                        <button class="btn" data-expand-box="box-scene">Expand</button>
-                    </div>
-                </div>
-                <textarea
-                    id="box-scene"
-                    class="prompt-textarea"
-                    placeholder="Background setting, atmosphere, weather..."
-                ></textarea>
-                <div class="chip-row" id="chips-scene"></div>
-            </div>
-
-            <!-- 04. Art Style, Camera & Quality -->
-            <div class="editor-card" id="card-style">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <span class="section-index">04</span>
-                        <h2 class="card-title">Art Style, Camera &amp; Lighting</h2>
-                        <span class="card-hint">Medium, framing, lens, lighting, quality tags</span>
-                    </div>
-                    <div class="card-controls">
-                        <select id="preset-select-style" class="select-input"></select>
-                        <button class="btn" data-save-section="style">Save</button>
-                        <button class="btn hidden" id="del-section-style" data-delete-section="style">Delete</button>
-                        <button class="btn" data-upgrade-section="style">Upgrade Words</button>
-                        <button class="btn" data-expand-box="box-style">Expand</button>
-                    </div>
-                </div>
-                <textarea
-                    id="box-style"
-                    class="prompt-textarea"
-                    placeholder="Art style, camera angle, lighting, quality tags..."
-                ></textarea>
-                <div class="chip-row" id="chips-style"></div>
-            </div>
-
-            <!-- 05. Negative Prompt -->
-            <div class="editor-card" id="card-negative">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <span class="section-index">05</span>
-                        <h2 class="card-title">Negative Prompt</h2>
-                        <span class="card-hint">Exclusions</span>
-                    </div>
-                    <div class="card-controls">
-                        <button class="btn" id="btn-reset-negative">Reset Defaults</button>
-                        <button class="btn" data-expand-box="box-negative">Expand</button>
-                    </div>
-                </div>
-                <textarea
-                    id="box-negative"
-                    class="prompt-textarea"
-                    style="min-height:60px;"
-                    placeholder="lowres, worst quality, low quality, bad anatomy, bad hands, blurry, watermark..."
-                ></textarea>
-                <div class="chip-row" id="chips-negative"></div>
-            </div>
-        </section>
-
-        <!-- Right Column: Full Prompt Master Window & Word Upgrader -->
-        <aside class="column-stack" aria-label="Full Prompt and Word Upgrader">
-            <!-- Master Copy-Paste Window -->
+    <main class="main-shell">
+        <!-- VIEW 1: PROMPT OPTIMISER -->
+        <section id="view-optimiser" class="tool-view" role="tabpanel" aria-labelledby="tab-optimiser">
             <div class="editor-card">
                 <div class="card-header">
                     <div class="card-title-group">
-                        <h2 class="card-title">Full Prompt</h2>
-                        <span class="card-hint">Synced with modular sections</span>
+                        <h2 class="card-title">Prompt</h2>
+                        <span class="card-hint">Enter or paste any prompt and press Fix Prompt</span>
                     </div>
                     <div class="card-controls">
-                        <select id="master-format-select" class="select-input">
+                        <select id="master-format-select" class="select-input" title="Output format">
                             <option value="standard">Standard Prompt</option>
                             <option value="with-negative">Prompt + Negative</option>
                             <option value="perchance-list">Perchance List</option>
                         </select>
-                        <button class="btn" data-expand-box="box-master">Expand</button>
                     </div>
                 </div>
 
                 <textarea
                     id="box-master"
                     class="prompt-textarea master-textarea"
-                    placeholder="Assembled full prompt. Paste any prompt here and click 'Split to Sections' to populate the modular editors."
+                    placeholder="Type or paste your prompt here (e.g. 'Rosalina in a cozy cafe', 'a girl in a red dress in a forest at sunset', or full tag lists)..."
                 ></textarea>
 
-                <div class="master-toolbar">
-                    <button id="btn-copy-master" class="btn btn-primary">Copy Prompt</button>
-                    <button id="btn-copy-negative" class="btn">Copy Negative</button>
-                    <button id="btn-upgrade-all" class="btn">Upgrade Weak Words</button>
-                    <button id="btn-upgrade-perchance" class="btn">Upgrade to {a|b}</button>
-                    <button id="btn-wrap-choice" class="btn">Wrap Selection {a|b}</button>
-                    <button id="btn-roll-preview" class="btn">Test Roll</button>
-                    <button id="btn-split-to-boxes" class="btn">Split to Sections</button>
-                </div>
-
-                <div id="roll-preview-container" class="roll-preview-box hidden">
-                    <div class="card-header" style="margin-bottom:4px;">
-                        <span class="card-title" style="font-size:12px;">Sample Roll Output</span>
-                        <div class="card-controls">
-                            <button id="btn-reroll" class="btn btn-sm">Re-Roll</button>
-                            <button id="btn-copy-roll" class="btn btn-sm">Copy</button>
-                            <button id="btn-close-roll" class="btn btn-sm">Close</button>
-                        </div>
-                    </div>
-                    <p id="roll-preview-output" class="roll-preview-text"></p>
+                <div class="action-bar">
+                    <button id="btn-fix-prompt" class="btn btn-primary">Fix Prompt</button>
+                    <button id="btn-fix-perchance" class="btn">Fix as {a|b}</button>
+                    <button id="btn-go-split" class="btn">Split into Sections &rarr;</button>
+                    <div class="spacer"></div>
+                    <button id="btn-copy-master" class="btn">Copy Prompt</button>
                 </div>
             </div>
 
-            <!-- Detected Word & Character Upgrades -->
             <div class="editor-card">
                 <div class="card-header">
                     <div class="card-title-group">
-                        <h2 class="card-title">Suggested Word Upgrades</h2>
-                        <span id="upgrade-count-badge" class="status-count">0</span>
+                        <h2 class="card-title">Negative Prompt</h2>
+                        <span class="card-hint">Standard exclusions</span>
                     </div>
-                    <span class="card-hint">Click to replace weak terms with model tags</span>
+                    <div class="card-controls">
+                        <button id="btn-reset-negative-opt" class="btn">Reset Defaults</button>
+                        <button id="btn-copy-negative-opt" class="btn">Copy Negative</button>
+                    </div>
                 </div>
-                <div id="upgrade-suggestions-list" class="upgrade-list"></div>
+                <textarea
+                    id="box-negative-opt"
+                    class="prompt-textarea negative-textarea"
+                    placeholder="lowres, worst quality, low quality, bad anatomy, bad hands, blurry, watermark..."
+                ></textarea>
             </div>
-        </aside>
+        </section>
+
+        <!-- VIEW 2: SECTION SPLITTER -->
+        <section id="view-splitter" class="tool-view hidden" role="tabpanel" aria-labelledby="tab-splitter">
+            <div class="splitter-bar">
+                <div class="splitter-bar-left">
+                    <button id="btn-go-optimiser" class="btn btn-primary">&larr; Put Back Together (Optimiser)</button>
+                    <button id="btn-fix-all-sections" class="btn">Fix All Sections</button>
+                </div>
+                <div class="splitter-bar-right">
+                    <button id="btn-copy-combined" class="btn">Copy Combined Prompt</button>
+                </div>
+            </div>
+
+            <div class="splitter-grid">
+                <!-- 01. Character -->
+                <div class="editor-card" id="card-character">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="section-index">01</span>
+                            <h2 class="card-title">Character</h2>
+                        </div>
+                        <div class="card-controls">
+                            <select id="preset-select-character" class="select-input"></select>
+                            <button class="btn" data-save-section="character">Save</button>
+                            <button class="btn hidden" id="del-section-character" data-delete-section="character">Delete</button>
+                            <button class="btn" data-upgrade-section="character">Fix</button>
+                        </div>
+                    </div>
+                    <textarea
+                        id="box-character"
+                        class="prompt-textarea"
+                        placeholder="Character name or traits (e.g. Rosalina, 1girl, solo, silver hair, emerald eyes)..."
+                    ></textarea>
+                </div>
+
+                <!-- 02. Outfit -->
+                <div class="editor-card" id="card-outfit">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="section-index">02</span>
+                            <h2 class="card-title">Outfit &amp; Props</h2>
+                        </div>
+                        <div class="card-controls">
+                            <select id="preset-select-outfit" class="select-input"></select>
+                            <button class="btn" data-save-section="outfit">Save</button>
+                            <button class="btn hidden" id="del-section-outfit" data-delete-section="outfit">Delete</button>
+                            <button class="btn" data-upgrade-section="outfit">Fix</button>
+                        </div>
+                    </div>
+                    <textarea
+                        id="box-outfit"
+                        class="prompt-textarea"
+                        placeholder="Clothing, fabrics, armor, accessories, held items..."
+                    ></textarea>
+                </div>
+
+                <!-- 03. Pose -->
+                <div class="editor-card" id="card-pose">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="section-index">03</span>
+                            <h2 class="card-title">Pose &amp; Expression</h2>
+                        </div>
+                        <div class="card-controls">
+                            <select id="preset-select-pose" class="select-input"></select>
+                            <button class="btn" data-save-section="pose">Save</button>
+                            <button class="btn hidden" id="del-section-pose" data-delete-section="pose">Delete</button>
+                            <button class="btn" data-upgrade-section="pose">Fix</button>
+                        </div>
+                    </div>
+                    <textarea
+                        id="box-pose"
+                        class="prompt-textarea"
+                        placeholder="Stance, posture, action, facial expression, gaze..."
+                    ></textarea>
+                </div>
+
+                <!-- 04. Scene -->
+                <div class="editor-card" id="card-scene">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="section-index">04</span>
+                            <h2 class="card-title">Scene &amp; Environment</h2>
+                        </div>
+                        <div class="card-controls">
+                            <select id="preset-select-scene" class="select-input"></select>
+                            <button class="btn" data-save-section="scene">Save</button>
+                            <button class="btn hidden" id="del-section-scene" data-delete-section="scene">Delete</button>
+                            <button class="btn" data-upgrade-section="scene">Fix</button>
+                        </div>
+                    </div>
+                    <textarea
+                        id="box-scene"
+                        class="prompt-textarea"
+                        placeholder="Background setting, architecture, weather, time of day..."
+                    ></textarea>
+                </div>
+
+                <!-- 05. Style -->
+                <div class="editor-card" id="card-style">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="section-index">05</span>
+                            <h2 class="card-title">Style, Camera &amp; Lighting</h2>
+                        </div>
+                        <div class="card-controls">
+                            <select id="preset-select-style" class="select-input"></select>
+                            <button class="btn" data-save-section="style">Save</button>
+                            <button class="btn hidden" id="del-section-style" data-delete-section="style">Delete</button>
+                            <button class="btn" data-upgrade-section="style">Fix</button>
+                        </div>
+                    </div>
+                    <textarea
+                        id="box-style"
+                        class="prompt-textarea"
+                        placeholder="Art style, camera angle, lighting, quality boosters..."
+                    ></textarea>
+                </div>
+
+                <!-- 06. Negative -->
+                <div class="editor-card" id="card-negative">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="section-index">06</span>
+                            <h2 class="card-title">Negative Prompt</h2>
+                        </div>
+                        <div class="card-controls">
+                            <button class="btn" id="btn-reset-negative">Reset Defaults</button>
+                            <button class="btn" id="btn-copy-negative">Copy</button>
+                        </div>
+                    </div>
+                    <textarea
+                        id="box-negative"
+                        class="prompt-textarea"
+                        placeholder="lowres, worst quality, low quality, bad anatomy, bad hands..."
+                    ></textarea>
+                </div>
+            </div>
+        </section>
     </main>
 
     <div id="toast-banner" class="toast-banner" role="status" aria-live="polite"></div>
@@ -999,12 +929,12 @@ const PromptEngine = (() => {
             match: /\b(pinup|2d pinup|pin-up)\b/gi,
             label: "2D pinup style",
             category: "Style",
-            primary: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy figure, stylized large head, large expressive eyes, bold clean lineart, smooth cel shading, vibrant colors",
+            primary: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy figure, large expressive eyes, bold clean lineart, smooth cel shading, vibrant colors",
             alternatives: [
-                "stylized 2D pinup proportions, exaggerated hourglass silhouette, wide hips, thick thighs, large expressive eyes, crisp ink lineart, glossy cel shading",
-                "modern 2D cartoon pinup aesthetic, curvy stylized anatomy, large head proportion, expressive eyes, clean vector-style linework"
+                "stylized 2D pinup proportions, hourglass silhouette, wide hips, thick thighs, large expressive eyes, crisp ink lineart, glossy cel shading",
+                "modern 2D cartoon pinup aesthetic, curvy stylized anatomy, expressive eyes, clean vector-style linework"
             ],
-            perchance: "{2D pinup illustration style, wide hips, thick thighs, curvy, stylized large head, large expressive eyes, bold lineart|stylized 2D pinup aesthetic, exaggerated curvy proportions, glossy cel shading}"
+            perchance: "{2D pinup illustration style, wide hips, thick thighs, curvy, large expressive eyes, bold lineart|stylized 2D pinup aesthetic, curvy proportions, glossy cel shading}"
         },
         {
             match: /\b(anime|anime style)\b/gi,
@@ -1021,12 +951,122 @@ const PromptEngine = (() => {
             match: /\b(realistic|photorealistic)\b/gi,
             label: "realistic / photorealistic",
             category: "Style",
-            primary: "photorealistic RAW photo, 85mm f/1.4 DSLR, natural skin pores, subsurface scattering, film grain",
+            primary: "photorealistic RAW photo, 85mm f/1.4 DSLR, natural skin texture, subsurface scattering, film grain",
             alternatives: [
                 "cinematic 35mm film still, Kodak Portra 400 color grading, lifelike textures",
                 "hyper-detailed studio portrait photography, physically accurate lighting"
             ],
             perchance: "{photorealistic RAW photo, 85mm DSLR, subsurface scattering|cinematic 35mm film still, Kodak Portra 400}"
+        },
+        {
+            match: /\b(cute|pretty|beautiful|gorgeous)\b/gi,
+            label: "cute / pretty / beautiful",
+            category: "Character",
+            primary: "refined facial features, expressive eyes, detailed iris catchlights, soft natural blush",
+            alternatives: [
+                "delicate symmetry, luminous eyes, graceful demeanor",
+                "charming expression, glossy lips, fine eyelashes"
+            ],
+            perchance: "{refined facial features, expressive eyes, detailed catchlights|delicate symmetry, luminous gaze}"
+        },
+        {
+            match: /\b(cool|epic|awesome)\b/gi,
+            label: "cool / epic / awesome",
+            category: "Style",
+            primary: "dramatic composition, high-contrast rim lighting, kinetic energy, striking visual impact",
+            alternatives: [
+                "cinematic framing, atmospheric depth, bold silhouette",
+                "dynamic perspective, volumetric lighting, intense atmosphere"
+            ],
+            perchance: "{dramatic composition, high-contrast rim lighting|cinematic framing, volumetric lighting}"
+        },
+        {
+            match: /\b(magic|magical|spell)\b/gi,
+            label: "magic / spell",
+            category: "Outfit",
+            primary: "swirling arcane energy, glowing runes, luminous particle effects, ethereal aura",
+            alternatives: [
+                "casting radiant spell circle, floating light motes, mystic glow",
+                "crackling elemental energy, bioluminescent mana ribbons"
+            ],
+            perchance: "{swirling arcane energy, glowing runes|radiant spell circle, floating light particles}"
+        },
+        {
+            match: /\b(water|ocean|sea|beach)\b/gi,
+            label: "water / ocean / beach",
+            category: "Scene",
+            primary: "crystal-clear turquoise water, glistening wave crests, caustic light reflections, coastal horizon",
+            alternatives: [
+                "sunlit ocean shoreline, wet sand mirror reflections, sea mist",
+                "tranquil water surface, shimmering ripples, refracted light"
+            ],
+            perchance: "{crystal-clear turquoise water, caustic light reflections|sunlit ocean shoreline, wet sand reflections}"
+        },
+        {
+            match: /\b(rain|raining|rainy)\b/gi,
+            label: "rain / rainy",
+            category: "Scene",
+            primary: "falling rain droplets, wet surface reflections, atmospheric mist, puddles",
+            alternatives: [
+                "heavy downpour, glistening wet textures, Moody overcast sky",
+                "gentle rain shower, water streaks on glass, ambient reflections"
+            ],
+            perchance: "{falling rain droplets, wet surface reflections|gentle rain shower, glistening puddles}"
+        },
+        {
+            match: /\b(fire|flames|burning)\b/gi,
+            label: "fire / flames",
+            category: "Scene",
+            primary: "dancing embers, warm orange rim lighting, flickering flames, rising heat haze",
+            alternatives: [
+                "roaring firelight, glowing sparks, dramatic warm-cool contrast",
+                "swirling flame tongues, floating ash particles, intense illumination"
+            ],
+            perchance: "{dancing embers, warm firelight, glowing sparks|roaring flames, dramatic warm rim lighting}"
+        },
+        {
+            match: /\b(snow|snowing|snowy|winter)\b/gi,
+            label: "snow / winter",
+            category: "Scene",
+            primary: "falling snowflakes, frost-covered surfaces, crisp winter air, soft diffused overcast light",
+            alternatives: [
+                "pristine snowdrifts, visible breath in cold air, icy specular glints",
+                "serene winter landscape, glistening ice crystals, pale blue shadows"
+            ],
+            perchance: "{falling snowflakes, frost-covered surfaces|pristine snowdrifts, glistening ice crystals}"
+        },
+        {
+            match: /\b(sunset|sunrise|golden hour)\b/gi,
+            label: "sunset / sunrise",
+            category: "Scene",
+            primary: "golden hour warm sunlight, long dramatic shadows, glowing amber and violet horizon clouds",
+            alternatives: [
+                "radiant twilight sky, warm backlit rim glow, atmospheric haze",
+                "crimson and gold sunset clouds, soft lens flare, warm color grading"
+            ],
+            perchance: "{golden hour warm sunlight, glowing amber horizon|radiant twilight sky, warm backlit rim glow}"
+        },
+        {
+            match: /\b(running|jumping)\b/gi,
+            label: "running / jumping",
+            category: "Pose",
+            primary: "dynamic mid-motion pose, kinetic energy, windswept motion, foreshortened angle",
+            alternatives: [
+                "agile airborne leap, flowing garments, action framing",
+                "energetic sprint, expressive movement, subtle motion blur"
+            ],
+            perchance: "{dynamic mid-motion pose, kinetic energy|agile airborne leap, flowing movement}"
+        },
+        {
+            match: /\b(sword|blade|weapon)\b/gi,
+            label: "sword / weapon",
+            category: "Outfit",
+            primary: "ornate forged steel blade,sharp metallic reflections, engraved hilt, gleaming edge",
+            alternatives: [
+                "luminous enchanted sword, intricate crossguard, specular steel glint",
+                "masterwork katana, polished edge, dynamic weapon stance"
+            ],
+            perchance: "{ornate forged steel blade, metallic reflections|luminous enchanted sword, engraved hilt}"
         }
     ];
 
@@ -1035,57 +1075,65 @@ const PromptEngine = (() => {
     const CHARACTER_IDENTIFIERS = {
         "rosalina": {
             name: "Rosalina (Super Mario)",
-            character: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, serene regal expression, fair skin",
-            outfit: "silver tiara crown with jewels, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, long flared dress hem, wand with golden star, accompanied by floating yellow Luma star companion",
+            character: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, fair skin",
+            outfit: "silver tiara crown with jewels, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, long flared dress hem, golden star wand, floating yellow Luma companion",
+            pose: "graceful floating posture, serene regal expression, looking at viewer",
             scene: "Comet Observatory dome, deep cosmic starry night sky, glowing Milky Way nebula, floating stardust particles, crescent moon",
             style: "masterpiece, best quality, vibrant anime illustration, luminous magical bloom, soft rim lighting, intricate eye catchlights, smooth cel shading"
         },
         "peach": {
             name: "Princess Peach (Super Mario)",
-            character: "Princess Peach (Super Mario), 1girl, solo, long wavy golden blonde hair, sapphire blue eyes, sweet royal smile, rosy cheeks",
+            character: "Princess Peach (Super Mario), 1girl, solo, long wavy golden blonde hair, sapphire blue eyes, rosy cheeks",
             outfit: "gold crown with red and blue jewels, pink puff-sleeve ballgown, darker pink pannier hip drapes, blue oval brooch on chest, long white opera gloves, blue round earrings",
+            pose: "poised royal stance, hands clasped gently, sweet warm smile",
             scene: "sunlit Mushroom Kingdom castle garden, stained glass castle towers in background, floating flower petals",
             style: "masterpiece, best quality, vibrant anime illustration, soft pastel lighting, crisp lineart"
         },
         "zelda": {
             name: "Princess Zelda (Legend of Zelda)",
-            character: "Princess Zelda (Breath of the Wild / Tears of the Kingdom), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes, noble determined expression",
+            character: "Princess Zelda (Breath of the Wild / Tears of the Kingdom), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes",
             outfit: "ornate royal blue and white Hylian ceremonial dress, gold Triforce embroidery, decorative shoulder pauldrons, golden belt",
+            pose: "poised standing stance, noble contemplative expression, looking at viewer",
             scene: "ancient overgrown Temple of Time ruins, Silent Princess glowing blue flowers, sunbeams through stone arches",
             style: "masterpiece, best quality, painterly fantasy anime illustration, golden hour volumetric light, intricate textures"
         },
         "samus": {
             name: "Samus Aran (Metroid)",
-            character: "Samus Aran (Metroid), 1girl, solo, athletic tall figure, long golden blonde hair in high ponytail, piercing ice-blue eyes, beauty mark under left eye, confident expression",
-            outfit: "sleek glowing blue Zero Suit bodysuit, subtle hexagonal tech texture, glowing pink chest insignia, metallic paralyzer pistol in hand",
+            character: "Samus Aran (Metroid), 1girl, solo, athletic tall figure, long golden blonde hair in high ponytail, piercing ice-blue eyes, beauty mark under left eye",
+            outfit: "sleek glowing blue Zero Suit bodysuit, subtle hexagonal tech texture, glowing pink chest insignia, metallic paralyzer pistol",
+            pose: "confident contrapposto stance, hand on hip, focused expression",
             scene: "high-tech galactic starship bridge, holographic star map displays, atmospheric cyan neon rim lighting",
             style: "masterpiece, best quality, sci-fi anime key visual, glossy specular highlights, cinematic contrast"
         },
         "2b": {
             name: "2B (NieR:Automata)",
-            character: "2B (NieR:Automata), YoRHa No.2 Type B, 1girl, solo, short silver-white bob hair, bangs, black combat visor blindfold over eyes, beauty mark under lip, stoic expression",
-            outfit: "black Gothic lolita combat dress, high-slit velvet skirt with silver embroidery, puff sleeves with feather trim, black thigh-high boots, floating Virtuous Contract katana behind back",
+            character: "2B (NieR:Automata), YoRHa No.2 Type B, 1girl, solo, short silver-white bob hair, bangs, black combat visor blindfold over eyes, beauty mark under lip",
+            outfit: "black Gothic lolita combat dress, high-slit velvet skirt with silver embroidery, puff sleeves with feather trim, black thigh-high boots, Virtuous Contract katana",
+            pose: "dynamic combat stance, stoic expression, poised readiness",
             scene: "overgrown post-apocalyptic city ruins, crumbling concrete skyscrapers, shafts of pale sunlight, floating white dust motes",
             style: "masterpiece, best quality, atmospheric dark fantasy sci-fi illustration, delicate fabric textures, rim lighting"
         },
         "frieren": {
             name: "Frieren (Sousou no Frieren)",
-            character: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in twin tails, long pointed elf ears, calm green eyes, peaceful nostalgic expression",
+            character: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in twin tails, long pointed elf ears, calm green eyes",
             outfit: "white and gold-trimmed capelet over white tunic shirt, striped scarf, black skirt, brown leather boots, red-gemmed golden mage staff, dangling red earrings",
+            pose: "seated gracefully, peaceful nostalgic expression, gentle gaze",
             scene: "field of glowing blue-moon weed flowers at twilight, starry dusk sky, gentle breeze",
             style: "masterpiece, best quality, delicate watercolor anime aesthetic, soft magical lighting, expressive linework"
         },
         "miku": {
             name: "Hatsune Miku (Vocaloid)",
-            character: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails reaching knees, bright turquoise eyes, cheerful energetic smile",
+            character: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails reaching knees, bright turquoise eyes",
             outfit: "sleeveless grey futuristic collared top with turquoise tie, black detached arm warmers with glowing equalizer graphics, pleated black skirt with teal trim, square hair ribbons",
+            pose: "dynamic singing pose reaching toward viewer, cheerful energetic smile",
             scene: "virtual concert stage, floating holographic musical notes, cyan laser beams, glowing crowd silhouettes",
             style: "masterpiece, best quality, vibrant modern anime illustration, luminous neon bloom, sharp focus"
         },
         "tifa": {
             name: "Tifa Lockhart (Final Fantasy VII)",
-            character: "Tifa Lockhart (Final Fantasy VII Remake), 1girl, solo, long dark brown hair with dolphin-tail tips, warm wine-red eyes, athletic toned physique, warm confident smile",
+            character: "Tifa Lockhart (Final Fantasy VII Remake), 1girl, solo, long dark brown hair with dolphin-tail tips, warm wine-red eyes, athletic toned physique",
             outfit: "fitted white cropped tank top, black miniskirt with suspenders, red leather combat gloves with metallic plates, black thigh-high socks, red boots",
+            pose: "confident standing posture, warm confident smile, looking at viewer",
             scene: "Seventh Heaven bar interior, warm amber Edison bulb lighting, wooden counter, neon sign glow",
             style: "masterpiece, best quality, semi-realistic 3D anime rendering, subsurface skin scattering, cinematic depth of field"
         }
@@ -1094,7 +1142,7 @@ const PromptEngine = (() => {
     // 3. Curated Quick-Add Tag Chips per Section
     const SECTION_QUICK_TAGS = {
         character: [
-            { label: "+ 2D Pinup Proportions", value: "stylized 2D pinup proportions, curvy, wide hips, thick thighs, narrow waist, stylized large head, large expressive eyes" },
+            { label: "+ 2D Pinup Proportions", value: "stylized 2D pinup proportions, curvy, wide hips, thick thighs, narrow waist, large expressive eyes" },
             { label: "+ 1girl, solo", value: "1girl, solo" },
             { label: "+ 1boy, solo", value: "1boy, solo" },
             { label: "+ Expressive Eyes", value: "large expressive eyes, detailed iris texture, sparkling eye catchlights, long eyelashes" },
@@ -1121,7 +1169,7 @@ const PromptEngine = (() => {
             { label: "+ Perchance Time", value: "{golden hour sunset|starlit midnight|crisp morning sunlight|twilight dusk}" }
         ],
         style: [
-            { label: "+ 2D Pinup Style", value: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy, stylized large head, large expressive eyes, bold clean lineart, smooth cel shading, glossy highlights" },
+            { label: "+ 2D Pinup Style", value: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy, large expressive eyes, bold clean lineart, smooth cel shading, glossy highlights" },
             { label: "+ Masterpiece Boosters", value: "masterpiece, best quality, ultra-detailed, sharp focus, intricate textures" },
             { label: "+ Modern Anime Key Visual", value: "modern anime key visual, vibrant cel shading, crisp lineart, luminous bloom" },
             { label: "+ 90s Retro Cel Anime", value: "1990s retro anime cel aesthetic, hand-painted background, subtle film grain" },
@@ -1229,7 +1277,7 @@ const PromptEngine = (() => {
 
     // 7. Assemble Modular Sections into a Unified Full Prompt
     function assembleFullPrompt(sections, format = "standard") {
-        const order = ["character", "outfit", "scene", "style"];
+        const order = ["character", "outfit", "pose", "scene", "style"];
         const activeParts = order
             .map((key) => (sections[key] || "").trim().replace(/,+$/, "").trim())
             .filter(Boolean);
@@ -1256,18 +1304,19 @@ const PromptEngine = (() => {
         return positivePrompt;
     }
 
-    // 8. Parse a Full Pasted Prompt into Modular Sections (Character, Outfit/Pose, Scene, Style, Negative)
+    // 8. Parse a Full Pasted Prompt into Modular Sections (Character, Outfit, Pose, Scene, Style, Negative)
     function parseFullPromptToSections(fullText) {
         const result = {
             character: [],
             outfit: [],
+            pose: [],
             scene: [],
             style: [],
             negative: []
         };
 
         if (!fullText || !fullText.trim()) {
-            return { character: "", outfit: "", scene: "", style: "", negative: "" };
+            return { character: "", outfit: "", pose: "", scene: "", style: "", negative: "" };
         }
 
         // Extract Negative prompt if present
@@ -1278,16 +1327,39 @@ const PromptEngine = (() => {
             mainText = fullText.slice(0, negMatch.index).trim();
         }
 
-        // Tokenize by comma outside of {...} braces
-        const tokens = splitTopLevelCommas(mainText);
+        // Strip common conversational filler prefixes
+        mainText = mainText
+            .replace(/^(?:please\s+)?(?:can you\s+)?(?:draw|create|generate|make|paint|render|show)\s+(?:me\s+)?(?:a\s+|an\s+)?(?:picture|image|photo|illustration|drawing|art|portrait)\s+of\s+/i, "")
+            .replace(/^(?:a\s+|an\s+)?(?:picture|image|photo|illustration|drawing|art|portrait)\s+of\s+/i, "");
 
-        const styleKeywords = /\b(masterpiece|best quality|highres|absurdres|8k|4k|illustration|anime|cel shading|lineart|concept art|photorealistic|raw photo|dslr|lens|bokeh|depth of field|lighting|rim light|god rays|volumetric|chiaroscuro|bloom|angle|from below|from above|close-up|full body|portrait|shot|film grain|watercolor|oil painting|render|ufotable|shinkai|ghibli)\b/i;
-        const sceneKeywords = /\b(background|sky|night|daylight|sunset|sunrise|twilight|forest|woods|city|street|castle|palace|room|interior|outdoor|observatory|nebula|starry|stars|moon|clouds|rain|snow|mist|fog|ocean|beach|mountain|garden|cafe|ruins|temple|flowers|petals|stardust|horizon|landscape|architecture)\b/i;
-        const outfitPoseKeywords = /\b(dress|gown|skirt|shirt|jacket|coat|sweater|cardigan|armor|suit|bodysuit|gloves|boots|shoes|stockings|thighhighs|crown|tiara|brooch|wand|sword|katana|weapon|staff|scarf|hat|ribbon|earrings|necklace|glasses|visor|blindfold|standing|sitting|seated|pose|stance|walking|running|action|fighting|leaning|crossed|holding|smiling|smile|expression|blush|crying|tears|scowl|glare|looking|gaze)\b/i;
-        const negKeywords = /\b(lowres|worst quality|low quality|bad anatomy|bad hands|extra digits|blurry|watermark|signature|mutated|deformed|ugly|jpeg artifacts)\b/i;
+        // Tokenize by comma outside of {...} braces, and further split long natural-language clauses
+        const rawTokens = splitTopLevelCommas(mainText);
+        const tokens = [];
+        rawTokens.forEach((t) => {
+            if (t.includes("{") || t.split(/\s+/).length <= 4) {
+                tokens.push(t);
+            } else {
+                // Split natural language prepositional clauses into tag-friendly chunks
+                const subParts = t
+                    .replace(/\b(wearing|dressed in|holding|carrying)\b/gi, ", $1")
+                    .replace(/\b(standing|sitting|seated|walking|running|kneeling|floating|leaning|posing)\b/gi, ", $1")
+                    .replace(/\b(in a|in an|in the|inside a|at a|at the|on a|on the|under a|under the|surrounded by|with a background of)\b/gi, ", ")
+                    .replace(/\b(in style of|in the style of|drawn in|rendered in|lit by)\b/gi, ", ")
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+                tokens.push(...subParts);
+            }
+        });
+
+        const styleKeywords = /\b(masterpiece|best quality|highres|absurdres|8k|4k|illustration|anime|pinup|pin-up|cel shading|lineart|concept art|photorealistic|raw photo|dslr|lens|bokeh|depth of field|lighting|rim light|god rays|volumetric|chiaroscuro|bloom|angle|from below|from above|close-up|closeup|full body|portrait|shot|film grain|watercolor|oil painting|render|ufotable|shinkai|ghibli|sharp focus|textures|highlights)\b/i;
+        const sceneKeywords = /\b(background|backdrop|sky|night|daylight|sunset|sunrise|golden hour|twilight|forest|woods|city|street|alley|castle|palace|room|interior|outdoor|observatory|nebula|starry|stars|moon|clouds|rain|rainy|snow|snowy|winter|mist|fog|ocean|sea|water|beach|shore|mountain|garden|meadow|field|cafe|bar|ruins|temple|cathedral|library|stage|bridge|flowers|petals|stardust|horizon|landscape|architecture|window)\b/i;
+        const poseKeywords = /\b(standing|sitting|seated|pose|posing|stance|posture|contrapposto|walking|running|jumping|leaping|action|fighting|combat|spellcasting|leaning|crossed|kneeling|floating|perched|curtsy|stride|smiling|smile|grin|laugh|expression|blush|crying|tears|scowl|glare|looking|gaze|staring|wink|hand on hip|arms|reaching|clasped)\b/i;
+        const outfitKeywords = /\b(wearing|dressed|dress|gown|ballgown|sundress|skirt|miniskirt|shirt|top|blouse|tunic|jacket|coat|sweater|cardigan|armor|pauldrons|suit|bodysuit|techwear|robe|cloak|cape|capelet|gloves|boots|shoes|stockings|thighhighs|socks|crown|tiara|brooch|wand|sword|katana|blade|weapon|spear|staff|pistol|scarf|hat|sunhat|ribbon|earrings|necklace|glasses|visor|blindfold|belt|suspenders|collar|sleeves|fabric|silk|satin|velvet|lace|denim|leather|attire|outfit|clothes|garment|mug|teacup|Luma)\b/i;
+        const negKeywords = /\b(lowres|worst quality|low quality|bad anatomy|bad hands|extra digits|fewer digits|blurry|watermark|signature|mutated|deformed|ugly|jpeg artifacts)\b/i;
 
         tokens.forEach((rawToken) => {
-            const token = rawToken.trim();
+            const token = rawToken.trim().replace(/^(?:a|an|the|and|with)\s+/i, "").trim();
             if (!token) return;
 
             if (negKeywords.test(token)) {
@@ -1296,8 +1368,10 @@ const PromptEngine = (() => {
                 result.style.push(token);
             } else if (sceneKeywords.test(token)) {
                 result.scene.push(token);
-            } else if (outfitPoseKeywords.test(token)) {
+            } else if (outfitKeywords.test(token)) {
                 result.outfit.push(token);
+            } else if (poseKeywords.test(token)) {
+                result.pose.push(token);
             } else {
                 result.character.push(token);
             }
@@ -1306,6 +1380,7 @@ const PromptEngine = (() => {
         return {
             character: result.character.join(", "),
             outfit: result.outfit.join(", "),
+            pose: result.pose.join(", "),
             scene: result.scene.join(", "),
             style: result.style.join(", "),
             negative: result.negative.join(", ")
@@ -1380,6 +1455,257 @@ const PromptEngine = (() => {
         return cleanCommaFormatting(output);
     }
 
+    // 10. Comprehensive Deterministic Prompt Improver
+    // Takes either a raw prompt string or a sections object, splits/normalizes it,
+    // upgrades weak words, expands known characters, and enriches sparse sections with high-signal tags.
+    function improvePrompt(input, options = {}) {
+        const usePerchance = Boolean(options.usePerchance);
+        const defaultNegative = options.defaultNegative || "lowres, worst quality, low quality, bad anatomy, bad hands, extra digits, fewer digits, blurry, watermark, signature, text, jpeg artifacts, deformed, mutated hands";
+
+        let sections = {
+            character: "",
+            outfit: "",
+            pose: "",
+            scene: "",
+            style: "",
+            negative: ""
+        };
+
+        if (typeof input === "string") {
+            sections = parseFullPromptToSections(input);
+        } else if (input && typeof input === "object") {
+            sections = {
+                character: (input.character || "").trim(),
+                outfit: (input.outfit || "").trim(),
+                pose: (input.pose || "").trim(),
+                scene: (input.scene || "").trim(),
+                style: (input.style || "").trim(),
+                negative: (input.negative || "").trim()
+            };
+            // If all modular tokens are crammed into character (e.g. unsplit paste), re-parse across sections
+            if (sections.character && !sections.outfit && !sections.pose && !sections.scene && !sections.style && sections.character.includes(",")) {
+                const parsed = parseFullPromptToSections(sections.character);
+                sections.character = parsed.character;
+                sections.outfit = parsed.outfit;
+                sections.pose = parsed.pose;
+                sections.scene = parsed.scene;
+                sections.style = parsed.style;
+                if (!sections.negative && parsed.negative) {
+                    sections.negative = parsed.negative;
+                }
+            }
+        }
+
+        let totalChanges = 0;
+        const appliedNotes = [];
+
+        const combinedInitial = [sections.character, sections.outfit, sections.pose, sections.scene, sections.style].join(" ");
+
+        // Step A: Expand recognizable character profiles across sections if present
+        Object.keys(CHARACTER_IDENTIFIERS).forEach((key) => {
+            const profile = CHARACTER_IDENTIFIERS[key];
+            const regex = new RegExp(`\\b${key}\\b`, "i");
+            if (regex.test(combinedInitial)) {
+                if (!sections.character.toLowerCase().includes(profile.character.slice(0, 28).toLowerCase())) {
+                    const replaceReg = new RegExp(`\\b${key}\\b`, "gi");
+                    if (replaceReg.test(sections.character)) {
+                        sections.character = cleanCommaFormatting(sections.character.replace(replaceReg, profile.character));
+                    } else {
+                        sections.character = cleanCommaFormatting(`${profile.character}, ${sections.character}`);
+                    }
+                    totalChanges++;
+                    appliedNotes.push(`Expanded ${profile.name}`);
+                }
+                if (!sections.outfit.trim()) {
+                    sections.outfit = profile.outfit;
+                    totalChanges++;
+                }
+                if (!sections.pose.trim() && profile.pose) {
+                    sections.pose = profile.pose;
+                    totalChanges++;
+                }
+                if (!sections.scene.trim()) {
+                    sections.scene = profile.scene;
+                    totalChanges++;
+                }
+                if (!sections.style.trim()) {
+                    sections.style = profile.style;
+                    totalChanges++;
+                }
+            }
+        });
+
+        // Step B: Normalize common subject nouns in character section
+        if (sections.character) {
+            if (/\b(girl|woman|female|lady|princess|heroine|maiden|witch|sorceress)\b/i.test(sections.character) && !/\b1girl\b/i.test(sections.character)) {
+                sections.character = cleanCommaFormatting(`1girl, solo, ${sections.character.replace(/\b(a|an|the)\s+(girl|woman|female|lady)\b/gi, "$2")}`);
+                totalChanges++;
+            } else if (/\b(boy|man|male|guy|prince|warrior)\b/i.test(sections.character) && !/\b1boy\b/i.test(sections.character)) {
+                sections.character = cleanCommaFormatting(`1boy, solo, ${sections.character.replace(/\b(a|an|the)\s+(boy|man|male|guy)\b/gi, "$2")}`);
+                totalChanges++;
+            }
+        }
+
+        // Step C: Upgrade weak/vague words in each section
+        ["character", "outfit", "pose", "scene", "style"].forEach((k) => {
+            if (!sections[k]) return;
+            const res = upgradeWeakWordsInText(sections[k], usePerchance);
+            if (res.count > 0) {
+                sections[k] = res.text;
+                totalChanges += res.count;
+            }
+        });
+
+        // Step D: Enrich sparse or missing sections with high-signal descriptors
+        // 1. Character enrichment
+        if (!sections.character.trim()) {
+            sections.character = usePerchance
+                ? "1girl, solo, {platinum blonde|silver-white|midnight black} hair, {emerald green|sapphire blue|amber} eyes, detailed iris catchlights, expressive facial features"
+                : "1girl, solo, expressive eyes, detailed iris catchlights, refined facial features";
+            totalChanges++;
+            appliedNotes.push("Added subject foundation");
+        } else if (!/\b(catchlights|iris|expressive eyes|facial features)\b/i.test(sections.character)) {
+            const booster = usePerchance
+                ? "{large expressive eyes, detailed iris catchlights|luminous eyes, long eyelashes, refined facial features}"
+                : "expressive eyes, detailed iris catchlights, refined facial features";
+            sections.character = cleanCommaFormatting(`${sections.character}, ${booster}`);
+            totalChanges++;
+            appliedNotes.push("Enhanced character details");
+        }
+
+        // 2. Outfit enrichment
+        if (sections.outfit) {
+            sections.outfit = cleanCommaFormatting(sections.outfit.replace(/\b(?:wearing|dressed in)\s+(?:a\s+|an\s+)?/gi, ""));
+        }
+        if (!sections.outfit.trim()) {
+            sections.outfit = usePerchance
+                ? "{detailed tailored attire, crisp fabric folds|ornate garment, intricate material textures}"
+                : "detailed attire, crisp fabric folds, intricate material textures";
+            totalChanges++;
+            appliedNotes.push("Added outfit detail");
+        } else if (!/\b(folds|texture|textures|fabric|silk|satin|leather|steel|trim|embroidery)\b/i.test(sections.outfit)) {
+            sections.outfit = cleanCommaFormatting(`${sections.outfit}, realistic fabric folds`);
+            totalChanges++;
+        }
+
+        // 3. Pose & Expression enrichment
+        if (!sections.pose.trim()) {
+            sections.pose = usePerchance
+                ? "{graceful contrapposto stance, looking at viewer|confident standing pose, hand on hip|poised posture, looking back over shoulder}"
+                : "graceful contrapposto stance, poised posture, looking at viewer";
+            totalChanges++;
+            appliedNotes.push("Added pose & expression");
+        } else if (!/\b(looking|gaze|viewer|expression|smile|glare|eyes)\b/i.test(sections.pose)) {
+            sections.pose = cleanCommaFormatting(`${sections.pose}, looking at viewer`);
+            totalChanges++;
+        }
+
+        // 4. Scene & Environment enrichment
+        if (!sections.scene.trim()) {
+            sections.scene = usePerchance
+                ? "{clean atmospheric backdrop, soft depth of field|scenic environment, ambient floating light motes, subtle vignette}"
+                : "atmospheric backdrop, subtle depth of field, ambient light motes";
+            totalChanges++;
+            appliedNotes.push("Added scene atmosphere");
+        } else if (!/\b(depth|atmosphere|atmospheric|motes|particles|reflections|sunbeams|bokeh|mist|shadows|lighting)\b/i.test(sections.scene)) {
+            const sceneBooster = usePerchance
+                ? "{atmospheric depth, floating light motes|rich environmental detail, soft background bokeh}"
+                : "atmospheric depth, rich environmental detail";
+            sections.scene = cleanCommaFormatting(`${sections.scene}, ${sceneBooster}`);
+            totalChanges++;
+            appliedNotes.push("Enhanced scene depth");
+        }
+
+        // 5. Art Style, Camera & Quality enrichment
+        if (!sections.style.trim()) {
+            sections.style = usePerchance
+                ? "masterpiece, best quality, ultra-detailed, {vibrant 2D illustration, bold clean lineart, smooth cel shading|modern anime key visual, luminous bloom}, cinematic rim lighting, sharp focus, highres"
+                : "masterpiece, best quality, ultra-detailed, vibrant 2D illustration, bold clean lineart, smooth cel shading, cinematic rim lighting, glossy specular highlights, sharp focus, highres";
+            totalChanges++;
+            appliedNotes.push("Added quality, lighting & style tags");
+        } else {
+            if (!/\b(masterpiece|best quality|ultra-detailed|highres|absurdres)\b/i.test(sections.style)) {
+                sections.style = cleanCommaFormatting(`masterpiece, best quality, ultra-detailed, highres, ${sections.style}`);
+                totalChanges++;
+                appliedNotes.push("Added quality boosters");
+            }
+            if (!/\b(lighting|light|god rays|chiaroscuro|bloom|highlights|subsurface)\b/i.test(sections.style)) {
+                const lightBooster = usePerchance
+                    ? "{cinematic rim lighting, luminous bloom|volumetric lighting, glossy specular highlights}"
+                    : "cinematic rim lighting, glossy specular highlights";
+                sections.style = cleanCommaFormatting(`${sections.style}, ${lightBooster}`);
+                totalChanges++;
+                appliedNotes.push("Added lighting tags");
+            }
+            if (!/\b(sharp focus|intricate textures|lineart|shading|render|photo)\b/i.test(sections.style)) {
+                sections.style = cleanCommaFormatting(`${sections.style}, sharp focus, intricate textures`);
+                totalChanges++;
+            }
+        }
+
+        // 6. Negative prompt fallback
+        if (!sections.negative.trim()) {
+            sections.negative = defaultNegative;
+        }
+
+        return {
+            sections,
+            count: totalChanges,
+            notes: appliedNotes
+        };
+    }
+
+    // 11. Improve a single modular section in place
+    function improveSingleSection(sectionKey, text, usePerchance = false) {
+        const raw = (text || "").trim();
+        let res = upgradeWeakWordsInText(raw, usePerchance);
+        let updated = res.text;
+        let count = res.count;
+
+        if (sectionKey === "character") {
+            if (updated && /\b(girl|woman|female|lady)\b/i.test(updated) && !/\b1girl\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`1girl, solo, ${updated.replace(/\b(a|an|the)\s+(girl|woman|female|lady)\b/gi, "$2")}`);
+                count++;
+            } else if (updated && /\b(boy|man|male|guy)\b/i.test(updated) && !/\b1boy\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`1boy, solo, ${updated.replace(/\b(a|an|the)\s+(boy|man|male|guy)\b/gi, "$2")}`);
+                count++;
+            }
+            if (updated && !/\b(catchlights|iris|expressive eyes|facial features)\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`${updated}, expressive eyes, detailed iris catchlights, refined facial features`);
+                count++;
+            }
+        } else if (sectionKey === "outfit") {
+            if (updated) {
+                updated = cleanCommaFormatting(updated.replace(/\b(?:wearing|dressed in)\s+(?:a\s+|an\s+)?/gi, ""));
+            }
+            if (updated && !/\b(folds|texture|textures|fabric|silk|satin|leather|steel|trim)\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`${updated}, realistic fabric folds, intricate material detail`);
+                count++;
+            }
+        } else if (sectionKey === "pose") {
+            if (updated && !/\b(stance|pose|posture|looking|gaze|viewer)\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`${updated}, poised posture, looking at viewer`);
+                count++;
+            }
+        } else if (sectionKey === "scene") {
+            if (updated && !/\b(depth|atmosphere|atmospheric|motes|particles|reflections|sunbeams|bokeh|mist)\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`${updated}, atmospheric depth, ambient light motes`);
+                count++;
+            }
+        } else if (sectionKey === "style") {
+            if (updated && !/\b(masterpiece|best quality|ultra-detailed|highres)\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`masterpiece, best quality, ultra-detailed, highres, ${updated}`);
+                count++;
+            }
+            if (updated && !/\b(lighting|light|god rays|chiaroscuro|bloom|highlights)\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`${updated}, cinematic rim lighting, sharp focus`);
+                count++;
+            }
+        }
+
+        return { text: updated, count };
+    }
+
     return {
         WORD_UPGRADES,
         CHARACTER_IDENTIFIERS,
@@ -1389,7 +1715,9 @@ const PromptEngine = (() => {
         cleanCommaFormatting,
         assembleFullPrompt,
         parseFullPromptToSections,
-        evaluatePerchanceSyntax
+        evaluatePerchanceSyntax,
+        improvePrompt,
+        improveSingleSection
     };
 })();
 
@@ -1406,9 +1734,9 @@ window.PromptEngine = PromptEngine;
 const PresetManager = (() => {
     const STORAGE_KEY_FULL = "bychance_v2_custom_full_presets";
     const STORAGE_KEY_SECTION = "bychance_v2_custom_section_presets";
-    const STORAGE_KEY_LAST_STATE = "bychance_v3_last_workbench_state";
+    const STORAGE_KEY_LAST_STATE = "bychance_v4_last_workbench_state";
 
-    const DEFAULT_NEGATIVE = "3d, photorealistic, realistic photo, lowres, worst quality, low quality, bad anatomy, bad hands, extra digits, fewer digits, blurry, watermark, signature, text, jpeg artifacts, deformed, mutated hands";
+    const DEFAULT_NEGATIVE = "3d, photorealistic, realistic photo, chibi, super deformed, big head, oversized head, lowres, worst quality, low quality, bad anatomy, bad hands, extra digits, fewer digits, blurry, watermark, signature, text, jpeg artifacts, deformed, mutated hands";
 
     // Built-in Full Setup Presets
     const BUILTIN_FULL_PRESETS = [
@@ -1417,10 +1745,11 @@ const PresetManager = (() => {
             name: "2D Pinup Style (Default)",
             builtin: true,
             sections: {
-                character: "1girl, solo, stylized 2D pinup proportions, curvy figure, wide hips, thick thighs, narrow waist, stylized large head, large expressive eyes, long eyelashes, detailed iris catchlights, expressive facial features",
-                outfit: "confident pinup stance, hand on hip, playful expression, form-fitting stylized outfit, crisp fabric folds",
+                character: "1girl, solo, stylized 2D pinup proportions, curvy figure, wide hips, thick thighs, narrow waist, large expressive eyes, long eyelashes, detailed iris catchlights, expressive facial features",
+                outfit: "form-fitting stylized outfit, crisp fabric folds, intricate material detail",
+                pose: "confident pinup stance, hand on hip, playful expression, looking at viewer",
                 scene: "clean simple studio backdrop, subtle gradient background, soft framing vignette",
-                style: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, large head, curvy, large expressive eyes, bold clean lineart, smooth cel shading, vibrant saturated colors, glossy specular highlights, masterpiece, best quality, highres",
+                style: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy, large expressive eyes, bold clean lineart, smooth cel shading, vibrant saturated colors, glossy specular highlights, masterpiece, best quality, highres",
                 negative: DEFAULT_NEGATIVE
             }
         },
@@ -1429,8 +1758,9 @@ const PresetManager = (() => {
             name: "Rosalina — Cosmic Observatory",
             builtin: true,
             sections: {
-                character: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, serene regal expression, fair skin",
-                outfit: "graceful floating posture, holding golden star wand, silver tiara crown with jewels, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, accompanied by floating yellow Luma star companion",
+                character: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, fair skin",
+                outfit: "silver tiara crown with jewels, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, golden star wand, floating yellow Luma star companion",
+                pose: "graceful floating posture, serene regal expression, looking at viewer",
                 scene: "Comet Observatory dome terrace, deep cosmic starry night sky, vivid Milky Way nebula, floating stardust motes, luminous crescent moon",
                 style: "masterpiece, best quality, ultra-detailed anime key visual, luminous magical bloom, cinematic cyan rim lighting, intricate iris catchlights, smooth cel shading",
                 negative: DEFAULT_NEGATIVE
@@ -1441,8 +1771,9 @@ const PresetManager = (() => {
             name: "Princess Zelda — Sacred Ruins",
             builtin: true,
             sections: {
-                character: "Princess Zelda (Legend of Zelda), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes, noble contemplative expression",
-                outfit: "poised standing stance, hands clasped in prayer, ornate royal blue and white Hylian ceremonial gown, gold Triforce embroidery, decorative shoulder pauldrons, golden belt",
+                character: "Princess Zelda (Legend of Zelda), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes",
+                outfit: "ornate royal blue and white Hylian ceremonial gown, gold Triforce embroidery, decorative shoulder pauldrons, golden belt",
+                pose: "poised standing stance, hands clasped in prayer, noble contemplative expression",
                 scene: "ancient moss-covered Temple of Time ruins, glowing blue Silent Princess flowers in foreground, shafts of warm golden sunlight filtering through stone arches",
                 style: "masterpiece, best quality, painterly fantasy anime illustration, volumetric god rays, rich atmospheric color grading, crisp lineart",
                 negative: DEFAULT_NEGATIVE
@@ -1453,8 +1784,9 @@ const PresetManager = (() => {
             name: "Frieren — Twilight Flower Field",
             builtin: true,
             sections: {
-                character: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in long twin tails, long pointed elf ears, calm emerald green eyes, gentle nostalgic smile",
-                outfit: "seated gracefully in flower meadow, holding red-gemmed golden mage staff, white and gold-trimmed capelet over white tunic, striped scarf, black skirt, brown leather boots, red dangling earrings",
+                character: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in long twin tails, long pointed elf ears, calm emerald green eyes",
+                outfit: "white and gold-trimmed capelet over white tunic, striped scarf, black skirt, brown leather boots, red-gemmed golden mage staff, red dangling earrings",
+                pose: "seated gracefully in flower meadow, gentle nostalgic smile, looking at viewer",
                 scene: "vast meadow of glowing blue-moon weed flowers at twilight dusk, shooting stars across indigo sky, fireflies, gentle breeze",
                 style: "masterpiece, best quality, delicate watercolor anime aesthetic, soft magical bioluminescent lighting, shallow depth of field, expressive lineweight",
                 negative: DEFAULT_NEGATIVE
@@ -1465,8 +1797,9 @@ const PresetManager = (() => {
             name: "2B — Post-Apocalyptic Cathedral",
             builtin: true,
             sections: {
-                character: "2B (NieR:Automata), YoRHa No.2 Type B, 1girl, solo, short silver-white bob hair, bangs, black combat visor blindfold over eyes, beauty mark under lip, stoic expression",
-                outfit: "dynamic combat stance, gripping Virtuous Contract katana, black Gothic lolita combat dress, high-slit velvet skirt with silver embroidery, puff sleeves with feather trim, black thigh-high boots",
+                character: "2B (NieR:Automata), YoRHa No.2 Type B, 1girl, solo, short silver-white bob hair, bangs, black combat visor blindfold over eyes, beauty mark under lip",
+                outfit: "black Gothic lolita combat dress, high-slit velvet skirt with silver embroidery, puff sleeves with feather trim, black thigh-high boots, Virtuous Contract katana",
+                pose: "dynamic combat stance, stoic expression, poised readiness",
                 scene: "sunlit overgrown city cathedral ruins, crumbling concrete pillars, white Lunar Tear flowers, floating dust motes in light beams",
                 style: "masterpiece, best quality, atmospheric dark sci-fi illustration, dramatic chiaroscuro lighting, intricate velvet and metallic textures, 85mm portrait framing",
                 negative: DEFAULT_NEGATIVE
@@ -1477,8 +1810,9 @@ const PresetManager = (() => {
             name: "Samus Aran — Starship Bridge",
             builtin: true,
             sections: {
-                character: "Samus Aran (Metroid), 1girl, solo, tall athletic figure, long golden blonde hair in high ponytail, piercing ice-blue eyes, beauty mark under left eye, confident gaze",
-                outfit: "confident contrapposto stance, hand on hip, sleek glowing blue Zero Suit bodysuit, subtle hexagonal panel texture, glowing pink chest insignia, metallic Paralyzer pistol holstered",
+                character: "Samus Aran (Metroid), 1girl, solo, tall athletic figure, long golden blonde hair in high ponytail, piercing ice-blue eyes, beauty mark under left eye",
+                outfit: "sleek glowing blue Zero Suit bodysuit, subtle hexagonal panel texture, glowing pink chest insignia, metallic Paralyzer pistol holstered",
+                pose: "confident contrapposto stance, hand on hip, confident gaze",
                 scene: "high-tech galactic starship command bridge, glowing cyan holographic star map projections, deep space viewport with nebula",
                 style: "masterpiece, best quality, sleek sci-fi anime key visual, glossy specular highlights, neon cyan and magenta rim lighting, sharp focus",
                 negative: DEFAULT_NEGATIVE
@@ -1489,8 +1823,9 @@ const PresetManager = (() => {
             name: "Hatsune Miku — Holographic Concert",
             builtin: true,
             sections: {
-                character: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails, bright turquoise eyes, joyful beaming smile, sparkling eye catchlights",
-                outfit: "dynamic singing pose reaching toward viewer, sleeveless grey futuristic collared top with turquoise tie, black detached arm warmers with glowing equalizer graphics, pleated black miniskirt, square hair ribbons",
+                character: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails, bright turquoise eyes, sparkling eye catchlights",
+                outfit: "sleeveless grey futuristic collared top with turquoise tie, black detached arm warmers with glowing equalizer graphics, pleated black miniskirt, square hair ribbons",
+                pose: "dynamic singing pose reaching toward viewer, joyful beaming smile",
                 scene: "futuristic holographic concert stage, floating cyan musical notes, laser light beams, bokeh stage lights",
                 style: "masterpiece, best quality, vibrant modern anime illustration, high-contrast neon bloom, crisp linework, dynamic low angle shot",
                 negative: DEFAULT_NEGATIVE
@@ -1502,7 +1837,8 @@ const PresetManager = (() => {
             builtin: true,
             sections: {
                 character: "1girl, solo, {silver-white|platinum blonde|midnight black|crimson} hair, {windswept hair|long braided hair|twin tails}, {emerald green|sapphire blue|amber gold} eyes, detailed iris catchlights",
-                outfit: "{graceful standing pose|dynamic spellcasting stance|looking back over shoulder}, {ornate royal mage robe with gold filigree|engraved silver valkyrie plate armor|stylish traveller cloak and leather tunic}",
+                outfit: "{ornate royal mage robe with gold filigree|engraved silver valkyrie plate armor|stylish traveller cloak and leather tunic}",
+                pose: "{graceful standing pose|dynamic spellcasting stance|looking back over shoulder}, poised posture",
                 scene: "{ancient floating sky citadel at sunset|enchanted bioluminescent forest glade at night|grand gothic library with floating grimoires}",
                 style: "masterpiece, best quality, {modern anime key visual, vibrant cel shading|painterly fantasy concept art, rich brushwork}, cinematic rim lighting, volumetric god rays",
                 negative: DEFAULT_NEGATIVE
@@ -1516,27 +1852,27 @@ const PresetManager = (() => {
             {
                 id: "char_2d_pinup",
                 name: "2D Pinup Proportions (Curvy / Expressive)",
-                value: "1girl, solo, stylized 2D pinup proportions, curvy figure, wide hips, thick thighs, narrow waist, stylized large head, large expressive eyes, long eyelashes, detailed iris catchlights, expressive facial features"
+                value: "1girl, solo, stylized 2D pinup proportions, curvy figure, wide hips, thick thighs, narrow waist, large expressive eyes, long eyelashes, detailed iris catchlights, expressive facial features"
             },
             {
                 id: "char_rosalina",
                 name: "Rosalina (Super Mario)",
-                value: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, serene regal expression, fair skin"
+                value: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, fair skin"
             },
             {
                 id: "char_peach",
                 name: "Princess Peach (Super Mario)",
-                value: "Princess Peach (Super Mario), 1girl, solo, long wavy golden blonde hair, sapphire blue eyes, sweet royal smile, rosy cheeks"
+                value: "Princess Peach (Super Mario), 1girl, solo, long wavy golden blonde hair, sapphire blue eyes, rosy cheeks"
             },
             {
                 id: "char_zelda",
                 name: "Princess Zelda (Legend of Zelda)",
-                value: "Princess Zelda (Legend of Zelda), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes, noble expression"
+                value: "Princess Zelda (Legend of Zelda), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes"
             },
             {
                 id: "char_frieren",
                 name: "Frieren (Sousou no Frieren)",
-                value: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in long twin tails, long pointed elf ears, calm green eyes, gentle nostalgic expression"
+                value: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in long twin tails, long pointed elf ears, calm green eyes"
             },
             {
                 id: "char_2b",
@@ -1551,54 +1887,81 @@ const PresetManager = (() => {
             {
                 id: "char_miku",
                 name: "Hatsune Miku (Vocaloid)",
-                value: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails, bright turquoise eyes, cheerful energetic smile"
+                value: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails, bright turquoise eyes"
             },
             {
                 id: "char_tifa",
                 name: "Tifa Lockhart (FFVII)",
-                value: "Tifa Lockhart (Final Fantasy VII), 1girl, solo, long dark brown hair with dolphin-tail tips, warm wine-red eyes, athletic toned physique, confident smile"
+                value: "Tifa Lockhart (Final Fantasy VII), 1girl, solo, long dark brown hair with dolphin-tail tips, warm wine-red eyes, athletic toned physique"
             },
             {
                 id: "char_custom_elf",
                 name: "Ethereal High Elf Archetype",
-                value: "1girl, solo, ethereal high elf, waist-length iridescent silver hair, long pointed elf ears, luminous violet eyes, delicate eyelashes, serene expression"
+                value: "1girl, solo, ethereal high elf, waist-length iridescent silver hair, long pointed elf ears, luminous violet eyes, delicate eyelashes"
             }
         ],
         outfit: [
             {
                 id: "out_rosalina_gown",
                 name: "Rosalina's Turquoise Gown & Luma",
-                value: "graceful floating posture, holding golden star wand, silver tiara crown, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, floating yellow Luma companion"
+                value: "silver tiara crown, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, golden star wand, floating yellow Luma companion"
             },
             {
                 id: "out_cozy_cafe",
-                name: "Cozy Autumn Sweater & Coffee",
-                value: "seated at wooden table, holding warm ceramic coffee mug with both hands, gentle smile, oversized cream cable-knit sweater, plaid pleated skirt, warm scarf"
+                name: "Cozy Autumn Sweater & Scarf",
+                value: "oversized cream cable-knit sweater, plaid pleated skirt, warm knit scarf, holding ceramic coffee mug"
             },
             {
                 id: "out_cyber_techwear",
                 name: "Cyberpunk Neon Techwear & Katana",
-                value: "confident standing pose, looking back over shoulder, sleek matte-black futuristic techwear jacket, glowing cyan neon collar trim, tactical utility straps, fingerless gloves, holographic katana"
+                value: "sleek matte-black futuristic techwear jacket, glowing cyan neon collar trim, tactical utility straps, fingerless gloves, holographic katana"
             },
             {
                 id: "out_royal_ballgown",
                 name: "Opulent Royal Ballgown",
-                value: "poised curtsy stance, looking at viewer, ornate midnight-blue silk ballgown, gold filigree embroidery, layered chiffon skirt, diamond tiara, long white opera gloves"
+                value: "ornate midnight-blue silk ballgown, gold filigree embroidery, layered chiffon skirt, diamond tiara, long white opera gloves"
             },
             {
                 id: "out_valkyrie_armor",
                 name: "Engraved Silver Valkyrie Armor",
-                value: "heroic wind-swept combat stance, holding winged spear, engraved silver filigree plate armor, white feathered cape, gilded pauldrons, battle-ready expression"
+                value: "engraved silver filigree plate armor, white feathered cape, gilded pauldrons, winged spear"
             },
             {
                 id: "out_summer_sundress",
                 name: "Sunlit Summer Sundress & Straw Hat",
-                value: "walking along shoreline, holding wide-brimmed straw sunhat against breeze, joyful laugh, flowing white linen sundress with ribbon, barefoot"
+                value: "flowing white linen sundress with ribbon, wide-brimmed straw sunhat, barefoot"
+            }
+        ],
+        pose: [
+            {
+                id: "pos_pinup_confident",
+                name: "Confident Pinup Stance",
+                value: "confident pinup stance, hand on hip, playful expression, looking at viewer"
             },
             {
-                id: "out_action_spellcaster",
-                name: "Dynamic Arcane Spellcasting Pose",
-                value: "dynamic airborne action pose, foreshortened hand reaching out, casting glowing arcane magic circle, billowing mage cloak, intense focused gaze"
+                id: "pos_graceful_standing",
+                name: "Graceful Contrapposto Stance",
+                value: "graceful contrapposto stance, poised posture, serene warm smile, looking at viewer"
+            },
+            {
+                id: "pos_seated_cozy",
+                name: "Seated Gracefully / Relaxed",
+                value: "seated gracefully, legs crossed, relaxed posture, gentle smile, looking at viewer"
+            },
+            {
+                id: "pos_looking_back",
+                name: "Looking Back Over Shoulder",
+                value: "standing pose, looking back over shoulder at viewer, captivating gaze, windswept motion"
+            },
+            {
+                id: "pos_dynamic_action",
+                name: "Dynamic Action / Combat Stance",
+                value: "dynamic airborne action pose, foreshortened perspective, kinetic motion, intense focused gaze"
+            },
+            {
+                id: "pos_spellcasting",
+                name: "Arcane Spellcasting Pose",
+                value: "dynamic spellcasting stance, hand reaching forward, casting glowing arcane magic circle, focused expression"
             }
         ],
         scene: [
@@ -1637,7 +2000,7 @@ const PresetManager = (() => {
             {
                 id: "sty_2d_pinup",
                 name: "2D Pinup Style (Default)",
-                value: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, large head, curvy, large expressive eyes, bold clean lineart, smooth cel shading, vibrant saturated colors, glossy specular highlights, masterpiece, best quality, highres"
+                value: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy, large expressive eyes, bold clean lineart, smooth cel shading, vibrant saturated colors, glossy specular highlights, masterpiece, best quality, highres"
             },
             {
                 id: "sty_modern_anime",
@@ -1696,11 +2059,12 @@ const PresetManager = (() => {
             return {
                 character: parsed.character || [],
                 outfit: parsed.outfit || [],
+                pose: parsed.pose || [],
                 scene: parsed.scene || [],
                 style: parsed.style || []
             };
         } catch (e) {
-            return { character: [], outfit: [], scene: [], style: [] };
+            return { character: [], outfit: [], pose: [], scene: [], style: [] };
         }
     }
 
@@ -1800,7 +2164,7 @@ const PresetManager = (() => {
         }
         if (data.sectionPresets && typeof data.sectionPresets === "object") {
             const currentSec = getCustomSectionPresets();
-            ["character", "outfit", "scene", "style"].forEach((k) => {
+            ["character", "outfit", "pose", "scene", "style"].forEach((k) => {
                 if (Array.isArray(data.sectionPresets[k])) {
                     currentSec[k] = [...(currentSec[k] || []), ...data.sectionPresets[k]];
                 }
@@ -1829,23 +2193,30 @@ window.PresetManager = PresetManager;
 </script>
     <script>
 /**
- * Bychance Workbench UI Controller
- * Connects Modular Split Editors, Full Copy-Paste Master Window,
- * Deterministic Word Upgrader, and Preset Manager.
+ * Bychance Controller — Minimalist Prompt Optimiser & Section Splitter
+ * Flip-flops seamlessly between the single-box Prompt Optimiser and the 6-part Section Splitter.
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-    const SECTION_KEYS = ["character", "outfit", "scene", "style", "negative"];
+    const SECTION_KEYS = ["character", "outfit", "pose", "scene", "style", "negative"];
+    const PRESET_SECTION_KEYS = ["character", "outfit", "pose", "scene", "style"];
+
+    const tabOptimiser = document.getElementById("tab-optimiser");
+    const tabSplitter = document.getElementById("tab-splitter");
+    const viewOptimiser = document.getElementById("view-optimiser");
+    const viewSplitter = document.getElementById("view-splitter");
 
     const boxes = {
         character: document.getElementById("box-character"),
         outfit: document.getElementById("box-outfit"),
+        pose: document.getElementById("box-pose"),
         scene: document.getElementById("box-scene"),
         style: document.getElementById("box-style"),
         negative: document.getElementById("box-negative")
     };
 
     const masterBox = document.getElementById("box-master");
+    const negativeOptBox = document.getElementById("box-negative-opt");
     const masterFormatSelect = document.getElementById("master-format-select");
     const fullPresetSelect = document.getElementById("full-preset-select");
     const deleteFullPresetBtn = document.getElementById("btn-delete-full-preset");
@@ -1853,17 +2224,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const sectionSelects = {
         character: document.getElementById("preset-select-character"),
         outfit: document.getElementById("preset-select-outfit"),
+        pose: document.getElementById("preset-select-pose"),
         scene: document.getElementById("preset-select-scene"),
         style: document.getElementById("preset-select-style")
     };
 
-    const upgradeSuggestionsList = document.getElementById("upgrade-suggestions-list");
-    const upgradeCountBadge = document.getElementById("upgrade-count-badge");
-
-    const rollPreviewContainer = document.getElementById("roll-preview-container");
-    const rollPreviewOutput = document.getElementById("roll-preview-output");
-
     let toastTimer = null;
+    let masterDirty = false;
 
     function showToast(msg) {
         const banner = document.getElementById("toast-banner");
@@ -1873,25 +2240,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (toastTimer) clearTimeout(toastTimer);
         toastTimer = setTimeout(() => {
             banner.classList.remove("visible");
-        }, 2400);
-    }
-
-    function autoFitTextarea(el) {
-        if (!el) return;
-        el.style.height = "auto";
-        const minH = el.classList.contains("master-textarea") ? 150 : 76;
-        el.style.height = Math.max(minH, Math.min(el.scrollHeight + 4, 420)) + "px";
-    }
-
-    function autoFitAllTextareas() {
-        SECTION_KEYS.forEach((k) => autoFitTextarea(boxes[k]));
-        autoFitTextarea(masterBox);
+        }, 2200);
     }
 
     function getCurrentSections() {
         return {
             character: boxes.character.value,
             outfit: boxes.outfit.value,
+            pose: boxes.pose.value,
             scene: boxes.scene.value,
             style: boxes.style.value,
             negative: boxes.negative.value
@@ -1899,29 +2255,199 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function setSections(sections, syncMaster = true) {
+        // Backward compatibility if a saved preset had no separate pose field
+        if (sections && !sections.pose && sections.outfit) {
+            const parsed = PromptEngine.parseFullPromptToSections(sections.outfit);
+            if (parsed.pose && parsed.outfit) {
+                sections = {
+                    ...sections,
+                    outfit: parsed.outfit,
+                    pose: parsed.pose
+                };
+            }
+        }
+
         SECTION_KEYS.forEach((k) => {
             if (typeof sections[k] === "string") {
                 boxes[k].value = sections[k];
             }
         });
+        negativeOptBox.value = boxes.negative.value;
+
         if (syncMaster) {
-            syncModularToMaster();
+            syncSectionsToMaster();
         } else {
-            refreshUpgradeSuggestions();
             PresetManager.saveLastWorkbenchState(getCurrentSections());
-            autoFitAllTextareas();
         }
     }
 
-    function syncModularToMaster() {
+    function syncSectionsToMaster() {
         const current = getCurrentSections();
+        negativeOptBox.value = current.negative;
         const format = masterFormatSelect.value || "standard";
         masterBox.value = PromptEngine.assembleFullPrompt(current, format);
+        masterDirty = false;
         PresetManager.saveLastWorkbenchState(current);
-        refreshUpgradeSuggestions();
-        autoFitAllTextareas();
     }
 
+    function syncMasterToSectionsIfEdited() {
+        const raw = masterBox.value.trim();
+        if (!raw) {
+            setSections(
+                {
+                    character: "",
+                    outfit: "",
+                    pose: "",
+                    scene: "",
+                    style: "",
+                    negative: negativeOptBox.value
+                },
+                false
+            );
+            masterDirty = false;
+            return;
+        }
+        const currentAssembled = PromptEngine.assembleFullPrompt(
+            getCurrentSections(),
+            masterFormatSelect.value || "standard"
+        ).trim();
+
+        if (masterDirty || raw !== currentAssembled) {
+            const split = PromptEngine.parseFullPromptToSections(raw);
+            if (!split.negative) {
+                split.negative = negativeOptBox.value || boxes.negative.value;
+            }
+            setSections(split, false);
+            masterDirty = false;
+        }
+    }
+
+    // Mode Switching (Flip-Flop between Optimiser and Splitter)
+    function switchMode(mode) {
+        if (mode === "splitter") {
+            syncMasterToSectionsIfEdited();
+            tabOptimiser.classList.remove("active");
+            tabOptimiser.setAttribute("aria-selected", "false");
+            tabSplitter.classList.add("active");
+            tabSplitter.setAttribute("aria-selected", "true");
+            viewOptimiser.classList.add("hidden");
+            viewSplitter.classList.remove("hidden");
+        } else {
+            syncSectionsToMaster();
+            tabSplitter.classList.remove("active");
+            tabSplitter.setAttribute("aria-selected", "false");
+            tabOptimiser.classList.add("active");
+            tabOptimiser.setAttribute("aria-selected", "true");
+            viewSplitter.classList.add("hidden");
+            viewOptimiser.classList.remove("hidden");
+        }
+    }
+
+    tabOptimiser.addEventListener("click", () => switchMode("optimiser"));
+    tabSplitter.addEventListener("click", () => switchMode("splitter"));
+
+    document.getElementById("btn-go-split").addEventListener("click", () => {
+        syncMasterToSectionsIfEdited();
+        switchMode("splitter");
+        showToast("Split prompt into sections");
+    });
+
+    document.getElementById("btn-go-optimiser").addEventListener("click", () => {
+        switchMode("optimiser");
+        showToast("Combined sections into Prompt Optimiser");
+    });
+
+    // Core Fix / Improve Action
+    function runFixPrompt(usePerchance = false) {
+        const isSplitterActive = !viewSplitter.classList.contains("hidden");
+        let source;
+        if (!isSplitterActive) {
+            const raw = masterBox.value.trim();
+            const currentAssembled = PromptEngine.assembleFullPrompt(
+                getCurrentSections(),
+                masterFormatSelect.value || "standard"
+            ).trim();
+            source = (masterDirty || raw !== currentAssembled) ? raw : getCurrentSections();
+        } else {
+            source = getCurrentSections();
+        }
+
+        const res = PromptEngine.improvePrompt(source, {
+            usePerchance,
+            defaultNegative: PresetManager.DEFAULT_NEGATIVE
+        });
+
+        setSections(res.sections, true);
+        if (res.count > 0) {
+            const detail = res.notes && res.notes.length
+                ? res.notes.slice(0, 2).join(", ")
+                : `+${res.count} improvements`;
+            showToast(`Fixed prompt (${detail})`);
+        } else {
+            showToast("Prompt is already optimized");
+        }
+    }
+
+    document.getElementById("btn-fix-prompt").addEventListener("click", () => {
+        runFixPrompt(false);
+    });
+
+    document.getElementById("btn-fix-perchance").addEventListener("click", () => {
+        runFixPrompt(true);
+    });
+
+    document.getElementById("btn-fix-all-sections").addEventListener("click", () => {
+        runFixPrompt(false);
+    });
+
+    masterBox.addEventListener("input", () => {
+        masterDirty = true;
+    });
+
+    masterBox.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+            e.preventDefault();
+            runFixPrompt(false);
+        }
+    });
+
+    negativeOptBox.addEventListener("input", () => {
+        boxes.negative.value = negativeOptBox.value;
+        PresetManager.saveLastWorkbenchState(getCurrentSections());
+        if (masterFormatSelect.value !== "standard") {
+            syncSectionsToMaster();
+        }
+    });
+
+    SECTION_KEYS.forEach((key) => {
+        boxes[key].addEventListener("input", () => {
+            if (key === "negative") {
+                negativeOptBox.value = boxes.negative.value;
+            }
+            syncSectionsToMaster();
+        });
+    });
+
+    masterFormatSelect.addEventListener("change", () => {
+        syncSectionsToMaster();
+    });
+
+    // Individual Section Fix Buttons
+    document.querySelectorAll("[data-upgrade-section]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const sectionKey = btn.getAttribute("data-upgrade-section");
+            const res = PromptEngine.improveSingleSection(sectionKey, boxes[sectionKey].value, false);
+            boxes[sectionKey].value = res.text;
+            syncSectionsToMaster();
+            if (res.count > 0) {
+                showToast(`Fixed ${sectionKey}`);
+            } else {
+                showToast(`${sectionKey} is already optimized`);
+            }
+        });
+    });
+
+    // Presets Management
     function renderFullPresetDropdown(selectedId) {
         const all = PresetManager.getAllFullPresets();
         fullPresetSelect.innerHTML = "";
@@ -1948,7 +2474,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderSectionPresetDropdowns() {
-        ["character", "outfit", "scene", "style"].forEach((sectionKey) => {
+        const labelMap = {
+            character: "Character Presets...",
+            outfit: "Outfit Presets...",
+            pose: "Pose Presets...",
+            scene: "Scene Presets...",
+            style: "Style Presets..."
+        };
+
+        PRESET_SECTION_KEYS.forEach((sectionKey) => {
             const selectEl = sectionSelects[sectionKey];
             if (!selectEl) return;
             const list = PresetManager.getSectionPresets(sectionKey);
@@ -1956,12 +2490,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const placeholder = document.createElement("option");
             placeholder.value = "";
-            const labelMap = {
-                character: "Select Character Preset...",
-                outfit: "Select Pose / Outfit Preset...",
-                scene: "Select Scene Preset...",
-                style: "Select Style Preset..."
-            };
             placeholder.textContent = labelMap[sectionKey];
             selectEl.appendChild(placeholder);
 
@@ -1989,180 +2517,83 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function renderQuickTagChips() {
-        SECTION_KEYS.forEach((sectionKey) => {
-            const container = document.getElementById(`chips-${sectionKey}`);
-            if (!container) return;
-            container.innerHTML = "";
-            const tags = PromptEngine.SECTION_QUICK_TAGS[sectionKey] || [];
-            tags.forEach((tag) => {
-                const btn = document.createElement("button");
-                btn.type = "button";
-                btn.className = "tag-chip";
-                btn.textContent = tag.label;
-                btn.title = `Append: ${tag.value}`;
-                btn.addEventListener("click", () => {
-                    appendTokenToBox(sectionKey, tag.value);
-                });
-                container.appendChild(btn);
-            });
-        });
-    }
-
-    function appendTokenToBox(sectionKey, tokenStr) {
-        const box = boxes[sectionKey];
-        if (!box) return;
-        const current = box.value.trim();
-        if (!current) {
-            box.value = tokenStr;
-        } else if (!current.toLowerCase().includes(tokenStr.toLowerCase())) {
-            box.value = PromptEngine.cleanCommaFormatting(`${current}, ${tokenStr}`);
+    fullPresetSelect.addEventListener("change", () => {
+        updateDeleteFullPresetVisibility();
+        const all = PresetManager.getAllFullPresets();
+        const chosen = all.find((p) => p.id === fullPresetSelect.value);
+        if (chosen) {
+            setSections(chosen.sections, true);
+            showToast(`Loaded ${chosen.name}`);
         }
-        syncModularToMaster();
-        showToast(`Added to ${sectionKey}`);
-    }
+    });
 
-    function refreshUpgradeSuggestions() {
-        const combinedText = [
-            boxes.character.value,
-            boxes.outfit.value,
-            boxes.scene.value,
-            boxes.style.value,
-            masterBox.value
-        ].join(", ");
+    document.getElementById("btn-save-full-preset").addEventListener("click", () => {
+        syncMasterToSectionsIfEdited();
+        const name = window.prompt("Preset name:");
+        if (!name || !name.trim()) return;
+        const created = PresetManager.addCustomFullPreset(name, getCurrentSections());
+        renderFullPresetDropdown(created.id);
+        showToast(`Saved preset: ${created.name}`);
+    });
 
-        const suggestions = PromptEngine.scanForUpgrades(combinedText);
-        upgradeCountBadge.textContent = `${suggestions.length}`;
-        upgradeSuggestionsList.innerHTML = "";
-
-        if (suggestions.length === 0) {
-            const empty = document.createElement("div");
-            empty.className = "card-hint";
-            empty.style.padding = "4px 0";
-            empty.textContent = "No weak words detected. Type terms like 'Rosalina', 'shiny', 'standing', 'sad', 'nice lighting', 'camera below', or 'good quality' to see deterministic tag replacements.";
-            upgradeSuggestionsList.appendChild(empty);
-            return;
+    deleteFullPresetBtn.addEventListener("click", () => {
+        const id = fullPresetSelect.value;
+        const all = PresetManager.getAllFullPresets();
+        const chosen = all.find((p) => p.id === id);
+        if (!chosen || chosen.builtin) return;
+        if (window.confirm(`Delete custom preset "${chosen.name}"?`)) {
+            PresetManager.deleteCustomFullPreset(id);
+            renderFullPresetDropdown();
+            showToast("Deleted custom preset");
         }
+    });
 
-        suggestions.forEach((item) => {
-            const card = document.createElement("div");
-            card.className = "upgrade-item";
-
-            const header = document.createElement("div");
-            header.className = "upgrade-item-header";
-
-            const wordBadge = document.createElement("span");
-            wordBadge.className = "upgrade-word-badge";
-            wordBadge.textContent = item.type === "character" ? item.label : `Term: ${item.label}`;
-
-            const catBadge = document.createElement("span");
-            catBadge.className = "upgrade-cat-badge";
-            catBadge.textContent = item.category;
-
-            header.appendChild(wordBadge);
-            header.appendChild(catBadge);
-
-            const preview = document.createElement("div");
-            preview.className = "upgrade-target-preview";
-            preview.textContent = item.primary;
-
-            const actions = document.createElement("div");
-            actions.className = "upgrade-actions";
-
-            if (item.type === "character" && item.characterProfile) {
-                const fillAllBtn = document.createElement("button");
-                fillAllBtn.className = "btn btn-sm btn-primary";
-                fillAllBtn.textContent = "Populate All Sections";
-                fillAllBtn.addEventListener("click", () => {
-                    const prof = item.characterProfile;
-                    boxes.character.value = prof.character;
-                    if (!boxes.outfit.value.trim()) boxes.outfit.value = prof.outfit;
-                    if (!boxes.scene.value.trim()) boxes.scene.value = prof.scene;
-                    if (!boxes.style.value.trim()) boxes.style.value = prof.style;
-                    syncModularToMaster();
-                    showToast(`Loaded visual traits for ${prof.name}`);
-                });
-
-                const charOnlyBtn = document.createElement("button");
-                charOnlyBtn.className = "btn btn-sm";
-                charOnlyBtn.textContent = "Expand Character Only";
-                charOnlyBtn.addEventListener("click", () => {
-                    const prof = item.characterProfile;
-                    const reg = new RegExp(`\\b${item.matchedWord}\\b`, "gi");
-                    if (reg.test(boxes.character.value)) {
-                        boxes.character.value = PromptEngine.cleanCommaFormatting(
-                            boxes.character.value.replace(reg, prof.character)
-                        );
-                    } else {
-                        boxes.character.value = prof.character;
-                    }
-                    syncModularToMaster();
-                    showToast(`Expanded character traits for ${prof.name}`);
-                });
-
-                actions.appendChild(fillAllBtn);
-                actions.appendChild(charOnlyBtn);
-            } else {
-                const applyPrimaryBtn = document.createElement("button");
-                applyPrimaryBtn.className = "btn btn-sm btn-primary";
-                applyPrimaryBtn.textContent = "Replace with Tags";
-                applyPrimaryBtn.addEventListener("click", () => {
-                    replaceRegexAcrossBoxes(item.regex, item.primary);
-                    showToast(`Upgraded ${item.label}`);
-                });
-
-                const applyPerchanceBtn = document.createElement("button");
-                applyPerchanceBtn.className = "btn btn-sm";
-                applyPerchanceBtn.textContent = "Replace as {a|b}";
-                applyPerchanceBtn.addEventListener("click", () => {
-                    replaceRegexAcrossBoxes(item.regex, item.perchance);
-                    showToast(`Upgraded ${item.label} to {a|b}`);
-                });
-
-                actions.appendChild(applyPrimaryBtn);
-                actions.appendChild(applyPerchanceBtn);
-
-                (item.alternatives || []).forEach((alt, idx) => {
-                    const altBtn = document.createElement("button");
-                    altBtn.className = "btn btn-sm";
-                    altBtn.textContent = `Option ${idx + 2}`;
-                    altBtn.title = alt;
-                    altBtn.addEventListener("click", () => {
-                        replaceRegexAcrossBoxes(item.regex, alt);
-                        showToast(`Replaced ${item.label}`);
-                    });
-                    actions.appendChild(altBtn);
-                });
-            }
-
-            card.appendChild(header);
-            card.appendChild(preview);
-            card.appendChild(actions);
-            upgradeSuggestionsList.appendChild(card);
-        });
-    }
-
-    function replaceRegexAcrossBoxes(regex, replacement) {
-        let changedInModular = false;
-        ["character", "outfit", "scene", "style"].forEach((k) => {
-            regex.lastIndex = 0;
-            if (regex.test(boxes[k].value)) {
-                regex.lastIndex = 0;
-                boxes[k].value = PromptEngine.cleanCommaFormatting(boxes[k].value.replace(regex, replacement));
-                changedInModular = true;
+    PRESET_SECTION_KEYS.forEach((sectionKey) => {
+        const selectEl = sectionSelects[sectionKey];
+        if (!selectEl) return;
+        selectEl.addEventListener("change", () => {
+            updateSectionDeleteBtn(sectionKey);
+            const list = PresetManager.getSectionPresets(sectionKey);
+            const chosen = list.find((item) => item.id === selectEl.value);
+            if (chosen) {
+                boxes[sectionKey].value = chosen.value;
+                syncSectionsToMaster();
+                showToast(`Loaded ${sectionKey}: ${chosen.name}`);
             }
         });
+    });
 
-        if (changedInModular) {
-            syncModularToMaster();
-        } else {
-            regex.lastIndex = 0;
-            masterBox.value = PromptEngine.cleanCommaFormatting(masterBox.value.replace(regex, replacement));
-            const parsed = PromptEngine.parseFullPromptToSections(masterBox.value);
-            setSections(parsed, true);
-        }
-    }
+    document.querySelectorAll("[data-save-section]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const sectionKey = btn.getAttribute("data-save-section");
+            const val = boxes[sectionKey].value.trim();
+            if (!val) {
+                showToast(`Enter text in ${sectionKey} first`);
+                return;
+            }
+            const name = window.prompt(`Save ${sectionKey} preset as:`);
+            if (!name || !name.trim()) return;
+            const created = PresetManager.addCustomSectionPreset(sectionKey, name, val);
+            renderSectionPresetDropdowns();
+            sectionSelects[sectionKey].value = created.id;
+            updateSectionDeleteBtn(sectionKey);
+            showToast(`Saved ${sectionKey} preset`);
+        });
+    });
 
+    document.querySelectorAll("[data-delete-section]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const sectionKey = btn.getAttribute("data-delete-section");
+            const selectEl = sectionSelects[sectionKey];
+            const id = selectEl.value;
+            if (!id) return;
+            PresetManager.deleteCustomSectionPreset(sectionKey, id);
+            renderSectionPresetDropdowns();
+            showToast(`Deleted custom ${sectionKey} preset`);
+        });
+    });
+
+    // Clipboard & Reset Controls
     async function copyTextToClipboard(text, label) {
         if (!text || !text.trim()) {
             showToast(`Nothing to copy in ${label}`);
@@ -2182,294 +2613,60 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    SECTION_KEYS.forEach((key) => {
-        boxes[key].addEventListener("input", () => {
-            autoFitTextarea(boxes[key]);
-            syncModularToMaster();
-        });
-    });
-
-    masterBox.addEventListener("input", () => {
-        autoFitTextarea(masterBox);
-        refreshUpgradeSuggestions();
-    });
-
-    masterFormatSelect.addEventListener("change", () => {
-        syncModularToMaster();
-    });
-
-    fullPresetSelect.addEventListener("change", () => {
-        updateDeleteFullPresetVisibility();
-        const all = PresetManager.getAllFullPresets();
-        const chosen = all.find((p) => p.id === fullPresetSelect.value);
-        if (chosen) {
-            setSections(chosen.sections, true);
-            showToast(`Loaded ${chosen.name}`);
-        }
-    });
-
-    document.getElementById("btn-load-full-preset").addEventListener("click", () => {
-        const all = PresetManager.getAllFullPresets();
-        const chosen = all.find((p) => p.id === fullPresetSelect.value);
-        if (chosen) {
-            setSections(chosen.sections, true);
-            showToast(`Loaded ${chosen.name}`);
-        }
-    });
-
-    document.getElementById("btn-save-full-preset").addEventListener("click", () => {
-        const name = window.prompt("Preset name (saves Character, Pose/Outfit, Scene, Style, and Negative):");
-        if (!name || !name.trim()) return;
-        const created = PresetManager.addCustomFullPreset(name, getCurrentSections());
-        renderFullPresetDropdown(created.id);
-        showToast(`Saved preset: ${created.name}`);
-    });
-
-    deleteFullPresetBtn.addEventListener("click", () => {
-        const id = fullPresetSelect.value;
-        const all = PresetManager.getAllFullPresets();
-        const chosen = all.find((p) => p.id === id);
-        if (!chosen || chosen.builtin) return;
-        if (window.confirm(`Delete custom preset "${chosen.name}"?`)) {
-            PresetManager.deleteCustomFullPreset(id);
-            renderFullPresetDropdown();
-            showToast("Deleted custom preset");
-        }
-    });
-
-    ["character", "outfit", "scene", "style"].forEach((sectionKey) => {
-        const selectEl = sectionSelects[sectionKey];
-        selectEl.addEventListener("change", () => {
-            updateSectionDeleteBtn(sectionKey);
-            const list = PresetManager.getSectionPresets(sectionKey);
-            const chosen = list.find((item) => item.id === selectEl.value);
-            if (chosen) {
-                boxes[sectionKey].value = chosen.value;
-                syncModularToMaster();
-                showToast(`Updated ${sectionKey}: ${chosen.name}`);
-            }
-        });
-    });
-
-    document.querySelectorAll("[data-save-section]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const sectionKey = btn.getAttribute("data-save-section");
-            const val = boxes[sectionKey].value.trim();
-            if (!val) {
-                showToast(`Enter text in ${sectionKey} first`);
-                return;
-            }
-            const name = window.prompt(`Save current ${sectionKey} preset as:`);
-            if (!name || !name.trim()) return;
-            const created = PresetManager.addCustomSectionPreset(sectionKey, name, val);
-            renderSectionPresetDropdowns();
-            sectionSelects[sectionKey].value = created.id;
-            updateSectionDeleteBtn(sectionKey);
-            showToast(`Saved ${sectionKey} preset: ${created.name}`);
-        });
-    });
-
-    document.querySelectorAll("[data-delete-section]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const sectionKey = btn.getAttribute("data-delete-section");
-            const selectEl = sectionSelects[sectionKey];
-            const id = selectEl.value;
-            if (!id) return;
-            PresetManager.deleteCustomSectionPreset(sectionKey, id);
-            renderSectionPresetDropdowns();
-            showToast(`Deleted custom ${sectionKey} preset`);
-        });
-    });
-
-    document.querySelectorAll("[data-upgrade-section]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const sectionKey = btn.getAttribute("data-upgrade-section");
-            const res = PromptEngine.upgradeWeakWordsInText(boxes[sectionKey].value, false);
-            boxes[sectionKey].value = res.text;
-            syncModularToMaster();
-            if (res.count > 0) {
-                showToast(`Upgraded ${res.count} term(s) in ${sectionKey}`);
-            } else {
-                showToast(`No weak terms found in ${sectionKey}`);
-            }
-        });
-    });
-
-    document.querySelectorAll("[data-expand-box]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const targetId = btn.getAttribute("data-expand-box");
-            const el = document.getElementById(targetId);
-            if (!el) return;
-            el.classList.toggle("expanded-box");
-            const isExpanded = el.classList.contains("expanded-box");
-            btn.textContent = isExpanded ? "Collapse" : "Expand";
-            autoFitTextarea(el);
-        });
-    });
-
     document.getElementById("btn-copy-master").addEventListener("click", () => {
-        copyTextToClipboard(masterBox.value, "Full Prompt");
+        copyTextToClipboard(masterBox.value, "Prompt");
+    });
+
+    document.getElementById("btn-copy-combined").addEventListener("click", () => {
+        syncSectionsToMaster();
+        copyTextToClipboard(masterBox.value, "Combined Prompt");
     });
 
     document.getElementById("btn-copy-negative").addEventListener("click", () => {
         copyTextToClipboard(boxes.negative.value, "Negative Prompt");
     });
 
-    document.getElementById("btn-upgrade-all").addEventListener("click", () => {
-        let total = 0;
-        ["character", "outfit", "scene", "style"].forEach((k) => {
-            const res = PromptEngine.upgradeWeakWordsInText(boxes[k].value, false);
-            boxes[k].value = res.text;
-            total += res.count;
-        });
-        syncModularToMaster();
-        if (total > 0) {
-            showToast(`Upgraded ${total} weak word(s)`);
-        } else {
-            showToast("No weak words detected");
-        }
+    document.getElementById("btn-copy-negative-opt").addEventListener("click", () => {
+        copyTextToClipboard(negativeOptBox.value, "Negative Prompt");
     });
 
-    document.getElementById("btn-upgrade-perchance").addEventListener("click", () => {
-        let total = 0;
-        ["character", "outfit", "scene", "style"].forEach((k) => {
-            const res = PromptEngine.upgradeWeakWordsInText(boxes[k].value, true);
-            boxes[k].value = res.text;
-            total += res.count;
-        });
-        syncModularToMaster();
-        if (total > 0) {
-            showToast(`Upgraded ${total} term(s) to {a|b} choices`);
-        } else {
-            showToast("No weak words detected");
-        }
-    });
-
-    document.getElementById("btn-wrap-choice").addEventListener("click", () => {
-        const start = masterBox.selectionStart;
-        const end = masterBox.selectionEnd;
-        const full = masterBox.value;
-        if (start === end) {
-            showToast("Select text inside Full Prompt first");
-            return;
-        }
-        const selected = full.slice(start, end).trim();
-        const parts = selected.split(",").map((s) => s.trim()).filter(Boolean);
-        const wrapped = parts.length > 1 ? `{${parts.join("|")}}` : `{${selected}|variant}`;
-        masterBox.value = full.slice(0, start) + wrapped + full.slice(end);
-        showToast(`Wrapped selection: ${wrapped}`);
-    });
-
-    function runRollPreview() {
-        const template = masterBox.value.trim();
-        if (!template) {
-            showToast("Prompt is empty");
-            return;
-        }
-        const rolled = PromptEngine.evaluatePerchanceSyntax(template);
-        rollPreviewOutput.textContent = rolled;
-        rollPreviewContainer.classList.remove("hidden");
+    function resetNegativeToDefault() {
+        boxes.negative.value = PresetManager.DEFAULT_NEGATIVE;
+        negativeOptBox.value = PresetManager.DEFAULT_NEGATIVE;
+        syncSectionsToMaster();
+        showToast("Restored default negative prompt");
     }
 
-    document.getElementById("btn-roll-preview").addEventListener("click", () => {
-        runRollPreview();
-        showToast("Rolled sample prompt");
-    });
-
-    document.getElementById("btn-reroll").addEventListener("click", runRollPreview);
-
-    document.getElementById("btn-copy-roll").addEventListener("click", () => {
-        copyTextToClipboard(rollPreviewOutput.textContent, "Sample Roll");
-    });
-
-    document.getElementById("btn-close-roll").addEventListener("click", () => {
-        rollPreviewContainer.classList.add("hidden");
-    });
-
-    document.getElementById("btn-split-to-boxes").addEventListener("click", () => {
-        const raw = masterBox.value.trim();
-        if (!raw) {
-            showToast("Paste or enter a prompt in Full Prompt first");
-            return;
-        }
-        const split = PromptEngine.parseFullPromptToSections(raw);
-        if (!split.negative && boxes.negative.value) {
-            split.negative = boxes.negative.value;
-        }
-        setSections(split, true);
-        showToast("Split full prompt into modular sections");
-    });
-
-    document.getElementById("btn-reset-negative").addEventListener("click", () => {
-        boxes.negative.value = PresetManager.DEFAULT_NEGATIVE;
-        syncModularToMaster();
-        showToast("Restored default negative prompt");
-    });
+    document.getElementById("btn-reset-negative").addEventListener("click", resetNegativeToDefault);
+    document.getElementById("btn-reset-negative-opt").addEventListener("click", resetNegativeToDefault);
 
     document.getElementById("btn-clear-all").addEventListener("click", () => {
         setSections(
             {
                 character: "",
                 outfit: "",
+                pose: "",
                 scene: "",
                 style: "",
                 negative: PresetManager.DEFAULT_NEGATIVE
             },
             true
         );
-        showToast("Cleared all sections");
-    });
-
-    document.getElementById("btn-export-presets").addEventListener("click", () => {
-        const json = PresetManager.exportAllCustomPresetsJSON();
-        const blob = new Blob([json], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "bychance-presets.json";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast("Exported bychance-presets.json");
-    });
-
-    const importInput = document.getElementById("import-presets-input");
-    document.getElementById("btn-import-presets").addEventListener("click", () => {
-        importInput.click();
-    });
-
-    importInput.addEventListener("change", (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-            try {
-                PresetManager.importCustomPresetsJSON(String(reader.result));
-                renderFullPresetDropdown();
-                renderSectionPresetDropdowns();
-                showToast("Imported custom presets");
-            } catch (err) {
-                showToast("Invalid preset JSON file");
-            }
-        };
-        reader.readAsText(file);
-        importInput.value = "";
+        showToast("Cleared prompt");
     });
 
     // Initialize
     renderFullPresetDropdown();
     renderSectionPresetDropdowns();
-    renderQuickTagChips();
 
     const lastState = PresetManager.loadLastWorkbenchState();
-    if (lastState && (lastState.character || lastState.outfit || lastState.scene || lastState.style)) {
+    if (lastState && (lastState.character || lastState.outfit || lastState.pose || lastState.scene || lastState.style)) {
         setSections(lastState, true);
     } else {
-        const rosalinaPreset = PresetManager.getAllFullPresets()[0];
-        if (rosalinaPreset) {
-            fullPresetSelect.value = rosalinaPreset.id;
-            setSections(rosalinaPreset.sections, true);
+        const defaultPreset = PresetManager.getAllFullPresets()[0];
+        if (defaultPreset) {
+            fullPresetSelect.value = defaultPreset.id;
+            setSections(defaultPreset.sections, true);
         }
     }
 });

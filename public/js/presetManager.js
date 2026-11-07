@@ -7,9 +7,9 @@
 const PresetManager = (() => {
     const STORAGE_KEY_FULL = "bychance_v2_custom_full_presets";
     const STORAGE_KEY_SECTION = "bychance_v2_custom_section_presets";
-    const STORAGE_KEY_LAST_STATE = "bychance_v3_last_workbench_state";
+    const STORAGE_KEY_LAST_STATE = "bychance_v4_last_workbench_state";
 
-    const DEFAULT_NEGATIVE = "3d, photorealistic, realistic photo, lowres, worst quality, low quality, bad anatomy, bad hands, extra digits, fewer digits, blurry, watermark, signature, text, jpeg artifacts, deformed, mutated hands";
+    const DEFAULT_NEGATIVE = "3d, photorealistic, realistic photo, chibi, super deformed, big head, oversized head, lowres, worst quality, low quality, bad anatomy, bad hands, extra digits, fewer digits, blurry, watermark, signature, text, jpeg artifacts, deformed, mutated hands";
 
     // Built-in Full Setup Presets
     const BUILTIN_FULL_PRESETS = [
@@ -18,10 +18,11 @@ const PresetManager = (() => {
             name: "2D Pinup Style (Default)",
             builtin: true,
             sections: {
-                character: "1girl, solo, stylized 2D pinup proportions, curvy figure, wide hips, thick thighs, narrow waist, stylized large head, large expressive eyes, long eyelashes, detailed iris catchlights, expressive facial features",
-                outfit: "confident pinup stance, hand on hip, playful expression, form-fitting stylized outfit, crisp fabric folds",
+                character: "1girl, solo, stylized 2D pinup proportions, curvy figure, wide hips, thick thighs, narrow waist, large expressive eyes, long eyelashes, detailed iris catchlights, expressive facial features",
+                outfit: "form-fitting stylized outfit, crisp fabric folds, intricate material detail",
+                pose: "confident pinup stance, hand on hip, playful expression, looking at viewer",
                 scene: "clean simple studio backdrop, subtle gradient background, soft framing vignette",
-                style: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, large head, curvy, large expressive eyes, bold clean lineart, smooth cel shading, vibrant saturated colors, glossy specular highlights, masterpiece, best quality, highres",
+                style: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy, large expressive eyes, bold clean lineart, smooth cel shading, vibrant saturated colors, glossy specular highlights, masterpiece, best quality, highres",
                 negative: DEFAULT_NEGATIVE
             }
         },
@@ -30,8 +31,9 @@ const PresetManager = (() => {
             name: "Rosalina — Cosmic Observatory",
             builtin: true,
             sections: {
-                character: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, serene regal expression, fair skin",
-                outfit: "graceful floating posture, holding golden star wand, silver tiara crown with jewels, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, accompanied by floating yellow Luma star companion",
+                character: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, fair skin",
+                outfit: "silver tiara crown with jewels, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, golden star wand, floating yellow Luma star companion",
+                pose: "graceful floating posture, serene regal expression, looking at viewer",
                 scene: "Comet Observatory dome terrace, deep cosmic starry night sky, vivid Milky Way nebula, floating stardust motes, luminous crescent moon",
                 style: "masterpiece, best quality, ultra-detailed anime key visual, luminous magical bloom, cinematic cyan rim lighting, intricate iris catchlights, smooth cel shading",
                 negative: DEFAULT_NEGATIVE
@@ -42,8 +44,9 @@ const PresetManager = (() => {
             name: "Princess Zelda — Sacred Ruins",
             builtin: true,
             sections: {
-                character: "Princess Zelda (Legend of Zelda), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes, noble contemplative expression",
-                outfit: "poised standing stance, hands clasped in prayer, ornate royal blue and white Hylian ceremonial gown, gold Triforce embroidery, decorative shoulder pauldrons, golden belt",
+                character: "Princess Zelda (Legend of Zelda), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes",
+                outfit: "ornate royal blue and white Hylian ceremonial gown, gold Triforce embroidery, decorative shoulder pauldrons, golden belt",
+                pose: "poised standing stance, hands clasped in prayer, noble contemplative expression",
                 scene: "ancient moss-covered Temple of Time ruins, glowing blue Silent Princess flowers in foreground, shafts of warm golden sunlight filtering through stone arches",
                 style: "masterpiece, best quality, painterly fantasy anime illustration, volumetric god rays, rich atmospheric color grading, crisp lineart",
                 negative: DEFAULT_NEGATIVE
@@ -54,8 +57,9 @@ const PresetManager = (() => {
             name: "Frieren — Twilight Flower Field",
             builtin: true,
             sections: {
-                character: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in long twin tails, long pointed elf ears, calm emerald green eyes, gentle nostalgic smile",
-                outfit: "seated gracefully in flower meadow, holding red-gemmed golden mage staff, white and gold-trimmed capelet over white tunic, striped scarf, black skirt, brown leather boots, red dangling earrings",
+                character: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in long twin tails, long pointed elf ears, calm emerald green eyes",
+                outfit: "white and gold-trimmed capelet over white tunic, striped scarf, black skirt, brown leather boots, red-gemmed golden mage staff, red dangling earrings",
+                pose: "seated gracefully in flower meadow, gentle nostalgic smile, looking at viewer",
                 scene: "vast meadow of glowing blue-moon weed flowers at twilight dusk, shooting stars across indigo sky, fireflies, gentle breeze",
                 style: "masterpiece, best quality, delicate watercolor anime aesthetic, soft magical bioluminescent lighting, shallow depth of field, expressive lineweight",
                 negative: DEFAULT_NEGATIVE
@@ -66,8 +70,9 @@ const PresetManager = (() => {
             name: "2B — Post-Apocalyptic Cathedral",
             builtin: true,
             sections: {
-                character: "2B (NieR:Automata), YoRHa No.2 Type B, 1girl, solo, short silver-white bob hair, bangs, black combat visor blindfold over eyes, beauty mark under lip, stoic expression",
-                outfit: "dynamic combat stance, gripping Virtuous Contract katana, black Gothic lolita combat dress, high-slit velvet skirt with silver embroidery, puff sleeves with feather trim, black thigh-high boots",
+                character: "2B (NieR:Automata), YoRHa No.2 Type B, 1girl, solo, short silver-white bob hair, bangs, black combat visor blindfold over eyes, beauty mark under lip",
+                outfit: "black Gothic lolita combat dress, high-slit velvet skirt with silver embroidery, puff sleeves with feather trim, black thigh-high boots, Virtuous Contract katana",
+                pose: "dynamic combat stance, stoic expression, poised readiness",
                 scene: "sunlit overgrown city cathedral ruins, crumbling concrete pillars, white Lunar Tear flowers, floating dust motes in light beams",
                 style: "masterpiece, best quality, atmospheric dark sci-fi illustration, dramatic chiaroscuro lighting, intricate velvet and metallic textures, 85mm portrait framing",
                 negative: DEFAULT_NEGATIVE
@@ -78,8 +83,9 @@ const PresetManager = (() => {
             name: "Samus Aran — Starship Bridge",
             builtin: true,
             sections: {
-                character: "Samus Aran (Metroid), 1girl, solo, tall athletic figure, long golden blonde hair in high ponytail, piercing ice-blue eyes, beauty mark under left eye, confident gaze",
-                outfit: "confident contrapposto stance, hand on hip, sleek glowing blue Zero Suit bodysuit, subtle hexagonal panel texture, glowing pink chest insignia, metallic Paralyzer pistol holstered",
+                character: "Samus Aran (Metroid), 1girl, solo, tall athletic figure, long golden blonde hair in high ponytail, piercing ice-blue eyes, beauty mark under left eye",
+                outfit: "sleek glowing blue Zero Suit bodysuit, subtle hexagonal panel texture, glowing pink chest insignia, metallic Paralyzer pistol holstered",
+                pose: "confident contrapposto stance, hand on hip, confident gaze",
                 scene: "high-tech galactic starship command bridge, glowing cyan holographic star map projections, deep space viewport with nebula",
                 style: "masterpiece, best quality, sleek sci-fi anime key visual, glossy specular highlights, neon cyan and magenta rim lighting, sharp focus",
                 negative: DEFAULT_NEGATIVE
@@ -90,8 +96,9 @@ const PresetManager = (() => {
             name: "Hatsune Miku — Holographic Concert",
             builtin: true,
             sections: {
-                character: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails, bright turquoise eyes, joyful beaming smile, sparkling eye catchlights",
-                outfit: "dynamic singing pose reaching toward viewer, sleeveless grey futuristic collared top with turquoise tie, black detached arm warmers with glowing equalizer graphics, pleated black miniskirt, square hair ribbons",
+                character: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails, bright turquoise eyes, sparkling eye catchlights",
+                outfit: "sleeveless grey futuristic collared top with turquoise tie, black detached arm warmers with glowing equalizer graphics, pleated black miniskirt, square hair ribbons",
+                pose: "dynamic singing pose reaching toward viewer, joyful beaming smile",
                 scene: "futuristic holographic concert stage, floating cyan musical notes, laser light beams, bokeh stage lights",
                 style: "masterpiece, best quality, vibrant modern anime illustration, high-contrast neon bloom, crisp linework, dynamic low angle shot",
                 negative: DEFAULT_NEGATIVE
@@ -103,7 +110,8 @@ const PresetManager = (() => {
             builtin: true,
             sections: {
                 character: "1girl, solo, {silver-white|platinum blonde|midnight black|crimson} hair, {windswept hair|long braided hair|twin tails}, {emerald green|sapphire blue|amber gold} eyes, detailed iris catchlights",
-                outfit: "{graceful standing pose|dynamic spellcasting stance|looking back over shoulder}, {ornate royal mage robe with gold filigree|engraved silver valkyrie plate armor|stylish traveller cloak and leather tunic}",
+                outfit: "{ornate royal mage robe with gold filigree|engraved silver valkyrie plate armor|stylish traveller cloak and leather tunic}",
+                pose: "{graceful standing pose|dynamic spellcasting stance|looking back over shoulder}, poised posture",
                 scene: "{ancient floating sky citadel at sunset|enchanted bioluminescent forest glade at night|grand gothic library with floating grimoires}",
                 style: "masterpiece, best quality, {modern anime key visual, vibrant cel shading|painterly fantasy concept art, rich brushwork}, cinematic rim lighting, volumetric god rays",
                 negative: DEFAULT_NEGATIVE
@@ -117,27 +125,27 @@ const PresetManager = (() => {
             {
                 id: "char_2d_pinup",
                 name: "2D Pinup Proportions (Curvy / Expressive)",
-                value: "1girl, solo, stylized 2D pinup proportions, curvy figure, wide hips, thick thighs, narrow waist, stylized large head, large expressive eyes, long eyelashes, detailed iris catchlights, expressive facial features"
+                value: "1girl, solo, stylized 2D pinup proportions, curvy figure, wide hips, thick thighs, narrow waist, large expressive eyes, long eyelashes, detailed iris catchlights, expressive facial features"
             },
             {
                 id: "char_rosalina",
                 name: "Rosalina (Super Mario)",
-                value: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, serene regal expression, fair skin"
+                value: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, fair skin"
             },
             {
                 id: "char_peach",
                 name: "Princess Peach (Super Mario)",
-                value: "Princess Peach (Super Mario), 1girl, solo, long wavy golden blonde hair, sapphire blue eyes, sweet royal smile, rosy cheeks"
+                value: "Princess Peach (Super Mario), 1girl, solo, long wavy golden blonde hair, sapphire blue eyes, rosy cheeks"
             },
             {
                 id: "char_zelda",
                 name: "Princess Zelda (Legend of Zelda)",
-                value: "Princess Zelda (Legend of Zelda), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes, noble expression"
+                value: "Princess Zelda (Legend of Zelda), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes"
             },
             {
                 id: "char_frieren",
                 name: "Frieren (Sousou no Frieren)",
-                value: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in long twin tails, long pointed elf ears, calm green eyes, gentle nostalgic expression"
+                value: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in long twin tails, long pointed elf ears, calm green eyes"
             },
             {
                 id: "char_2b",
@@ -152,54 +160,81 @@ const PresetManager = (() => {
             {
                 id: "char_miku",
                 name: "Hatsune Miku (Vocaloid)",
-                value: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails, bright turquoise eyes, cheerful energetic smile"
+                value: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails, bright turquoise eyes"
             },
             {
                 id: "char_tifa",
                 name: "Tifa Lockhart (FFVII)",
-                value: "Tifa Lockhart (Final Fantasy VII), 1girl, solo, long dark brown hair with dolphin-tail tips, warm wine-red eyes, athletic toned physique, confident smile"
+                value: "Tifa Lockhart (Final Fantasy VII), 1girl, solo, long dark brown hair with dolphin-tail tips, warm wine-red eyes, athletic toned physique"
             },
             {
                 id: "char_custom_elf",
                 name: "Ethereal High Elf Archetype",
-                value: "1girl, solo, ethereal high elf, waist-length iridescent silver hair, long pointed elf ears, luminous violet eyes, delicate eyelashes, serene expression"
+                value: "1girl, solo, ethereal high elf, waist-length iridescent silver hair, long pointed elf ears, luminous violet eyes, delicate eyelashes"
             }
         ],
         outfit: [
             {
                 id: "out_rosalina_gown",
                 name: "Rosalina's Turquoise Gown & Luma",
-                value: "graceful floating posture, holding golden star wand, silver tiara crown, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, floating yellow Luma companion"
+                value: "silver tiara crown, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, golden star wand, floating yellow Luma companion"
             },
             {
                 id: "out_cozy_cafe",
-                name: "Cozy Autumn Sweater & Coffee",
-                value: "seated at wooden table, holding warm ceramic coffee mug with both hands, gentle smile, oversized cream cable-knit sweater, plaid pleated skirt, warm scarf"
+                name: "Cozy Autumn Sweater & Scarf",
+                value: "oversized cream cable-knit sweater, plaid pleated skirt, warm knit scarf, holding ceramic coffee mug"
             },
             {
                 id: "out_cyber_techwear",
                 name: "Cyberpunk Neon Techwear & Katana",
-                value: "confident standing pose, looking back over shoulder, sleek matte-black futuristic techwear jacket, glowing cyan neon collar trim, tactical utility straps, fingerless gloves, holographic katana"
+                value: "sleek matte-black futuristic techwear jacket, glowing cyan neon collar trim, tactical utility straps, fingerless gloves, holographic katana"
             },
             {
                 id: "out_royal_ballgown",
                 name: "Opulent Royal Ballgown",
-                value: "poised curtsy stance, looking at viewer, ornate midnight-blue silk ballgown, gold filigree embroidery, layered chiffon skirt, diamond tiara, long white opera gloves"
+                value: "ornate midnight-blue silk ballgown, gold filigree embroidery, layered chiffon skirt, diamond tiara, long white opera gloves"
             },
             {
                 id: "out_valkyrie_armor",
                 name: "Engraved Silver Valkyrie Armor",
-                value: "heroic wind-swept combat stance, holding winged spear, engraved silver filigree plate armor, white feathered cape, gilded pauldrons, battle-ready expression"
+                value: "engraved silver filigree plate armor, white feathered cape, gilded pauldrons, winged spear"
             },
             {
                 id: "out_summer_sundress",
                 name: "Sunlit Summer Sundress & Straw Hat",
-                value: "walking along shoreline, holding wide-brimmed straw sunhat against breeze, joyful laugh, flowing white linen sundress with ribbon, barefoot"
+                value: "flowing white linen sundress with ribbon, wide-brimmed straw sunhat, barefoot"
+            }
+        ],
+        pose: [
+            {
+                id: "pos_pinup_confident",
+                name: "Confident Pinup Stance",
+                value: "confident pinup stance, hand on hip, playful expression, looking at viewer"
             },
             {
-                id: "out_action_spellcaster",
-                name: "Dynamic Arcane Spellcasting Pose",
-                value: "dynamic airborne action pose, foreshortened hand reaching out, casting glowing arcane magic circle, billowing mage cloak, intense focused gaze"
+                id: "pos_graceful_standing",
+                name: "Graceful Contrapposto Stance",
+                value: "graceful contrapposto stance, poised posture, serene warm smile, looking at viewer"
+            },
+            {
+                id: "pos_seated_cozy",
+                name: "Seated Gracefully / Relaxed",
+                value: "seated gracefully, legs crossed, relaxed posture, gentle smile, looking at viewer"
+            },
+            {
+                id: "pos_looking_back",
+                name: "Looking Back Over Shoulder",
+                value: "standing pose, looking back over shoulder at viewer, captivating gaze, windswept motion"
+            },
+            {
+                id: "pos_dynamic_action",
+                name: "Dynamic Action / Combat Stance",
+                value: "dynamic airborne action pose, foreshortened perspective, kinetic motion, intense focused gaze"
+            },
+            {
+                id: "pos_spellcasting",
+                name: "Arcane Spellcasting Pose",
+                value: "dynamic spellcasting stance, hand reaching forward, casting glowing arcane magic circle, focused expression"
             }
         ],
         scene: [
@@ -238,7 +273,7 @@ const PresetManager = (() => {
             {
                 id: "sty_2d_pinup",
                 name: "2D Pinup Style (Default)",
-                value: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, large head, curvy, large expressive eyes, bold clean lineart, smooth cel shading, vibrant saturated colors, glossy specular highlights, masterpiece, best quality, highres"
+                value: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy, large expressive eyes, bold clean lineart, smooth cel shading, vibrant saturated colors, glossy specular highlights, masterpiece, best quality, highres"
             },
             {
                 id: "sty_modern_anime",
@@ -297,11 +332,12 @@ const PresetManager = (() => {
             return {
                 character: parsed.character || [],
                 outfit: parsed.outfit || [],
+                pose: parsed.pose || [],
                 scene: parsed.scene || [],
                 style: parsed.style || []
             };
         } catch (e) {
-            return { character: [], outfit: [], scene: [], style: [] };
+            return { character: [], outfit: [], pose: [], scene: [], style: [] };
         }
     }
 
@@ -401,7 +437,7 @@ const PresetManager = (() => {
         }
         if (data.sectionPresets && typeof data.sectionPresets === "object") {
             const currentSec = getCustomSectionPresets();
-            ["character", "outfit", "scene", "style"].forEach((k) => {
+            ["character", "outfit", "pose", "scene", "style"].forEach((k) => {
                 if (Array.isArray(data.sectionPresets[k])) {
                     currentSec[k] = [...(currentSec[k] || []), ...data.sectionPresets[k]];
                 }

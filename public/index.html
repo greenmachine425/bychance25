@@ -3,214 +3,235 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bychance — Perchance Prompt Workbench</title>
+    <title>Bychance — Prompt Optimiser &amp; Splitter</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
     <header class="topbar">
         <div class="topbar-inner">
-            <div class="brand-group">
+            <div class="brand-and-tabs">
                 <h1 class="brand-title">Bychance</h1>
-                <p class="brand-subtitle">Perchance Prompting Workbench</p>
+                <div class="mode-switcher" role="tablist" aria-label="Tool Mode">
+                    <button
+                        id="tab-optimiser"
+                        class="mode-tab active"
+                        role="tab"
+                        aria-selected="true"
+                        aria-controls="view-optimiser"
+                    >
+                        Prompt Optimiser
+                    </button>
+                    <button
+                        id="tab-splitter"
+                        class="mode-tab"
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="view-splitter"
+                    >
+                        Section Splitter
+                    </button>
+                </div>
             </div>
 
             <div class="preset-toolbar">
-                <label for="full-preset-select" class="toolbar-label">Preset</label>
-                <select id="full-preset-select" class="select-input" style="min-width:220px;" title="Select a full preset"></select>
-                <button id="btn-load-full-preset" class="btn btn-primary">Load</button>
+                <select id="full-preset-select" class="select-input" title="Load a preset"></select>
                 <button id="btn-save-full-preset" class="btn">Save Preset</button>
                 <button id="btn-delete-full-preset" class="btn hidden">Delete</button>
-                <div class="toolbar-divider"></div>
-                <button id="btn-export-presets" class="btn">Export JSON</button>
-                <button id="btn-import-presets" class="btn">Import JSON</button>
-                <input type="file" id="import-presets-input" accept=".json" class="hidden" />
-                <button id="btn-clear-all" class="btn">Clear All</button>
+                <button id="btn-clear-all" class="btn">Clear</button>
             </div>
         </div>
     </header>
 
-    <main class="workbench-container">
-        <!-- Left Column: Split Modular Sections -->
-        <section class="column-stack" aria-label="Modular Prompt Sections">
-            <!-- 01. Character -->
-            <div class="editor-card" id="card-character">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <span class="section-index">01</span>
-                        <h2 class="card-title">Character &amp; Subject</h2>
-                        <span class="card-hint">Identity, hair, eyes, facial traits</span>
-                    </div>
-                    <div class="card-controls">
-                        <select id="preset-select-character" class="select-input"></select>
-                        <button class="btn" data-save-section="character">Save</button>
-                        <button class="btn hidden" id="del-section-character" data-delete-section="character">Delete</button>
-                        <button class="btn" data-upgrade-section="character">Upgrade Words</button>
-                        <button class="btn" data-expand-box="box-character">Expand</button>
-                    </div>
-                </div>
-                <textarea
-                    id="box-character"
-                    class="prompt-textarea"
-                    placeholder="Character name (e.g. Rosalina, Zelda, Frieren, 2B) or subject traits (1girl, solo, silver hair, emerald eyes)..."
-                ></textarea>
-                <div class="chip-row" id="chips-character"></div>
-            </div>
-
-            <!-- 02. Pose & Outfit -->
-            <div class="editor-card" id="card-outfit">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <span class="section-index">02</span>
-                        <h2 class="card-title">Pose, Outfit &amp; Action</h2>
-                        <span class="card-hint">Stance, expression, clothing, props</span>
-                    </div>
-                    <div class="card-controls">
-                        <select id="preset-select-outfit" class="select-input"></select>
-                        <button class="btn" data-save-section="outfit">Save</button>
-                        <button class="btn hidden" id="del-section-outfit" data-delete-section="outfit">Delete</button>
-                        <button class="btn" data-upgrade-section="outfit">Upgrade Words</button>
-                        <button class="btn" data-expand-box="box-outfit">Expand</button>
-                    </div>
-                </div>
-                <textarea
-                    id="box-outfit"
-                    class="prompt-textarea"
-                    placeholder="Pose, expression, garments, fabrics, accessories..."
-                ></textarea>
-                <div class="chip-row" id="chips-outfit"></div>
-            </div>
-
-            <!-- 03. Scene & Environment -->
-            <div class="editor-card" id="card-scene">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <span class="section-index">03</span>
-                        <h2 class="card-title">Scene &amp; Environment</h2>
-                        <span class="card-hint">Setting, architecture, weather, time of day</span>
-                    </div>
-                    <div class="card-controls">
-                        <select id="preset-select-scene" class="select-input"></select>
-                        <button class="btn" data-save-section="scene">Save</button>
-                        <button class="btn hidden" id="del-section-scene" data-delete-section="scene">Delete</button>
-                        <button class="btn" data-upgrade-section="scene">Upgrade Words</button>
-                        <button class="btn" data-expand-box="box-scene">Expand</button>
-                    </div>
-                </div>
-                <textarea
-                    id="box-scene"
-                    class="prompt-textarea"
-                    placeholder="Background setting, atmosphere, weather..."
-                ></textarea>
-                <div class="chip-row" id="chips-scene"></div>
-            </div>
-
-            <!-- 04. Art Style, Camera & Quality -->
-            <div class="editor-card" id="card-style">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <span class="section-index">04</span>
-                        <h2 class="card-title">Art Style, Camera &amp; Lighting</h2>
-                        <span class="card-hint">Medium, framing, lens, lighting, quality tags</span>
-                    </div>
-                    <div class="card-controls">
-                        <select id="preset-select-style" class="select-input"></select>
-                        <button class="btn" data-save-section="style">Save</button>
-                        <button class="btn hidden" id="del-section-style" data-delete-section="style">Delete</button>
-                        <button class="btn" data-upgrade-section="style">Upgrade Words</button>
-                        <button class="btn" data-expand-box="box-style">Expand</button>
-                    </div>
-                </div>
-                <textarea
-                    id="box-style"
-                    class="prompt-textarea"
-                    placeholder="Art style, camera angle, lighting, quality tags..."
-                ></textarea>
-                <div class="chip-row" id="chips-style"></div>
-            </div>
-
-            <!-- 05. Negative Prompt -->
-            <div class="editor-card" id="card-negative">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <span class="section-index">05</span>
-                        <h2 class="card-title">Negative Prompt</h2>
-                        <span class="card-hint">Exclusions</span>
-                    </div>
-                    <div class="card-controls">
-                        <button class="btn" id="btn-reset-negative">Reset Defaults</button>
-                        <button class="btn" data-expand-box="box-negative">Expand</button>
-                    </div>
-                </div>
-                <textarea
-                    id="box-negative"
-                    class="prompt-textarea"
-                    style="min-height:60px;"
-                    placeholder="lowres, worst quality, low quality, bad anatomy, bad hands, blurry, watermark..."
-                ></textarea>
-                <div class="chip-row" id="chips-negative"></div>
-            </div>
-        </section>
-
-        <!-- Right Column: Full Prompt Master Window & Word Upgrader -->
-        <aside class="column-stack" aria-label="Full Prompt and Word Upgrader">
-            <!-- Master Copy-Paste Window -->
+    <main class="main-shell">
+        <!-- VIEW 1: PROMPT OPTIMISER -->
+        <section id="view-optimiser" class="tool-view" role="tabpanel" aria-labelledby="tab-optimiser">
             <div class="editor-card">
                 <div class="card-header">
                     <div class="card-title-group">
-                        <h2 class="card-title">Full Prompt</h2>
-                        <span class="card-hint">Synced with modular sections</span>
+                        <h2 class="card-title">Prompt</h2>
+                        <span class="card-hint">Enter or paste any prompt and press Fix Prompt</span>
                     </div>
                     <div class="card-controls">
-                        <select id="master-format-select" class="select-input">
+                        <select id="master-format-select" class="select-input" title="Output format">
                             <option value="standard">Standard Prompt</option>
                             <option value="with-negative">Prompt + Negative</option>
                             <option value="perchance-list">Perchance List</option>
                         </select>
-                        <button class="btn" data-expand-box="box-master">Expand</button>
                     </div>
                 </div>
 
                 <textarea
                     id="box-master"
                     class="prompt-textarea master-textarea"
-                    placeholder="Assembled full prompt. Paste any prompt here and click 'Split to Sections' to populate the modular editors."
+                    placeholder="Type or paste your prompt here (e.g. 'Rosalina in a cozy cafe', 'a girl in a red dress in a forest at sunset', or full tag lists)..."
                 ></textarea>
 
-                <div class="master-toolbar">
-                    <button id="btn-copy-master" class="btn btn-primary">Copy Prompt</button>
-                    <button id="btn-copy-negative" class="btn">Copy Negative</button>
-                    <button id="btn-upgrade-all" class="btn">Upgrade Weak Words</button>
-                    <button id="btn-upgrade-perchance" class="btn">Upgrade to {a|b}</button>
-                    <button id="btn-wrap-choice" class="btn">Wrap Selection {a|b}</button>
-                    <button id="btn-roll-preview" class="btn">Test Roll</button>
-                    <button id="btn-split-to-boxes" class="btn">Split to Sections</button>
-                </div>
-
-                <div id="roll-preview-container" class="roll-preview-box hidden">
-                    <div class="card-header" style="margin-bottom:4px;">
-                        <span class="card-title" style="font-size:12px;">Sample Roll Output</span>
-                        <div class="card-controls">
-                            <button id="btn-reroll" class="btn btn-sm">Re-Roll</button>
-                            <button id="btn-copy-roll" class="btn btn-sm">Copy</button>
-                            <button id="btn-close-roll" class="btn btn-sm">Close</button>
-                        </div>
-                    </div>
-                    <p id="roll-preview-output" class="roll-preview-text"></p>
+                <div class="action-bar">
+                    <button id="btn-fix-prompt" class="btn btn-primary">Fix Prompt</button>
+                    <button id="btn-fix-perchance" class="btn">Fix as {a|b}</button>
+                    <button id="btn-go-split" class="btn">Split into Sections &rarr;</button>
+                    <div class="spacer"></div>
+                    <button id="btn-copy-master" class="btn">Copy Prompt</button>
                 </div>
             </div>
 
-            <!-- Detected Word & Character Upgrades -->
             <div class="editor-card">
                 <div class="card-header">
                     <div class="card-title-group">
-                        <h2 class="card-title">Suggested Word Upgrades</h2>
-                        <span id="upgrade-count-badge" class="status-count">0</span>
+                        <h2 class="card-title">Negative Prompt</h2>
+                        <span class="card-hint">Standard exclusions</span>
                     </div>
-                    <span class="card-hint">Click to replace weak terms with model tags</span>
+                    <div class="card-controls">
+                        <button id="btn-reset-negative-opt" class="btn">Reset Defaults</button>
+                        <button id="btn-copy-negative-opt" class="btn">Copy Negative</button>
+                    </div>
                 </div>
-                <div id="upgrade-suggestions-list" class="upgrade-list"></div>
+                <textarea
+                    id="box-negative-opt"
+                    class="prompt-textarea negative-textarea"
+                    placeholder="lowres, worst quality, low quality, bad anatomy, bad hands, blurry, watermark..."
+                ></textarea>
             </div>
-        </aside>
+        </section>
+
+        <!-- VIEW 2: SECTION SPLITTER -->
+        <section id="view-splitter" class="tool-view hidden" role="tabpanel" aria-labelledby="tab-splitter">
+            <div class="splitter-bar">
+                <div class="splitter-bar-left">
+                    <button id="btn-go-optimiser" class="btn btn-primary">&larr; Put Back Together (Optimiser)</button>
+                    <button id="btn-fix-all-sections" class="btn">Fix All Sections</button>
+                </div>
+                <div class="splitter-bar-right">
+                    <button id="btn-copy-combined" class="btn">Copy Combined Prompt</button>
+                </div>
+            </div>
+
+            <div class="splitter-grid">
+                <!-- 01. Character -->
+                <div class="editor-card" id="card-character">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="section-index">01</span>
+                            <h2 class="card-title">Character</h2>
+                        </div>
+                        <div class="card-controls">
+                            <select id="preset-select-character" class="select-input"></select>
+                            <button class="btn" data-save-section="character">Save</button>
+                            <button class="btn hidden" id="del-section-character" data-delete-section="character">Delete</button>
+                            <button class="btn" data-upgrade-section="character">Fix</button>
+                        </div>
+                    </div>
+                    <textarea
+                        id="box-character"
+                        class="prompt-textarea"
+                        placeholder="Character name or traits (e.g. Rosalina, 1girl, solo, silver hair, emerald eyes)..."
+                    ></textarea>
+                </div>
+
+                <!-- 02. Outfit -->
+                <div class="editor-card" id="card-outfit">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="section-index">02</span>
+                            <h2 class="card-title">Outfit &amp; Props</h2>
+                        </div>
+                        <div class="card-controls">
+                            <select id="preset-select-outfit" class="select-input"></select>
+                            <button class="btn" data-save-section="outfit">Save</button>
+                            <button class="btn hidden" id="del-section-outfit" data-delete-section="outfit">Delete</button>
+                            <button class="btn" data-upgrade-section="outfit">Fix</button>
+                        </div>
+                    </div>
+                    <textarea
+                        id="box-outfit"
+                        class="prompt-textarea"
+                        placeholder="Clothing, fabrics, armor, accessories, held items..."
+                    ></textarea>
+                </div>
+
+                <!-- 03. Pose -->
+                <div class="editor-card" id="card-pose">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="section-index">03</span>
+                            <h2 class="card-title">Pose &amp; Expression</h2>
+                        </div>
+                        <div class="card-controls">
+                            <select id="preset-select-pose" class="select-input"></select>
+                            <button class="btn" data-save-section="pose">Save</button>
+                            <button class="btn hidden" id="del-section-pose" data-delete-section="pose">Delete</button>
+                            <button class="btn" data-upgrade-section="pose">Fix</button>
+                        </div>
+                    </div>
+                    <textarea
+                        id="box-pose"
+                        class="prompt-textarea"
+                        placeholder="Stance, posture, action, facial expression, gaze..."
+                    ></textarea>
+                </div>
+
+                <!-- 04. Scene -->
+                <div class="editor-card" id="card-scene">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="section-index">04</span>
+                            <h2 class="card-title">Scene &amp; Environment</h2>
+                        </div>
+                        <div class="card-controls">
+                            <select id="preset-select-scene" class="select-input"></select>
+                            <button class="btn" data-save-section="scene">Save</button>
+                            <button class="btn hidden" id="del-section-scene" data-delete-section="scene">Delete</button>
+                            <button class="btn" data-upgrade-section="scene">Fix</button>
+                        </div>
+                    </div>
+                    <textarea
+                        id="box-scene"
+                        class="prompt-textarea"
+                        placeholder="Background setting, architecture, weather, time of day..."
+                    ></textarea>
+                </div>
+
+                <!-- 05. Style -->
+                <div class="editor-card" id="card-style">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="section-index">05</span>
+                            <h2 class="card-title">Style, Camera &amp; Lighting</h2>
+                        </div>
+                        <div class="card-controls">
+                            <select id="preset-select-style" class="select-input"></select>
+                            <button class="btn" data-save-section="style">Save</button>
+                            <button class="btn hidden" id="del-section-style" data-delete-section="style">Delete</button>
+                            <button class="btn" data-upgrade-section="style">Fix</button>
+                        </div>
+                    </div>
+                    <textarea
+                        id="box-style"
+                        class="prompt-textarea"
+                        placeholder="Art style, camera angle, lighting, quality boosters..."
+                    ></textarea>
+                </div>
+
+                <!-- 06. Negative -->
+                <div class="editor-card" id="card-negative">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="section-index">06</span>
+                            <h2 class="card-title">Negative Prompt</h2>
+                        </div>
+                        <div class="card-controls">
+                            <button class="btn" id="btn-reset-negative">Reset Defaults</button>
+                            <button class="btn" id="btn-copy-negative">Copy</button>
+                        </div>
+                    </div>
+                    <textarea
+                        id="box-negative"
+                        class="prompt-textarea"
+                        placeholder="lowres, worst quality, low quality, bad anatomy, bad hands..."
+                    ></textarea>
+                </div>
+            </div>
+        </section>
     </main>
 
     <div id="toast-banner" class="toast-banner" role="status" aria-live="polite"></div>

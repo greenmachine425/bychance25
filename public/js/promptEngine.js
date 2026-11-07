@@ -347,12 +347,12 @@ const PromptEngine = (() => {
             match: /\b(pinup|2d pinup|pin-up)\b/gi,
             label: "2D pinup style",
             category: "Style",
-            primary: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy figure, stylized large head, large expressive eyes, bold clean lineart, smooth cel shading, vibrant colors",
+            primary: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy figure, large expressive eyes, bold clean lineart, smooth cel shading, vibrant colors",
             alternatives: [
-                "stylized 2D pinup proportions, exaggerated hourglass silhouette, wide hips, thick thighs, large expressive eyes, crisp ink lineart, glossy cel shading",
-                "modern 2D cartoon pinup aesthetic, curvy stylized anatomy, large head proportion, expressive eyes, clean vector-style linework"
+                "stylized 2D pinup proportions, hourglass silhouette, wide hips, thick thighs, large expressive eyes, crisp ink lineart, glossy cel shading",
+                "modern 2D cartoon pinup aesthetic, curvy stylized anatomy, expressive eyes, clean vector-style linework"
             ],
-            perchance: "{2D pinup illustration style, wide hips, thick thighs, curvy, stylized large head, large expressive eyes, bold lineart|stylized 2D pinup aesthetic, exaggerated curvy proportions, glossy cel shading}"
+            perchance: "{2D pinup illustration style, wide hips, thick thighs, curvy, large expressive eyes, bold lineart|stylized 2D pinup aesthetic, curvy proportions, glossy cel shading}"
         },
         {
             match: /\b(anime|anime style)\b/gi,
@@ -369,12 +369,122 @@ const PromptEngine = (() => {
             match: /\b(realistic|photorealistic)\b/gi,
             label: "realistic / photorealistic",
             category: "Style",
-            primary: "photorealistic RAW photo, 85mm f/1.4 DSLR, natural skin pores, subsurface scattering, film grain",
+            primary: "photorealistic RAW photo, 85mm f/1.4 DSLR, natural skin texture, subsurface scattering, film grain",
             alternatives: [
                 "cinematic 35mm film still, Kodak Portra 400 color grading, lifelike textures",
                 "hyper-detailed studio portrait photography, physically accurate lighting"
             ],
             perchance: "{photorealistic RAW photo, 85mm DSLR, subsurface scattering|cinematic 35mm film still, Kodak Portra 400}"
+        },
+        {
+            match: /\b(cute|pretty|beautiful|gorgeous)\b/gi,
+            label: "cute / pretty / beautiful",
+            category: "Character",
+            primary: "refined facial features, expressive eyes, detailed iris catchlights, soft natural blush",
+            alternatives: [
+                "delicate symmetry, luminous eyes, graceful demeanor",
+                "charming expression, glossy lips, fine eyelashes"
+            ],
+            perchance: "{refined facial features, expressive eyes, detailed catchlights|delicate symmetry, luminous gaze}"
+        },
+        {
+            match: /\b(cool|epic|awesome)\b/gi,
+            label: "cool / epic / awesome",
+            category: "Style",
+            primary: "dramatic composition, high-contrast rim lighting, kinetic energy, striking visual impact",
+            alternatives: [
+                "cinematic framing, atmospheric depth, bold silhouette",
+                "dynamic perspective, volumetric lighting, intense atmosphere"
+            ],
+            perchance: "{dramatic composition, high-contrast rim lighting|cinematic framing, volumetric lighting}"
+        },
+        {
+            match: /\b(magic|magical|spell)\b/gi,
+            label: "magic / spell",
+            category: "Outfit",
+            primary: "swirling arcane energy, glowing runes, luminous particle effects, ethereal aura",
+            alternatives: [
+                "casting radiant spell circle, floating light motes, mystic glow",
+                "crackling elemental energy, bioluminescent mana ribbons"
+            ],
+            perchance: "{swirling arcane energy, glowing runes|radiant spell circle, floating light particles}"
+        },
+        {
+            match: /\b(water|ocean|sea|beach)\b/gi,
+            label: "water / ocean / beach",
+            category: "Scene",
+            primary: "crystal-clear turquoise water, glistening wave crests, caustic light reflections, coastal horizon",
+            alternatives: [
+                "sunlit ocean shoreline, wet sand mirror reflections, sea mist",
+                "tranquil water surface, shimmering ripples, refracted light"
+            ],
+            perchance: "{crystal-clear turquoise water, caustic light reflections|sunlit ocean shoreline, wet sand reflections}"
+        },
+        {
+            match: /\b(rain|raining|rainy)\b/gi,
+            label: "rain / rainy",
+            category: "Scene",
+            primary: "falling rain droplets, wet surface reflections, atmospheric mist, puddles",
+            alternatives: [
+                "heavy downpour, glistening wet textures, Moody overcast sky",
+                "gentle rain shower, water streaks on glass, ambient reflections"
+            ],
+            perchance: "{falling rain droplets, wet surface reflections|gentle rain shower, glistening puddles}"
+        },
+        {
+            match: /\b(fire|flames|burning)\b/gi,
+            label: "fire / flames",
+            category: "Scene",
+            primary: "dancing embers, warm orange rim lighting, flickering flames, rising heat haze",
+            alternatives: [
+                "roaring firelight, glowing sparks, dramatic warm-cool contrast",
+                "swirling flame tongues, floating ash particles, intense illumination"
+            ],
+            perchance: "{dancing embers, warm firelight, glowing sparks|roaring flames, dramatic warm rim lighting}"
+        },
+        {
+            match: /\b(snow|snowing|snowy|winter)\b/gi,
+            label: "snow / winter",
+            category: "Scene",
+            primary: "falling snowflakes, frost-covered surfaces, crisp winter air, soft diffused overcast light",
+            alternatives: [
+                "pristine snowdrifts, visible breath in cold air, icy specular glints",
+                "serene winter landscape, glistening ice crystals, pale blue shadows"
+            ],
+            perchance: "{falling snowflakes, frost-covered surfaces|pristine snowdrifts, glistening ice crystals}"
+        },
+        {
+            match: /\b(sunset|sunrise|golden hour)\b/gi,
+            label: "sunset / sunrise",
+            category: "Scene",
+            primary: "golden hour warm sunlight, long dramatic shadows, glowing amber and violet horizon clouds",
+            alternatives: [
+                "radiant twilight sky, warm backlit rim glow, atmospheric haze",
+                "crimson and gold sunset clouds, soft lens flare, warm color grading"
+            ],
+            perchance: "{golden hour warm sunlight, glowing amber horizon|radiant twilight sky, warm backlit rim glow}"
+        },
+        {
+            match: /\b(running|jumping)\b/gi,
+            label: "running / jumping",
+            category: "Pose",
+            primary: "dynamic mid-motion pose, kinetic energy, windswept motion, foreshortened angle",
+            alternatives: [
+                "agile airborne leap, flowing garments, action framing",
+                "energetic sprint, expressive movement, subtle motion blur"
+            ],
+            perchance: "{dynamic mid-motion pose, kinetic energy|agile airborne leap, flowing movement}"
+        },
+        {
+            match: /\b(sword|blade|weapon)\b/gi,
+            label: "sword / weapon",
+            category: "Outfit",
+            primary: "ornate forged steel blade,sharp metallic reflections, engraved hilt, gleaming edge",
+            alternatives: [
+                "luminous enchanted sword, intricate crossguard, specular steel glint",
+                "masterwork katana, polished edge, dynamic weapon stance"
+            ],
+            perchance: "{ornate forged steel blade, metallic reflections|luminous enchanted sword, engraved hilt}"
         }
     ];
 
@@ -383,57 +493,65 @@ const PromptEngine = (() => {
     const CHARACTER_IDENTIFIERS = {
         "rosalina": {
             name: "Rosalina (Super Mario)",
-            character: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, serene regal expression, fair skin",
-            outfit: "silver tiara crown with jewels, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, long flared dress hem, wand with golden star, accompanied by floating yellow Luma star companion",
+            character: "Rosalina (Super Mario), 1girl, solo, tall slender cosmic princess, platinum blonde hair, long swept bangs covering right eye, bright turquoise cyan eyes, fair skin",
+            outfit: "silver tiara crown with jewels, off-shoulder light turquoise sleeveless gown, white collar trim, silver star brooch on chest, long flared dress hem, golden star wand, floating yellow Luma companion",
+            pose: "graceful floating posture, serene regal expression, looking at viewer",
             scene: "Comet Observatory dome, deep cosmic starry night sky, glowing Milky Way nebula, floating stardust particles, crescent moon",
             style: "masterpiece, best quality, vibrant anime illustration, luminous magical bloom, soft rim lighting, intricate eye catchlights, smooth cel shading"
         },
         "peach": {
             name: "Princess Peach (Super Mario)",
-            character: "Princess Peach (Super Mario), 1girl, solo, long wavy golden blonde hair, sapphire blue eyes, sweet royal smile, rosy cheeks",
+            character: "Princess Peach (Super Mario), 1girl, solo, long wavy golden blonde hair, sapphire blue eyes, rosy cheeks",
             outfit: "gold crown with red and blue jewels, pink puff-sleeve ballgown, darker pink pannier hip drapes, blue oval brooch on chest, long white opera gloves, blue round earrings",
+            pose: "poised royal stance, hands clasped gently, sweet warm smile",
             scene: "sunlit Mushroom Kingdom castle garden, stained glass castle towers in background, floating flower petals",
             style: "masterpiece, best quality, vibrant anime illustration, soft pastel lighting, crisp lineart"
         },
         "zelda": {
             name: "Princess Zelda (Legend of Zelda)",
-            character: "Princess Zelda (Breath of the Wild / Tears of the Kingdom), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes, noble determined expression",
+            character: "Princess Zelda (Breath of the Wild / Tears of the Kingdom), 1girl, solo, long braided golden blonde hair, pointed Hylian ears, bright emerald green eyes",
             outfit: "ornate royal blue and white Hylian ceremonial dress, gold Triforce embroidery, decorative shoulder pauldrons, golden belt",
+            pose: "poised standing stance, noble contemplative expression, looking at viewer",
             scene: "ancient overgrown Temple of Time ruins, Silent Princess glowing blue flowers, sunbeams through stone arches",
             style: "masterpiece, best quality, painterly fantasy anime illustration, golden hour volumetric light, intricate textures"
         },
         "samus": {
             name: "Samus Aran (Metroid)",
-            character: "Samus Aran (Metroid), 1girl, solo, athletic tall figure, long golden blonde hair in high ponytail, piercing ice-blue eyes, beauty mark under left eye, confident expression",
-            outfit: "sleek glowing blue Zero Suit bodysuit, subtle hexagonal tech texture, glowing pink chest insignia, metallic paralyzer pistol in hand",
+            character: "Samus Aran (Metroid), 1girl, solo, athletic tall figure, long golden blonde hair in high ponytail, piercing ice-blue eyes, beauty mark under left eye",
+            outfit: "sleek glowing blue Zero Suit bodysuit, subtle hexagonal tech texture, glowing pink chest insignia, metallic paralyzer pistol",
+            pose: "confident contrapposto stance, hand on hip, focused expression",
             scene: "high-tech galactic starship bridge, holographic star map displays, atmospheric cyan neon rim lighting",
             style: "masterpiece, best quality, sci-fi anime key visual, glossy specular highlights, cinematic contrast"
         },
         "2b": {
             name: "2B (NieR:Automata)",
-            character: "2B (NieR:Automata), YoRHa No.2 Type B, 1girl, solo, short silver-white bob hair, bangs, black combat visor blindfold over eyes, beauty mark under lip, stoic expression",
-            outfit: "black Gothic lolita combat dress, high-slit velvet skirt with silver embroidery, puff sleeves with feather trim, black thigh-high boots, floating Virtuous Contract katana behind back",
+            character: "2B (NieR:Automata), YoRHa No.2 Type B, 1girl, solo, short silver-white bob hair, bangs, black combat visor blindfold over eyes, beauty mark under lip",
+            outfit: "black Gothic lolita combat dress, high-slit velvet skirt with silver embroidery, puff sleeves with feather trim, black thigh-high boots, Virtuous Contract katana",
+            pose: "dynamic combat stance, stoic expression, poised readiness",
             scene: "overgrown post-apocalyptic city ruins, crumbling concrete skyscrapers, shafts of pale sunlight, floating white dust motes",
             style: "masterpiece, best quality, atmospheric dark fantasy sci-fi illustration, delicate fabric textures, rim lighting"
         },
         "frieren": {
             name: "Frieren (Sousou no Frieren)",
-            character: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in twin tails, long pointed elf ears, calm green eyes, peaceful nostalgic expression",
+            character: "Frieren (Sousou no Frieren), 1girl, solo, petite elf mage, silver-white hair in twin tails, long pointed elf ears, calm green eyes",
             outfit: "white and gold-trimmed capelet over white tunic shirt, striped scarf, black skirt, brown leather boots, red-gemmed golden mage staff, dangling red earrings",
+            pose: "seated gracefully, peaceful nostalgic expression, gentle gaze",
             scene: "field of glowing blue-moon weed flowers at twilight, starry dusk sky, gentle breeze",
             style: "masterpiece, best quality, delicate watercolor anime aesthetic, soft magical lighting, expressive linework"
         },
         "miku": {
             name: "Hatsune Miku (Vocaloid)",
-            character: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails reaching knees, bright turquoise eyes, cheerful energetic smile",
+            character: "Hatsune Miku (Vocaloid), 1girl, solo, very long aqua-turquoise twin tails reaching knees, bright turquoise eyes",
             outfit: "sleeveless grey futuristic collared top with turquoise tie, black detached arm warmers with glowing equalizer graphics, pleated black skirt with teal trim, square hair ribbons",
+            pose: "dynamic singing pose reaching toward viewer, cheerful energetic smile",
             scene: "virtual concert stage, floating holographic musical notes, cyan laser beams, glowing crowd silhouettes",
             style: "masterpiece, best quality, vibrant modern anime illustration, luminous neon bloom, sharp focus"
         },
         "tifa": {
             name: "Tifa Lockhart (Final Fantasy VII)",
-            character: "Tifa Lockhart (Final Fantasy VII Remake), 1girl, solo, long dark brown hair with dolphin-tail tips, warm wine-red eyes, athletic toned physique, warm confident smile",
+            character: "Tifa Lockhart (Final Fantasy VII Remake), 1girl, solo, long dark brown hair with dolphin-tail tips, warm wine-red eyes, athletic toned physique",
             outfit: "fitted white cropped tank top, black miniskirt with suspenders, red leather combat gloves with metallic plates, black thigh-high socks, red boots",
+            pose: "confident standing posture, warm confident smile, looking at viewer",
             scene: "Seventh Heaven bar interior, warm amber Edison bulb lighting, wooden counter, neon sign glow",
             style: "masterpiece, best quality, semi-realistic 3D anime rendering, subsurface skin scattering, cinematic depth of field"
         }
@@ -442,7 +560,7 @@ const PromptEngine = (() => {
     // 3. Curated Quick-Add Tag Chips per Section
     const SECTION_QUICK_TAGS = {
         character: [
-            { label: "+ 2D Pinup Proportions", value: "stylized 2D pinup proportions, curvy, wide hips, thick thighs, narrow waist, stylized large head, large expressive eyes" },
+            { label: "+ 2D Pinup Proportions", value: "stylized 2D pinup proportions, curvy, wide hips, thick thighs, narrow waist, large expressive eyes" },
             { label: "+ 1girl, solo", value: "1girl, solo" },
             { label: "+ 1boy, solo", value: "1boy, solo" },
             { label: "+ Expressive Eyes", value: "large expressive eyes, detailed iris texture, sparkling eye catchlights, long eyelashes" },
@@ -469,7 +587,7 @@ const PromptEngine = (() => {
             { label: "+ Perchance Time", value: "{golden hour sunset|starlit midnight|crisp morning sunlight|twilight dusk}" }
         ],
         style: [
-            { label: "+ 2D Pinup Style", value: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy, stylized large head, large expressive eyes, bold clean lineart, smooth cel shading, glossy highlights" },
+            { label: "+ 2D Pinup Style", value: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy, large expressive eyes, bold clean lineart, smooth cel shading, glossy highlights" },
             { label: "+ Masterpiece Boosters", value: "masterpiece, best quality, ultra-detailed, sharp focus, intricate textures" },
             { label: "+ Modern Anime Key Visual", value: "modern anime key visual, vibrant cel shading, crisp lineart, luminous bloom" },
             { label: "+ 90s Retro Cel Anime", value: "1990s retro anime cel aesthetic, hand-painted background, subtle film grain" },
@@ -577,7 +695,7 @@ const PromptEngine = (() => {
 
     // 7. Assemble Modular Sections into a Unified Full Prompt
     function assembleFullPrompt(sections, format = "standard") {
-        const order = ["character", "outfit", "scene", "style"];
+        const order = ["character", "outfit", "pose", "scene", "style"];
         const activeParts = order
             .map((key) => (sections[key] || "").trim().replace(/,+$/, "").trim())
             .filter(Boolean);
@@ -604,18 +722,19 @@ const PromptEngine = (() => {
         return positivePrompt;
     }
 
-    // 8. Parse a Full Pasted Prompt into Modular Sections (Character, Outfit/Pose, Scene, Style, Negative)
+    // 8. Parse a Full Pasted Prompt into Modular Sections (Character, Outfit, Pose, Scene, Style, Negative)
     function parseFullPromptToSections(fullText) {
         const result = {
             character: [],
             outfit: [],
+            pose: [],
             scene: [],
             style: [],
             negative: []
         };
 
         if (!fullText || !fullText.trim()) {
-            return { character: "", outfit: "", scene: "", style: "", negative: "" };
+            return { character: "", outfit: "", pose: "", scene: "", style: "", negative: "" };
         }
 
         // Extract Negative prompt if present
@@ -626,16 +745,39 @@ const PromptEngine = (() => {
             mainText = fullText.slice(0, negMatch.index).trim();
         }
 
-        // Tokenize by comma outside of {...} braces
-        const tokens = splitTopLevelCommas(mainText);
+        // Strip common conversational filler prefixes
+        mainText = mainText
+            .replace(/^(?:please\s+)?(?:can you\s+)?(?:draw|create|generate|make|paint|render|show)\s+(?:me\s+)?(?:a\s+|an\s+)?(?:picture|image|photo|illustration|drawing|art|portrait)\s+of\s+/i, "")
+            .replace(/^(?:a\s+|an\s+)?(?:picture|image|photo|illustration|drawing|art|portrait)\s+of\s+/i, "");
 
-        const styleKeywords = /\b(masterpiece|best quality|highres|absurdres|8k|4k|illustration|anime|cel shading|lineart|concept art|photorealistic|raw photo|dslr|lens|bokeh|depth of field|lighting|rim light|god rays|volumetric|chiaroscuro|bloom|angle|from below|from above|close-up|full body|portrait|shot|film grain|watercolor|oil painting|render|ufotable|shinkai|ghibli)\b/i;
-        const sceneKeywords = /\b(background|sky|night|daylight|sunset|sunrise|twilight|forest|woods|city|street|castle|palace|room|interior|outdoor|observatory|nebula|starry|stars|moon|clouds|rain|snow|mist|fog|ocean|beach|mountain|garden|cafe|ruins|temple|flowers|petals|stardust|horizon|landscape|architecture)\b/i;
-        const outfitPoseKeywords = /\b(dress|gown|skirt|shirt|jacket|coat|sweater|cardigan|armor|suit|bodysuit|gloves|boots|shoes|stockings|thighhighs|crown|tiara|brooch|wand|sword|katana|weapon|staff|scarf|hat|ribbon|earrings|necklace|glasses|visor|blindfold|standing|sitting|seated|pose|stance|walking|running|action|fighting|leaning|crossed|holding|smiling|smile|expression|blush|crying|tears|scowl|glare|looking|gaze)\b/i;
-        const negKeywords = /\b(lowres|worst quality|low quality|bad anatomy|bad hands|extra digits|blurry|watermark|signature|mutated|deformed|ugly|jpeg artifacts)\b/i;
+        // Tokenize by comma outside of {...} braces, and further split long natural-language clauses
+        const rawTokens = splitTopLevelCommas(mainText);
+        const tokens = [];
+        rawTokens.forEach((t) => {
+            if (t.includes("{") || t.split(/\s+/).length <= 4) {
+                tokens.push(t);
+            } else {
+                // Split natural language prepositional clauses into tag-friendly chunks
+                const subParts = t
+                    .replace(/\b(wearing|dressed in|holding|carrying)\b/gi, ", $1")
+                    .replace(/\b(standing|sitting|seated|walking|running|kneeling|floating|leaning|posing)\b/gi, ", $1")
+                    .replace(/\b(in a|in an|in the|inside a|at a|at the|on a|on the|under a|under the|surrounded by|with a background of)\b/gi, ", ")
+                    .replace(/\b(in style of|in the style of|drawn in|rendered in|lit by)\b/gi, ", ")
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+                tokens.push(...subParts);
+            }
+        });
+
+        const styleKeywords = /\b(masterpiece|best quality|highres|absurdres|8k|4k|illustration|anime|pinup|pin-up|cel shading|lineart|concept art|photorealistic|raw photo|dslr|lens|bokeh|depth of field|lighting|rim light|god rays|volumetric|chiaroscuro|bloom|angle|from below|from above|close-up|closeup|full body|portrait|shot|film grain|watercolor|oil painting|render|ufotable|shinkai|ghibli|sharp focus|textures|highlights)\b/i;
+        const sceneKeywords = /\b(background|backdrop|sky|night|daylight|sunset|sunrise|golden hour|twilight|forest|woods|city|street|alley|castle|palace|room|interior|outdoor|observatory|nebula|starry|stars|moon|clouds|rain|rainy|snow|snowy|winter|mist|fog|ocean|sea|water|beach|shore|mountain|garden|meadow|field|cafe|bar|ruins|temple|cathedral|library|stage|bridge|flowers|petals|stardust|horizon|landscape|architecture|window)\b/i;
+        const poseKeywords = /\b(standing|sitting|seated|pose|posing|stance|posture|contrapposto|walking|running|jumping|leaping|action|fighting|combat|spellcasting|leaning|crossed|kneeling|floating|perched|curtsy|stride|smiling|smile|grin|laugh|expression|blush|crying|tears|scowl|glare|looking|gaze|staring|wink|hand on hip|arms|reaching|clasped)\b/i;
+        const outfitKeywords = /\b(wearing|dressed|dress|gown|ballgown|sundress|skirt|miniskirt|shirt|top|blouse|tunic|jacket|coat|sweater|cardigan|armor|pauldrons|suit|bodysuit|techwear|robe|cloak|cape|capelet|gloves|boots|shoes|stockings|thighhighs|socks|crown|tiara|brooch|wand|sword|katana|blade|weapon|spear|staff|pistol|scarf|hat|sunhat|ribbon|earrings|necklace|glasses|visor|blindfold|belt|suspenders|collar|sleeves|fabric|silk|satin|velvet|lace|denim|leather|attire|outfit|clothes|garment|mug|teacup|Luma)\b/i;
+        const negKeywords = /\b(lowres|worst quality|low quality|bad anatomy|bad hands|extra digits|fewer digits|blurry|watermark|signature|mutated|deformed|ugly|jpeg artifacts)\b/i;
 
         tokens.forEach((rawToken) => {
-            const token = rawToken.trim();
+            const token = rawToken.trim().replace(/^(?:a|an|the|and|with)\s+/i, "").trim();
             if (!token) return;
 
             if (negKeywords.test(token)) {
@@ -644,8 +786,10 @@ const PromptEngine = (() => {
                 result.style.push(token);
             } else if (sceneKeywords.test(token)) {
                 result.scene.push(token);
-            } else if (outfitPoseKeywords.test(token)) {
+            } else if (outfitKeywords.test(token)) {
                 result.outfit.push(token);
+            } else if (poseKeywords.test(token)) {
+                result.pose.push(token);
             } else {
                 result.character.push(token);
             }
@@ -654,6 +798,7 @@ const PromptEngine = (() => {
         return {
             character: result.character.join(", "),
             outfit: result.outfit.join(", "),
+            pose: result.pose.join(", "),
             scene: result.scene.join(", "),
             style: result.style.join(", "),
             negative: result.negative.join(", ")
@@ -728,6 +873,257 @@ const PromptEngine = (() => {
         return cleanCommaFormatting(output);
     }
 
+    // 10. Comprehensive Deterministic Prompt Improver
+    // Takes either a raw prompt string or a sections object, splits/normalizes it,
+    // upgrades weak words, expands known characters, and enriches sparse sections with high-signal tags.
+    function improvePrompt(input, options = {}) {
+        const usePerchance = Boolean(options.usePerchance);
+        const defaultNegative = options.defaultNegative || "lowres, worst quality, low quality, bad anatomy, bad hands, extra digits, fewer digits, blurry, watermark, signature, text, jpeg artifacts, deformed, mutated hands";
+
+        let sections = {
+            character: "",
+            outfit: "",
+            pose: "",
+            scene: "",
+            style: "",
+            negative: ""
+        };
+
+        if (typeof input === "string") {
+            sections = parseFullPromptToSections(input);
+        } else if (input && typeof input === "object") {
+            sections = {
+                character: (input.character || "").trim(),
+                outfit: (input.outfit || "").trim(),
+                pose: (input.pose || "").trim(),
+                scene: (input.scene || "").trim(),
+                style: (input.style || "").trim(),
+                negative: (input.negative || "").trim()
+            };
+            // If all modular tokens are crammed into character (e.g. unsplit paste), re-parse across sections
+            if (sections.character && !sections.outfit && !sections.pose && !sections.scene && !sections.style && sections.character.includes(",")) {
+                const parsed = parseFullPromptToSections(sections.character);
+                sections.character = parsed.character;
+                sections.outfit = parsed.outfit;
+                sections.pose = parsed.pose;
+                sections.scene = parsed.scene;
+                sections.style = parsed.style;
+                if (!sections.negative && parsed.negative) {
+                    sections.negative = parsed.negative;
+                }
+            }
+        }
+
+        let totalChanges = 0;
+        const appliedNotes = [];
+
+        const combinedInitial = [sections.character, sections.outfit, sections.pose, sections.scene, sections.style].join(" ");
+
+        // Step A: Expand recognizable character profiles across sections if present
+        Object.keys(CHARACTER_IDENTIFIERS).forEach((key) => {
+            const profile = CHARACTER_IDENTIFIERS[key];
+            const regex = new RegExp(`\\b${key}\\b`, "i");
+            if (regex.test(combinedInitial)) {
+                if (!sections.character.toLowerCase().includes(profile.character.slice(0, 28).toLowerCase())) {
+                    const replaceReg = new RegExp(`\\b${key}\\b`, "gi");
+                    if (replaceReg.test(sections.character)) {
+                        sections.character = cleanCommaFormatting(sections.character.replace(replaceReg, profile.character));
+                    } else {
+                        sections.character = cleanCommaFormatting(`${profile.character}, ${sections.character}`);
+                    }
+                    totalChanges++;
+                    appliedNotes.push(`Expanded ${profile.name}`);
+                }
+                if (!sections.outfit.trim()) {
+                    sections.outfit = profile.outfit;
+                    totalChanges++;
+                }
+                if (!sections.pose.trim() && profile.pose) {
+                    sections.pose = profile.pose;
+                    totalChanges++;
+                }
+                if (!sections.scene.trim()) {
+                    sections.scene = profile.scene;
+                    totalChanges++;
+                }
+                if (!sections.style.trim()) {
+                    sections.style = profile.style;
+                    totalChanges++;
+                }
+            }
+        });
+
+        // Step B: Normalize common subject nouns in character section
+        if (sections.character) {
+            if (/\b(girl|woman|female|lady|princess|heroine|maiden|witch|sorceress)\b/i.test(sections.character) && !/\b1girl\b/i.test(sections.character)) {
+                sections.character = cleanCommaFormatting(`1girl, solo, ${sections.character.replace(/\b(a|an|the)\s+(girl|woman|female|lady)\b/gi, "$2")}`);
+                totalChanges++;
+            } else if (/\b(boy|man|male|guy|prince|warrior)\b/i.test(sections.character) && !/\b1boy\b/i.test(sections.character)) {
+                sections.character = cleanCommaFormatting(`1boy, solo, ${sections.character.replace(/\b(a|an|the)\s+(boy|man|male|guy)\b/gi, "$2")}`);
+                totalChanges++;
+            }
+        }
+
+        // Step C: Upgrade weak/vague words in each section
+        ["character", "outfit", "pose", "scene", "style"].forEach((k) => {
+            if (!sections[k]) return;
+            const res = upgradeWeakWordsInText(sections[k], usePerchance);
+            if (res.count > 0) {
+                sections[k] = res.text;
+                totalChanges += res.count;
+            }
+        });
+
+        // Step D: Enrich sparse or missing sections with high-signal descriptors
+        // 1. Character enrichment
+        if (!sections.character.trim()) {
+            sections.character = usePerchance
+                ? "1girl, solo, {platinum blonde|silver-white|midnight black} hair, {emerald green|sapphire blue|amber} eyes, detailed iris catchlights, expressive facial features"
+                : "1girl, solo, expressive eyes, detailed iris catchlights, refined facial features";
+            totalChanges++;
+            appliedNotes.push("Added subject foundation");
+        } else if (!/\b(catchlights|iris|expressive eyes|facial features)\b/i.test(sections.character)) {
+            const booster = usePerchance
+                ? "{large expressive eyes, detailed iris catchlights|luminous eyes, long eyelashes, refined facial features}"
+                : "expressive eyes, detailed iris catchlights, refined facial features";
+            sections.character = cleanCommaFormatting(`${sections.character}, ${booster}`);
+            totalChanges++;
+            appliedNotes.push("Enhanced character details");
+        }
+
+        // 2. Outfit enrichment
+        if (sections.outfit) {
+            sections.outfit = cleanCommaFormatting(sections.outfit.replace(/\b(?:wearing|dressed in)\s+(?:a\s+|an\s+)?/gi, ""));
+        }
+        if (!sections.outfit.trim()) {
+            sections.outfit = usePerchance
+                ? "{detailed tailored attire, crisp fabric folds|ornate garment, intricate material textures}"
+                : "detailed attire, crisp fabric folds, intricate material textures";
+            totalChanges++;
+            appliedNotes.push("Added outfit detail");
+        } else if (!/\b(folds|texture|textures|fabric|silk|satin|leather|steel|trim|embroidery)\b/i.test(sections.outfit)) {
+            sections.outfit = cleanCommaFormatting(`${sections.outfit}, realistic fabric folds`);
+            totalChanges++;
+        }
+
+        // 3. Pose & Expression enrichment
+        if (!sections.pose.trim()) {
+            sections.pose = usePerchance
+                ? "{graceful contrapposto stance, looking at viewer|confident standing pose, hand on hip|poised posture, looking back over shoulder}"
+                : "graceful contrapposto stance, poised posture, looking at viewer";
+            totalChanges++;
+            appliedNotes.push("Added pose & expression");
+        } else if (!/\b(looking|gaze|viewer|expression|smile|glare|eyes)\b/i.test(sections.pose)) {
+            sections.pose = cleanCommaFormatting(`${sections.pose}, looking at viewer`);
+            totalChanges++;
+        }
+
+        // 4. Scene & Environment enrichment
+        if (!sections.scene.trim()) {
+            sections.scene = usePerchance
+                ? "{clean atmospheric backdrop, soft depth of field|scenic environment, ambient floating light motes, subtle vignette}"
+                : "atmospheric backdrop, subtle depth of field, ambient light motes";
+            totalChanges++;
+            appliedNotes.push("Added scene atmosphere");
+        } else if (!/\b(depth|atmosphere|atmospheric|motes|particles|reflections|sunbeams|bokeh|mist|shadows|lighting)\b/i.test(sections.scene)) {
+            const sceneBooster = usePerchance
+                ? "{atmospheric depth, floating light motes|rich environmental detail, soft background bokeh}"
+                : "atmospheric depth, rich environmental detail";
+            sections.scene = cleanCommaFormatting(`${sections.scene}, ${sceneBooster}`);
+            totalChanges++;
+            appliedNotes.push("Enhanced scene depth");
+        }
+
+        // 5. Art Style, Camera & Quality enrichment
+        if (!sections.style.trim()) {
+            sections.style = usePerchance
+                ? "masterpiece, best quality, ultra-detailed, {vibrant 2D illustration, bold clean lineart, smooth cel shading|modern anime key visual, luminous bloom}, cinematic rim lighting, sharp focus, highres"
+                : "masterpiece, best quality, ultra-detailed, vibrant 2D illustration, bold clean lineart, smooth cel shading, cinematic rim lighting, glossy specular highlights, sharp focus, highres";
+            totalChanges++;
+            appliedNotes.push("Added quality, lighting & style tags");
+        } else {
+            if (!/\b(masterpiece|best quality|ultra-detailed|highres|absurdres)\b/i.test(sections.style)) {
+                sections.style = cleanCommaFormatting(`masterpiece, best quality, ultra-detailed, highres, ${sections.style}`);
+                totalChanges++;
+                appliedNotes.push("Added quality boosters");
+            }
+            if (!/\b(lighting|light|god rays|chiaroscuro|bloom|highlights|subsurface)\b/i.test(sections.style)) {
+                const lightBooster = usePerchance
+                    ? "{cinematic rim lighting, luminous bloom|volumetric lighting, glossy specular highlights}"
+                    : "cinematic rim lighting, glossy specular highlights";
+                sections.style = cleanCommaFormatting(`${sections.style}, ${lightBooster}`);
+                totalChanges++;
+                appliedNotes.push("Added lighting tags");
+            }
+            if (!/\b(sharp focus|intricate textures|lineart|shading|render|photo)\b/i.test(sections.style)) {
+                sections.style = cleanCommaFormatting(`${sections.style}, sharp focus, intricate textures`);
+                totalChanges++;
+            }
+        }
+
+        // 6. Negative prompt fallback
+        if (!sections.negative.trim()) {
+            sections.negative = defaultNegative;
+        }
+
+        return {
+            sections,
+            count: totalChanges,
+            notes: appliedNotes
+        };
+    }
+
+    // 11. Improve a single modular section in place
+    function improveSingleSection(sectionKey, text, usePerchance = false) {
+        const raw = (text || "").trim();
+        let res = upgradeWeakWordsInText(raw, usePerchance);
+        let updated = res.text;
+        let count = res.count;
+
+        if (sectionKey === "character") {
+            if (updated && /\b(girl|woman|female|lady)\b/i.test(updated) && !/\b1girl\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`1girl, solo, ${updated.replace(/\b(a|an|the)\s+(girl|woman|female|lady)\b/gi, "$2")}`);
+                count++;
+            } else if (updated && /\b(boy|man|male|guy)\b/i.test(updated) && !/\b1boy\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`1boy, solo, ${updated.replace(/\b(a|an|the)\s+(boy|man|male|guy)\b/gi, "$2")}`);
+                count++;
+            }
+            if (updated && !/\b(catchlights|iris|expressive eyes|facial features)\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`${updated}, expressive eyes, detailed iris catchlights, refined facial features`);
+                count++;
+            }
+        } else if (sectionKey === "outfit") {
+            if (updated) {
+                updated = cleanCommaFormatting(updated.replace(/\b(?:wearing|dressed in)\s+(?:a\s+|an\s+)?/gi, ""));
+            }
+            if (updated && !/\b(folds|texture|textures|fabric|silk|satin|leather|steel|trim)\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`${updated}, realistic fabric folds, intricate material detail`);
+                count++;
+            }
+        } else if (sectionKey === "pose") {
+            if (updated && !/\b(stance|pose|posture|looking|gaze|viewer)\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`${updated}, poised posture, looking at viewer`);
+                count++;
+            }
+        } else if (sectionKey === "scene") {
+            if (updated && !/\b(depth|atmosphere|atmospheric|motes|particles|reflections|sunbeams|bokeh|mist)\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`${updated}, atmospheric depth, ambient light motes`);
+                count++;
+            }
+        } else if (sectionKey === "style") {
+            if (updated && !/\b(masterpiece|best quality|ultra-detailed|highres)\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`masterpiece, best quality, ultra-detailed, highres, ${updated}`);
+                count++;
+            }
+            if (updated && !/\b(lighting|light|god rays|chiaroscuro|bloom|highlights)\b/i.test(updated)) {
+                updated = cleanCommaFormatting(`${updated}, cinematic rim lighting, sharp focus`);
+                count++;
+            }
+        }
+
+        return { text: updated, count };
+    }
+
     return {
         WORD_UPGRADES,
         CHARACTER_IDENTIFIERS,
@@ -737,7 +1133,9 @@ const PromptEngine = (() => {
         cleanCommaFormatting,
         assembleFullPrompt,
         parseFullPromptToSections,
-        evaluatePerchanceSyntax
+        evaluatePerchanceSyntax,
+        improvePrompt,
+        improveSingleSection
     };
 })();
 

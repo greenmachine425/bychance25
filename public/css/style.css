@@ -1,4 +1,4 @@
-/* Bychance — Utilitarian Minimalist Workbench Stylesheet */
+/* Bychance — Minimalist Prompt Optimiser & Section Splitter */
 :root {
     --bg-canvas: #f4f4f1;
     --bg-surface: #ffffff;
@@ -11,7 +11,7 @@
     --line-strong: #c8c8c2;
     --accent-ink: #141413;
     --accent-ink-hover: #2c2c2a;
-    --control-h: 32px;
+    --control-h: 34px;
     --radius: 4px;
     --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
@@ -33,7 +33,7 @@ html, body {
     min-height: 100vh;
 }
 
-/* Header Bar */
+/* Header & Mode Switcher */
 .topbar {
     background-color: var(--bg-surface);
     border-bottom: 1px solid var(--line-color);
@@ -44,7 +44,7 @@ html, body {
 }
 
 .topbar-inner {
-    max-width: 1480px;
+    max-width: 1080px;
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
@@ -53,10 +53,11 @@ html, body {
     gap: 16px;
 }
 
-.brand-group {
+.brand-and-tabs {
     display: flex;
-    align-items: baseline;
-    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
 }
 
 .brand-title {
@@ -67,10 +68,36 @@ html, body {
     color: var(--text-main);
 }
 
-.brand-subtitle {
-    font-size: 12px;
+.mode-switcher {
+    display: inline-flex;
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--line-color);
+    border-radius: var(--radius);
+    padding: 2px;
+    gap: 2px;
+}
+
+.mode-tab {
+    height: 30px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 3px;
+    background: transparent;
     color: var(--text-muted);
-    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.mode-tab:hover {
+    color: var(--text-main);
+}
+
+.mode-tab.active {
+    background-color: var(--accent-ink);
+    color: #ffffff;
 }
 
 .preset-toolbar {
@@ -80,50 +107,58 @@ html, body {
     gap: 8px;
 }
 
-.toolbar-label {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-muted);
-    margin-right: 4px;
-}
-
-.toolbar-divider {
-    width: 1px;
-    height: 18px;
-    background-color: var(--line-color);
-    margin: 0 4px;
-}
-
-/* Main Workbench Grid */
-.workbench-container {
-    max-width: 1480px;
+/* Main Workspace Container */
+.main-shell {
+    max-width: 1080px;
     margin: 0 auto;
     padding: 24px;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
-    align-items: start;
 }
 
-@media (min-width: 1040px) {
-    .workbench-container {
-        grid-template-columns: 1.1fr 0.9fr;
-    }
-}
-
-.column-stack {
+.tool-view {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    min-width: 0;
+}
+
+/* Splitter Top Bar & Grid */
+.splitter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--line-color);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+}
+
+.splitter-bar-left,
+.splitter-bar-right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.splitter-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+@media (min-width: 820px) {
+    .splitter-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 /* Section Panels */
 .editor-card {
     background-color: var(--bg-surface);
+    border: 1px solid var(--line-color);
     border-radius: var(--radius);
     padding: 16px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
@@ -149,7 +184,7 @@ html, body {
 }
 
 .card-title {
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 600;
     margin: 0;
     color: var(--text-main);
@@ -167,7 +202,7 @@ html, body {
     gap: 6px;
 }
 
-/* Uniform Form Controls: All selects, inputs, and buttons share exact height & spacing */
+/* Uniform Form Controls */
 .select-input {
     height: var(--control-h);
     background-color: var(--bg-subtle);
@@ -177,9 +212,8 @@ html, body {
     padding: 0 10px;
     font-family: var(--font-sans);
     font-size: 12px;
-    line-height: 30px;
     cursor: pointer;
-    transition: border-color 0.12s ease, background-color 0.12s ease;
+    max-width: 220px;
 }
 
 .select-input:hover {
@@ -197,10 +231,10 @@ html, body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 12px;
+    padding: 0 14px;
     border-radius: var(--radius);
     font-family: var(--font-sans);
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 500;
     border: 1px solid var(--line-color);
     background-color: var(--bg-subtle);
@@ -230,28 +264,20 @@ html, body {
     border-color: var(--accent-ink-hover);
 }
 
-.btn-sm {
-    height: 28px;
-    padding: 0 10px;
-    font-size: 12px;
-}
-
-/* Textareas — Clean, Unclipped, Auto-Growing */
+/* Textareas */
 .prompt-textarea {
     width: 100%;
-    min-height: 76px;
+    min-height: 92px;
     background-color: var(--bg-subtle);
     color: var(--text-main);
     border: 1px solid var(--line-color);
     border-radius: var(--radius);
     padding: 10px 12px;
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 13px;
     line-height: 1.55;
     resize: vertical;
-    overflow-y: auto;
     display: block;
-    transition: border-color 0.12s ease, background-color 0.12s ease;
 }
 
 .prompt-textarea::placeholder {
@@ -265,142 +291,25 @@ html, body {
 }
 
 .prompt-textarea.master-textarea {
-    min-height: 150px;
+    min-height: 170px;
     background-color: var(--bg-surface);
 }
 
-.prompt-textarea.expanded-box {
-    min-height: 260px !important;
+.prompt-textarea.negative-textarea {
+    min-height: 68px;
 }
 
-/* Quick Tag Chips */
-.chip-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 8px;
-}
-
-.tag-chip {
-    height: 24px;
-    display: inline-flex;
-    align-items: center;
-    background-color: transparent;
-    border: 1px solid var(--line-color);
-    color: var(--text-muted);
-    border-radius: var(--radius);
-    padding: 0 8px;
-    font-family: var(--font-sans);
-    font-size: 11.5px;
-    cursor: pointer;
-    transition: all 0.12s ease;
-}
-
-.tag-chip:hover {
-    color: var(--text-main);
-    border-color: var(--line-strong);
-    background-color: var(--bg-subtle);
-}
-
-/* Master Action Bar */
-.master-toolbar {
+/* Action Bar */
+.action-bar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--line-color);
-}
-
-/* Roll Preview Box */
-.roll-preview-box {
+    gap: 8px;
     margin-top: 12px;
-    padding: 12px;
-    border-radius: var(--radius);
-    background-color: var(--bg-subtle);
-    border-left: 2px solid var(--accent-ink);
 }
 
-.roll-preview-text {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--text-main);
-    white-space: pre-wrap;
-    word-break: break-word;
-    margin: 6px 0 0 0;
-}
-
-/* Word Upgrade List & Lookup Table */
-.upgrade-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.upgrade-item {
-    background-color: var(--bg-subtle);
-    border-radius: var(--radius);
-    padding: 10px 12px;
-}
-
-.upgrade-item-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-
-.upgrade-word-badge {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-main);
-}
-
-.upgrade-cat-badge {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-muted);
-}
-
-.upgrade-target-preview {
-    font-family: var(--font-mono);
-    font-size: 11.5px;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    word-break: break-word;
-}
-
-.upgrade-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-/* Dictionary Reference List */
-.dict-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-height: 340px;
-    overflow-y: auto;
-    padding-right: 4px;
-}
-
-.dict-row {
-    background-color: var(--bg-subtle);
-    border-radius: var(--radius);
-    padding: 10px 12px;
-}
-
-.status-count {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-muted);
-    background-color: var(--bg-subtle);
-    padding: 2px 8px;
-    border-radius: var(--radius);
+.spacer {
+    flex: 1;
 }
 
 /* Toast Notification */
