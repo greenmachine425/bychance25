@@ -644,23 +644,6 @@ html, body {
                 </div>
                 <div id="upgrade-suggestions-list" class="upgrade-list"></div>
             </div>
-
-            <!-- Deterministic Tag & Character Lookup -->
-            <div class="editor-card">
-                <div class="card-header">
-                    <div class="card-title-group">
-                        <h2 class="card-title">Tag &amp; Synonym Reference</h2>
-                    </div>
-                    <input
-                        type="search"
-                        id="dict-search-input"
-                        class="select-input"
-                        style="min-width:210px;"
-                        placeholder="Filter terms or characters..."
-                    />
-                </div>
-                <div id="dict-browser-grid" class="dict-grid"></div>
-            </div>
         </aside>
     </main>
 
@@ -1876,8 +1859,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const upgradeSuggestionsList = document.getElementById("upgrade-suggestions-list");
     const upgradeCountBadge = document.getElementById("upgrade-count-badge");
-    const dictSearchInput = document.getElementById("dict-search-input");
-    const dictBrowserGrid = document.getElementById("dict-browser-grid");
 
     const rollPreviewContainer = document.getElementById("roll-preview-container");
     const rollPreviewOutput = document.getElementById("roll-preview-output");
@@ -2182,110 +2163,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function renderDictionaryBrowser(query = "") {
-        const q = query.trim().toLowerCase();
-        dictBrowserGrid.innerHTML = "";
-
-        const categoryToSection = {
-            Character: "character",
-            Expression: "outfit",
-            Pose: "outfit",
-            Outfit: "outfit",
-            Scene: "scene",
-            Lighting: "style",
-            Camera: "style",
-            Style: "style"
-        };
-
-        // 1. Character Profiles
-        Object.keys(PromptEngine.CHARACTER_IDENTIFIERS).forEach((key) => {
-            const prof = PromptEngine.CHARACTER_IDENTIFIERS[key];
-            if (q && !prof.name.toLowerCase().includes(q) && !prof.character.toLowerCase().includes(q)) {
-                return;
-            }
-            const row = document.createElement("div");
-            row.className = "dict-row";
-            row.innerHTML = `
-                <div class="upgrade-item-header">
-                    <span class="upgrade-word-badge">${prof.name}</span>
-                    <span class="upgrade-cat-badge">Character Profile</span>
-                </div>
-                <div class="upgrade-target-preview">${prof.character}</div>
-            `;
-            const btnRow = document.createElement("div");
-            btnRow.className = "upgrade-actions";
-
-            const loadCharBtn = document.createElement("button");
-            loadCharBtn.className = "btn btn-sm";
-            loadCharBtn.textContent = "Set Character";
-            loadCharBtn.addEventListener("click", () => {
-                boxes.character.value = prof.character;
-                syncModularToMaster();
-                showToast(`Set Character to ${prof.name}`);
-            });
-
-            const loadFullCharBtn = document.createElement("button");
-            loadFullCharBtn.className = "btn btn-sm btn-primary";
-            loadFullCharBtn.textContent = "Load Full Profile";
-            loadFullCharBtn.addEventListener("click", () => {
-                boxes.character.value = prof.character;
-                boxes.outfit.value = prof.outfit;
-                boxes.scene.value = prof.scene;
-                boxes.style.value = prof.style;
-                syncModularToMaster();
-                showToast(`Loaded full profile for ${prof.name}`);
-            });
-
-            btnRow.appendChild(loadCharBtn);
-            btnRow.appendChild(loadFullCharBtn);
-            row.appendChild(btnRow);
-            dictBrowserGrid.appendChild(row);
-        });
-
-        // 2. Weak Word -> High-Signal Tag Rules
-        PromptEngine.WORD_UPGRADES.forEach((rule) => {
-            if (
-                q &&
-                !rule.label.toLowerCase().includes(q) &&
-                !rule.primary.toLowerCase().includes(q) &&
-                !rule.category.toLowerCase().includes(q)
-            ) {
-                return;
-            }
-            const targetSection = categoryToSection[rule.category] || "style";
-            const row = document.createElement("div");
-            row.className = "dict-row";
-            row.innerHTML = `
-                <div class="upgrade-item-header">
-                    <span class="upgrade-word-badge">"${rule.label}"</span>
-                    <span class="upgrade-cat-badge">${rule.category} &rarr; ${targetSection}</span>
-                </div>
-                <div class="upgrade-target-preview">${rule.primary}</div>
-            `;
-            const btnRow = document.createElement("div");
-            btnRow.className = "upgrade-actions";
-
-            const addTagBtn = document.createElement("button");
-            addTagBtn.className = "btn btn-sm";
-            addTagBtn.textContent = `Add to ${targetSection}`;
-            addTagBtn.addEventListener("click", () => {
-                appendTokenToBox(targetSection, rule.primary);
-            });
-
-            const addChoiceBtn = document.createElement("button");
-            addChoiceBtn.className = "btn btn-sm";
-            addChoiceBtn.textContent = `Add {a|b} to ${targetSection}`;
-            addChoiceBtn.addEventListener("click", () => {
-                appendTokenToBox(targetSection, rule.perchance);
-            });
-
-            btnRow.appendChild(addTagBtn);
-            btnRow.appendChild(addChoiceBtn);
-            row.appendChild(btnRow);
-            dictBrowserGrid.appendChild(row);
-        });
-    }
-
     async function copyTextToClipboard(text, label) {
         if (!text || !text.trim()) {
             showToast(`Nothing to copy in ${label}`);
@@ -2580,15 +2457,10 @@ document.addEventListener("DOMContentLoaded", () => {
         importInput.value = "";
     });
 
-    dictSearchInput.addEventListener("input", () => {
-        renderDictionaryBrowser(dictSearchInput.value);
-    });
-
     // Initialize
     renderFullPresetDropdown();
     renderSectionPresetDropdowns();
     renderQuickTagChips();
-    renderDictionaryBrowser("");
 
     const lastState = PresetManager.loadLastWorkbenchState();
     if (lastState && (lastState.character || lastState.outfit || lastState.scene || lastState.style)) {
