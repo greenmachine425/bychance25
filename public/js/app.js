@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
-    function setSections(sections, syncMaster = true) {
+    function setSections(sections, syncMaster = true, exactPrompt = "") {
         // Backward compatibility if a saved preset had no separate pose field
         if (sections && !sections.pose && sections.outfit) {
             const parsed = PromptEngine.parseFullPromptToSections(sections.outfit);
@@ -113,6 +113,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (syncMaster) {
             syncSectionsToMaster();
+            if (exactPrompt && (masterFormatSelect.value || "standard") === "standard") {
+                masterBox.value = exactPrompt;
+                refreshUpgradeSuggestions();
+            }
         } else {
             refreshUpgradeSuggestions();
             PresetManager.saveLastWorkbenchState(getCurrentSections());
@@ -520,7 +524,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const all = PresetManager.getAllFullPresets();
         const chosen = all.find((p) => p.id === fullPresetSelect.value);
         if (chosen) {
-            setSections(chosen.sections, true);
+            setSections(chosen.sections, true, chosen.rawPrompt || "");
             showToast(`Loaded ${chosen.name}`);
         }
     });
@@ -664,7 +668,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const defaultPreset = PresetManager.getAllFullPresets()[0];
         if (defaultPreset) {
             fullPresetSelect.value = defaultPreset.id;
-            setSections(defaultPreset.sections, true);
+            setSections(defaultPreset.sections, true, defaultPreset.rawPrompt || "");
         }
     }
 });

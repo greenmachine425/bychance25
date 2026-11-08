@@ -1906,7 +1906,7 @@ window.PromptEngine = PromptEngine;
 const PresetManager = (() => {
     const STORAGE_KEY_FULL = "bychance_v2_custom_full_presets";
     const STORAGE_KEY_SECTION = "bychance_v2_custom_section_presets";
-    const STORAGE_KEY_LAST_STATE = "bychance_v4_last_workbench_state";
+    const STORAGE_KEY_LAST_STATE = "bychance_v5_last_workbench_state";
 
     const DEFAULT_NEGATIVE = "3d, photorealistic, realistic photo, chibi, super deformed, big head, oversized head, lowres, worst quality, low quality, bad anatomy, bad hands, extra digits, fewer digits, blurry, watermark, signature, text, jpeg artifacts, deformed, mutated hands";
 
@@ -1916,12 +1916,13 @@ const PresetManager = (() => {
             id: "full_2d_pinup",
             name: "2D Pinup Style (Default)",
             builtin: true,
+            rawPrompt: "aesthetic 11, anthro art style, zoomorphism character, anthropomorphic in the style of furry art, anthropomorphic animal. aesthetic 11, anthro art style, zoomorphism character, anthropomorphic in the style of furry art, anthropomorphic animal. aesthetic 11, anthro art style, zoomorphism character, anthropomorphic in the style of furry art. Cowboy shot of an adult human woman, extreme exaggerated pin-up figure, 3/4 side angle. Posing with arms raised up behind head, arched back, leaning back slightly. Stylized 2D Disney-anime face: huge expressive bright green anime eyes, friendly sweet smile, winged liner, minimalist dot nose, cute tapered chin, short wavy Monroe blonde hair fading to pink tips, ahoge, black choker. Black spaghetti strap crop tank top, bare midriff, tight grey cotton booty shorts, plain heather grey lounge shorts. Extreme cartoon anatomy, gigantic drooping heavy bust, massive sagging breasts, natural gravity hang, tiny cinched waist, massive flared shelf hips, thick thighs. Bold angular linework in the style of Bruce Timm, AWD, and xaxaxa, flat color fills, stark two-tone cel shading, zero gradients, 1990s animated screencap.",
             sections: {
-                character: "1girl, solo, stylized 2D pinup proportions, curvy figure, wide hips, thick thighs, narrow waist, large expressive eyes, long eyelashes, detailed iris catchlights, expressive facial features",
-                outfit: "form-fitting stylized outfit, crisp fabric folds, intricate material detail",
-                pose: "confident pinup stance, hand on hip, playful expression, looking at viewer",
-                scene: "clean simple studio backdrop, subtle gradient background, soft framing vignette",
-                style: "2D pinup illustration style, stylized 2D character art, wide hips, thick thighs, curvy, large expressive eyes, bold clean lineart, smooth cel shading, vibrant saturated colors, glossy specular highlights, masterpiece, best quality, highres",
+                character: "Stylized 2D Disney-anime face: huge expressive bright green anime eyes, friendly sweet smile, winged liner, minimalist dot nose, cute tapered chin, short wavy Monroe blonde hair fading to pink tips, ahoge, black choker. Extreme cartoon anatomy, gigantic drooping heavy bust, massive sagging breasts, natural gravity hang, tiny cinched waist, massive flared shelf hips, thick thighs.",
+                outfit: "Black spaghetti strap crop tank top, bare midriff, tight grey cotton booty shorts, plain heather grey lounge shorts.",
+                pose: "Cowboy shot of an adult human woman, extreme exaggerated pin-up figure, 3/4 side angle. Posing with arms raised up behind head, arched back, leaning back slightly.",
+                scene: "",
+                style: "aesthetic 11, anthro art style, zoomorphism character, anthropomorphic in the style of furry art, anthropomorphic animal. aesthetic 11, anthro art style, zoomorphism character, anthropomorphic in the style of furry art, anthropomorphic animal. aesthetic 11, anthro art style, zoomorphism character, anthropomorphic in the style of furry art. Bold angular linework in the style of Bruce Timm, AWD, and xaxaxa, flat color fills, stark two-tone cel shading, zero gradients, 1990s animated screencap.",
                 negative: DEFAULT_NEGATIVE
             }
         },
@@ -2457,7 +2458,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
-    function setSections(sections, syncMaster = true) {
+    function setSections(sections, syncMaster = true, exactPrompt = "") {
         // Backward compatibility if a saved preset had no separate pose field
         if (sections && !sections.pose && sections.outfit) {
             const parsed = PromptEngine.parseFullPromptToSections(sections.outfit);
@@ -2479,6 +2480,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (syncMaster) {
             syncSectionsToMaster();
+            if (exactPrompt && (masterFormatSelect.value || "standard") === "standard") {
+                masterBox.value = exactPrompt;
+                refreshUpgradeSuggestions();
+            }
         } else {
             refreshUpgradeSuggestions();
             PresetManager.saveLastWorkbenchState(getCurrentSections());
@@ -2886,7 +2891,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const all = PresetManager.getAllFullPresets();
         const chosen = all.find((p) => p.id === fullPresetSelect.value);
         if (chosen) {
-            setSections(chosen.sections, true);
+            setSections(chosen.sections, true, chosen.rawPrompt || "");
             showToast(`Loaded ${chosen.name}`);
         }
     });
@@ -3030,7 +3035,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const defaultPreset = PresetManager.getAllFullPresets()[0];
         if (defaultPreset) {
             fullPresetSelect.value = defaultPreset.id;
-            setSections(defaultPreset.sections, true);
+            setSections(defaultPreset.sections, true, defaultPreset.rawPrompt || "");
         }
     }
 });
